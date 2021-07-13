@@ -1,0 +1,339 @@
+CF1394229600000_CEM_CC04: RaceResultStart.getWinnerHorses empty
+Empty programfile: CF1394229600000_CEM_CC4.php
+CF1394229600000_CEM_CC05: RaceResultStart.getWinnerHorses empty
+Empty programfile: CF1394229600000_CEM_CC5.php
+CF1394229600000_CEM_CC06: RaceResultStart.getWinnerHorses empty
+Empty programfile: CF1394229600000_CEM_CC6.php
+CF1394229600000_CEM_CC07: RaceResultStart.getWinnerHorses empty
+Empty programfile: CF1394229600000_CEM_CC7.php
+CF1394229600000_CEM_CC08: RaceResultStart.getWinnerHorses empty
+Empty programfile: CF1394229600000_CEM_CC8.php
+CF1394229600000_CEM_CC09: RaceResultStart.getWinnerHorses empty
+Empty programfile: CF1394229600000_CEM_CC9.php
+CF1394229600000_CEM_CC10: RaceResultStart.getWinnerHorses empty
+Empty programfile: CF1394229600000_CEM_CC10.php
+CF1394229600000_CEM_CC11: RaceResultStart.getWinnerHorses empty
+Empty programfile: CF1394229600000_CEM_CC11.php
+CF1394229600000_CEM_CC12: RaceResultStart.getWinnerHorses empty
+Empty programfile: CF1394229600000_CEM_CC12.php
+CF1394229600000_CEM_CC13: RaceResultStart.getWinnerHorses empty
+Empty programfile: CF1394229600000_CEM_CC13.php
+Empty programfile: CF1416520800000_CETK_CC1.php
+Empty programfile: CF1416520800000_CETK_CC2.php
+Empty programfile: CF1416520800000_CETK_CC3.php
+Empty programfile: CF1416520800000_CETK_CC4.php
+Empty programfile: CF1416520800000_CETK_CC5.php
+CF1416520800000_CETK_CC06: RaceResultStart.getWinnerHorses empty
+Empty programfile: CF1416520800000_CETK_CC6.php
+CF1416520800000_CETK_CC07: RaceResultStart.getWinnerHorses empty
+Empty programfile: CF1416520800000_CETK_CC7.php
+CF1416520800000_CETK_CC08: RaceResultStart.getWinnerHorses empty
+Empty programfile: CF1416520800000_CETK_CC8.php
+CF1416520800000_CETK_CC09: RaceResultStart.getWinnerHorses empty
+Empty programfile: CF1416520800000_CETK_CC9.php
+CF1416520800000_CETK_CC10: RaceResultStart.getWinnerHorses empty
+Empty programfile: CF1416520800000_CETK_CC10.php
+CF1416520800000_CETK_CC11: RaceResultStart.getWinnerHorses empty
+Empty programfile: CF1416520800000_CETK_CC11.php
+
+
+java.lang.Exception: CF1424815200000_CEH_CC09
+	at utils.Log.write(Log.java:59)
+	at hippos.RaceProgramStart.insert(RaceProgramStart.java:270)
+	at hippos.io.RaceProgramFile.insert(RaceProgramFile.java:123)
+	at hippos.HarnessApp.parseNewFiles(HarnessApp.java:239)
+	at hippos.HarnessApp.main(HarnessApp.java:346)
+Caused by: java.lang.NullPointerException: Cannot invoke "java.math.BigDecimal.intValue()" because the return value of "hippos.RaceProgramHorse.getHorseProgNumber()" is null
+	at hippos.RaceProgramHorse.getId(RaceProgramHorse.java:759)
+	at hippos.RaceProgramStart.insertHorses(RaceProgramStart.java:327)
+	at hippos.RaceProgramStart.insert(RaceProgramStart.java:263)
+	... 3 more
+CF1508187600000_CET_CC02: RaceResultStart.getWinnerHorses empty
+Empty programfile: CF1508187600000_CET_CC2.php
+CF1508187600000_CET_CC03: RaceResultStart.getWinnerHorses empty
+Empty programfile: CF1508187600000_CET_CC3.php
+CF1508187600000_CET_CC04: RaceResultStart.getWinnerHorses empty
+Empty programfile: CF1508187600000_CET_CC4.php
+CF1508187600000_CET_CC05: RaceResultStart.getWinnerHorses empty
+Empty programfile: CF1508187600000_CET_CC5.php
+CF1508187600000_CET_CC06: RaceResultStart.getWinnerHorses empty
+Empty programfile: CF1508187600000_CET_CC6.php
+CF1508187600000_CET_CC07: RaceResultStart.getWinnerHorses empty
+Empty programfile: CF1508187600000_CET_CC7.php
+CF1508187600000_CET_CC08: RaceResultStart.getWinnerHorses empty
+Empty programfile: CF1508187600000_CET_CC8.php
+CF1508187600000_CET_CC09: RaceResultStart.getWinnerHorses empty
+Empty programfile: CF1508187600000_CET_CC9.php
+CF1508187600000_CET_CC10: RaceResultStart.getWinnerHorses empty
+Empty programfile: CF1508187600000_CET_CC10.php
+RaceProgramHorse.insert - subStarts is empty for CF1517522400000_CEKT_CC02_04
+
+
+java.sql.SQLRecoverableException: IO-virhe: The Network Adapter could not establish the connection
+	at oracle.jdbc.driver.T4CConnection.logon(T4CConnection.java:858)
+	at oracle.jdbc.driver.PhysicalConnection.connect(PhysicalConnection.java:793)
+	at oracle.jdbc.driver.T4CDriverExtension.getConnection(T4CDriverExtension.java:57)
+	at oracle.jdbc.driver.OracleDriver.connect(OracleDriver.java:747)
+	at oracle.jdbc.driver.OracleDriver.connect(OracleDriver.java:562)
+	at java.sql/java.sql.DriverManager.getConnection(DriverManager.java:677)
+	at java.sql/java.sql.DriverManager.getConnection(DriverManager.java:228)
+	at hippos.database.Database.getConnection(Database.java:49)
+	at hippos.HarnessApp.main(HarnessApp.java:305)
+Caused by: oracle.net.ns.NetException: The Network Adapter could not establish the connection
+	at oracle.net.nt.ConnStrategy.execute(ConnStrategy.java:571)
+	at oracle.net.resolver.AddrResolution.resolveAndExecute(AddrResolution.java:548)
+	at oracle.net.ns.NSProtocol.establishConnection(NSProtocol.java:682)
+	at oracle.net.ns.NSProtocol.connect(NSProtocol.java:309)
+	at oracle.jdbc.driver.T4CConnection.connect(T4CConnection.java:1600)
+	at oracle.jdbc.driver.T4CConnection.logon(T4CConnection.java:592)
+	... 8 more
+Caused by: java.io.IOException: Connection refused: connect, socket connect lapse 2062 ms. localhost/0:0:0:0:0:0:0:1 1521 0 2 true
+	at oracle.net.nt.TcpNTAdapter.connect(TcpNTAdapter.java:233)
+	at oracle.net.nt.ConnOption.connect(ConnOption.java:174)
+	at oracle.net.nt.ConnStrategy.execute(ConnStrategy.java:510)
+	... 13 more
+Caused by: java.net.ConnectException: Connection refused: connect
+	at java.base/sun.nio.ch.Net.connect0(Native Method)
+	at java.base/sun.nio.ch.Net.connect(Net.java:574)
+	at java.base/sun.nio.ch.SocketChannelImpl.connect(SocketChannelImpl.java:784)
+	at java.base/java.nio.channels.SocketChannel.open(SocketChannel.java:224)
+	at oracle.net.nt.TimeoutSocketChannel.connect(TimeoutSocketChannel.java:99)
+	at oracle.net.nt.TimeoutSocketChannel.<init>(TimeoutSocketChannel.java:77)
+	at oracle.net.nt.TcpNTAdapter.connect(TcpNTAdapter.java:192)
+	... 15 more
+
+
+java.sql.SQLRecoverableException: IO-virhe: The Network Adapter could not establish the connection
+	at oracle.jdbc.driver.T4CConnection.logon(T4CConnection.java:858)
+	at oracle.jdbc.driver.PhysicalConnection.connect(PhysicalConnection.java:793)
+	at oracle.jdbc.driver.T4CDriverExtension.getConnection(T4CDriverExtension.java:57)
+	at oracle.jdbc.driver.OracleDriver.connect(OracleDriver.java:747)
+	at oracle.jdbc.driver.OracleDriver.connect(OracleDriver.java:562)
+	at java.sql/java.sql.DriverManager.getConnection(DriverManager.java:677)
+	at java.sql/java.sql.DriverManager.getConnection(DriverManager.java:228)
+	at hippos.database.Database.getConnection(Database.java:49)
+	at hippos.HarnessApp.main(HarnessApp.java:305)
+Caused by: oracle.net.ns.NetException: The Network Adapter could not establish the connection
+	at oracle.net.nt.ConnStrategy.execute(ConnStrategy.java:571)
+	at oracle.net.resolver.AddrResolution.resolveAndExecute(AddrResolution.java:548)
+	at oracle.net.ns.NSProtocol.establishConnection(NSProtocol.java:682)
+	at oracle.net.ns.NSProtocol.connect(NSProtocol.java:309)
+	at oracle.jdbc.driver.T4CConnection.connect(T4CConnection.java:1600)
+	at oracle.jdbc.driver.T4CConnection.logon(T4CConnection.java:592)
+	... 8 more
+Caused by: java.io.IOException: Connection refused: connect, socket connect lapse 2046 ms. localhost/0:0:0:0:0:0:0:1 1521 0 2 true
+	at oracle.net.nt.TcpNTAdapter.connect(TcpNTAdapter.java:233)
+	at oracle.net.nt.ConnOption.connect(ConnOption.java:174)
+	at oracle.net.nt.ConnStrategy.execute(ConnStrategy.java:510)
+	... 13 more
+Caused by: java.net.ConnectException: Connection refused: connect
+	at java.base/sun.nio.ch.Net.connect0(Native Method)
+	at java.base/sun.nio.ch.Net.connect(Net.java:574)
+	at java.base/sun.nio.ch.SocketChannelImpl.connect(SocketChannelImpl.java:784)
+	at java.base/java.nio.channels.SocketChannel.open(SocketChannel.java:224)
+	at oracle.net.nt.TimeoutSocketChannel.connect(TimeoutSocketChannel.java:99)
+	at oracle.net.nt.TimeoutSocketChannel.<init>(TimeoutSocketChannel.java:77)
+	at oracle.net.nt.TcpNTAdapter.connect(TcpNTAdapter.java:192)
+	... 15 more
+
+
+java.sql.SQLRecoverableException: IO-virhe: The Network Adapter could not establish the connection
+	at oracle.jdbc.driver.T4CConnection.logon(T4CConnection.java:858)
+	at oracle.jdbc.driver.PhysicalConnection.connect(PhysicalConnection.java:793)
+	at oracle.jdbc.driver.T4CDriverExtension.getConnection(T4CDriverExtension.java:57)
+	at oracle.jdbc.driver.OracleDriver.connect(OracleDriver.java:747)
+	at oracle.jdbc.driver.OracleDriver.connect(OracleDriver.java:562)
+	at java.sql/java.sql.DriverManager.getConnection(DriverManager.java:677)
+	at java.sql/java.sql.DriverManager.getConnection(DriverManager.java:228)
+	at hippos.database.Database.getConnection(Database.java:49)
+	at hippos.HarnessApp.main(HarnessApp.java:305)
+Caused by: oracle.net.ns.NetException: The Network Adapter could not establish the connection
+	at oracle.net.nt.ConnStrategy.execute(ConnStrategy.java:571)
+	at oracle.net.resolver.AddrResolution.resolveAndExecute(AddrResolution.java:548)
+	at oracle.net.ns.NSProtocol.establishConnection(NSProtocol.java:682)
+	at oracle.net.ns.NSProtocol.connect(NSProtocol.java:309)
+	at oracle.jdbc.driver.T4CConnection.connect(T4CConnection.java:1600)
+	at oracle.jdbc.driver.T4CConnection.logon(T4CConnection.java:592)
+	... 8 more
+Caused by: java.io.IOException: Connection refused: connect, socket connect lapse 2046 ms. localhost/0:0:0:0:0:0:0:1 1521 0 2 true
+	at oracle.net.nt.TcpNTAdapter.connect(TcpNTAdapter.java:233)
+	at oracle.net.nt.ConnOption.connect(ConnOption.java:174)
+	at oracle.net.nt.ConnStrategy.execute(ConnStrategy.java:510)
+	... 13 more
+Caused by: java.net.ConnectException: Connection refused: connect
+	at java.base/sun.nio.ch.Net.connect0(Native Method)
+	at java.base/sun.nio.ch.Net.connect(Net.java:574)
+	at java.base/sun.nio.ch.SocketChannelImpl.connect(SocketChannelImpl.java:784)
+	at java.base/java.nio.channels.SocketChannel.open(SocketChannel.java:224)
+	at oracle.net.nt.TimeoutSocketChannel.connect(TimeoutSocketChannel.java:99)
+	at oracle.net.nt.TimeoutSocketChannel.<init>(TimeoutSocketChannel.java:77)
+	at oracle.net.nt.TcpNTAdapter.connect(TcpNTAdapter.java:192)
+	... 15 more
+
+
+java.sql.SQLRecoverableException: IO-virhe: The Network Adapter could not establish the connection
+	at oracle.jdbc.driver.T4CConnection.logon(T4CConnection.java:858)
+	at oracle.jdbc.driver.PhysicalConnection.connect(PhysicalConnection.java:793)
+	at oracle.jdbc.driver.T4CDriverExtension.getConnection(T4CDriverExtension.java:57)
+	at oracle.jdbc.driver.OracleDriver.connect(OracleDriver.java:747)
+	at oracle.jdbc.driver.OracleDriver.connect(OracleDriver.java:562)
+	at java.sql/java.sql.DriverManager.getConnection(DriverManager.java:677)
+	at java.sql/java.sql.DriverManager.getConnection(DriverManager.java:228)
+	at hippos.database.Database.getConnection(Database.java:49)
+	at hippos.HarnessApp.main(HarnessApp.java:305)
+Caused by: oracle.net.ns.NetException: The Network Adapter could not establish the connection
+	at oracle.net.nt.ConnStrategy.execute(ConnStrategy.java:571)
+	at oracle.net.resolver.AddrResolution.resolveAndExecute(AddrResolution.java:548)
+	at oracle.net.ns.NSProtocol.establishConnection(NSProtocol.java:682)
+	at oracle.net.ns.NSProtocol.connect(NSProtocol.java:309)
+	at oracle.jdbc.driver.T4CConnection.connect(T4CConnection.java:1600)
+	at oracle.jdbc.driver.T4CConnection.logon(T4CConnection.java:592)
+	... 8 more
+Caused by: java.io.IOException: Connection refused: connect, socket connect lapse 2063 ms. localhost/0:0:0:0:0:0:0:1 1521 0 2 true
+	at oracle.net.nt.TcpNTAdapter.connect(TcpNTAdapter.java:233)
+	at oracle.net.nt.ConnOption.connect(ConnOption.java:174)
+	at oracle.net.nt.ConnStrategy.execute(ConnStrategy.java:510)
+	... 13 more
+Caused by: java.net.ConnectException: Connection refused: connect
+	at java.base/sun.nio.ch.Net.connect0(Native Method)
+	at java.base/sun.nio.ch.Net.connect(Net.java:574)
+	at java.base/sun.nio.ch.SocketChannelImpl.connect(SocketChannelImpl.java:784)
+	at java.base/java.nio.channels.SocketChannel.open(SocketChannel.java:224)
+	at oracle.net.nt.TimeoutSocketChannel.connect(TimeoutSocketChannel.java:99)
+	at oracle.net.nt.TimeoutSocketChannel.<init>(TimeoutSocketChannel.java:77)
+	at oracle.net.nt.TcpNTAdapter.connect(TcpNTAdapter.java:192)
+	... 15 more
+
+
+java.sql.SQLRecoverableException: IO-virhe: The Network Adapter could not establish the connection
+	at oracle.jdbc.driver.T4CConnection.logon(T4CConnection.java:858)
+	at oracle.jdbc.driver.PhysicalConnection.connect(PhysicalConnection.java:793)
+	at oracle.jdbc.driver.T4CDriverExtension.getConnection(T4CDriverExtension.java:57)
+	at oracle.jdbc.driver.OracleDriver.connect(OracleDriver.java:747)
+	at oracle.jdbc.driver.OracleDriver.connect(OracleDriver.java:562)
+	at java.sql/java.sql.DriverManager.getConnection(DriverManager.java:677)
+	at java.sql/java.sql.DriverManager.getConnection(DriverManager.java:228)
+	at hippos.database.Database.getConnection(Database.java:49)
+	at hippos.HarnessApp.main(HarnessApp.java:305)
+Caused by: oracle.net.ns.NetException: The Network Adapter could not establish the connection
+	at oracle.net.nt.ConnStrategy.execute(ConnStrategy.java:571)
+	at oracle.net.resolver.AddrResolution.resolveAndExecute(AddrResolution.java:548)
+	at oracle.net.ns.NSProtocol.establishConnection(NSProtocol.java:682)
+	at oracle.net.ns.NSProtocol.connect(NSProtocol.java:309)
+	at oracle.jdbc.driver.T4CConnection.connect(T4CConnection.java:1600)
+	at oracle.jdbc.driver.T4CConnection.logon(T4CConnection.java:592)
+	... 8 more
+Caused by: java.io.IOException: Connection refused: connect, socket connect lapse 2062 ms. localhost/0:0:0:0:0:0:0:1 1521 0 2 true
+	at oracle.net.nt.TcpNTAdapter.connect(TcpNTAdapter.java:233)
+	at oracle.net.nt.ConnOption.connect(ConnOption.java:174)
+	at oracle.net.nt.ConnStrategy.execute(ConnStrategy.java:510)
+	... 13 more
+Caused by: java.net.ConnectException: Connection refused: connect
+	at java.base/sun.nio.ch.Net.connect0(Native Method)
+	at java.base/sun.nio.ch.Net.connect(Net.java:574)
+	at java.base/sun.nio.ch.SocketChannelImpl.connect(SocketChannelImpl.java:784)
+	at java.base/java.nio.channels.SocketChannel.open(SocketChannel.java:224)
+	at oracle.net.nt.TimeoutSocketChannel.connect(TimeoutSocketChannel.java:99)
+	at oracle.net.nt.TimeoutSocketChannel.<init>(TimeoutSocketChannel.java:77)
+	at oracle.net.nt.TcpNTAdapter.connect(TcpNTAdapter.java:192)
+	... 15 more
+
+
+java.sql.SQLRecoverableException: IO-virhe: The Network Adapter could not establish the connection
+	at oracle.jdbc.driver.T4CConnection.logon(T4CConnection.java:858)
+	at oracle.jdbc.driver.PhysicalConnection.connect(PhysicalConnection.java:793)
+	at oracle.jdbc.driver.T4CDriverExtension.getConnection(T4CDriverExtension.java:57)
+	at oracle.jdbc.driver.OracleDriver.connect(OracleDriver.java:747)
+	at oracle.jdbc.driver.OracleDriver.connect(OracleDriver.java:562)
+	at java.sql/java.sql.DriverManager.getConnection(DriverManager.java:677)
+	at java.sql/java.sql.DriverManager.getConnection(DriverManager.java:228)
+	at hippos.database.Database.getConnection(Database.java:49)
+	at hippos.HarnessApp.main(HarnessApp.java:305)
+Caused by: oracle.net.ns.NetException: The Network Adapter could not establish the connection
+	at oracle.net.nt.ConnStrategy.execute(ConnStrategy.java:571)
+	at oracle.net.resolver.AddrResolution.resolveAndExecute(AddrResolution.java:548)
+	at oracle.net.ns.NSProtocol.establishConnection(NSProtocol.java:682)
+	at oracle.net.ns.NSProtocol.connect(NSProtocol.java:309)
+	at oracle.jdbc.driver.T4CConnection.connect(T4CConnection.java:1600)
+	at oracle.jdbc.driver.T4CConnection.logon(T4CConnection.java:592)
+	... 8 more
+Caused by: java.io.IOException: Connection refused: connect, socket connect lapse 2062 ms. localhost/0:0:0:0:0:0:0:1 1521 0 2 true
+	at oracle.net.nt.TcpNTAdapter.connect(TcpNTAdapter.java:233)
+	at oracle.net.nt.ConnOption.connect(ConnOption.java:174)
+	at oracle.net.nt.ConnStrategy.execute(ConnStrategy.java:510)
+	... 13 more
+Caused by: java.net.ConnectException: Connection refused: connect
+	at java.base/sun.nio.ch.Net.connect0(Native Method)
+	at java.base/sun.nio.ch.Net.connect(Net.java:574)
+	at java.base/sun.nio.ch.SocketChannelImpl.connect(SocketChannelImpl.java:784)
+	at java.base/java.nio.channels.SocketChannel.open(SocketChannel.java:224)
+	at oracle.net.nt.TimeoutSocketChannel.connect(TimeoutSocketChannel.java:99)
+	at oracle.net.nt.TimeoutSocketChannel.<init>(TimeoutSocketChannel.java:77)
+	at oracle.net.nt.TcpNTAdapter.connect(TcpNTAdapter.java:192)
+	... 15 more
+
+
+java.sql.SQLException: Listener refused the connection with the following error:
+ORA-12505, TNS:listener does not currently know of SID given in connect descriptor
+ 
+	at oracle.jdbc.driver.T4CConnection.logon(T4CConnection.java:858)
+	at oracle.jdbc.driver.PhysicalConnection.connect(PhysicalConnection.java:793)
+	at oracle.jdbc.driver.T4CDriverExtension.getConnection(T4CDriverExtension.java:57)
+	at oracle.jdbc.driver.OracleDriver.connect(OracleDriver.java:747)
+	at oracle.jdbc.driver.OracleDriver.connect(OracleDriver.java:562)
+	at java.sql/java.sql.DriverManager.getConnection(DriverManager.java:677)
+	at java.sql/java.sql.DriverManager.getConnection(DriverManager.java:228)
+	at hippos.database.Database.getConnection(Database.java:49)
+	at hippos.HarnessApp.main(HarnessApp.java:305)
+Caused by: oracle.net.ns.NetException: Listener refused the connection with the following error:
+ORA-12505, TNS:listener does not currently know of SID given in connect descriptor
+ 
+	at oracle.net.ns.NSProtocolNIO.negotiateConnection(NSProtocolNIO.java:284)
+	at oracle.net.ns.NSProtocol.connect(NSProtocol.java:340)
+	at oracle.jdbc.driver.T4CConnection.connect(T4CConnection.java:1600)
+	at oracle.jdbc.driver.T4CConnection.logon(T4CConnection.java:592)
+	... 8 more
+
+
+java.sql.SQLException: Listener refused the connection with the following error:
+ORA-12505, TNS:listener does not currently know of SID given in connect descriptor
+ 
+	at oracle.jdbc.driver.T4CConnection.logon(T4CConnection.java:858)
+	at oracle.jdbc.driver.PhysicalConnection.connect(PhysicalConnection.java:793)
+	at oracle.jdbc.driver.T4CDriverExtension.getConnection(T4CDriverExtension.java:57)
+	at oracle.jdbc.driver.OracleDriver.connect(OracleDriver.java:747)
+	at oracle.jdbc.driver.OracleDriver.connect(OracleDriver.java:562)
+	at java.sql/java.sql.DriverManager.getConnection(DriverManager.java:677)
+	at java.sql/java.sql.DriverManager.getConnection(DriverManager.java:228)
+	at hippos.database.Database.getConnection(Database.java:49)
+	at hippos.HarnessApp.main(HarnessApp.java:305)
+Caused by: oracle.net.ns.NetException: Listener refused the connection with the following error:
+ORA-12505, TNS:listener does not currently know of SID given in connect descriptor
+ 
+	at oracle.net.ns.NSProtocolNIO.negotiateConnection(NSProtocolNIO.java:284)
+	at oracle.net.ns.NSProtocol.connect(NSProtocol.java:340)
+	at oracle.jdbc.driver.T4CConnection.connect(T4CConnection.java:1600)
+	at oracle.jdbc.driver.T4CConnection.logon(T4CConnection.java:592)
+	... 8 more
+
+
+java.sql.SQLException: Listener refused the connection with the following error:
+ORA-12505, TNS:listener does not currently know of SID given in connect descriptor
+ 
+	at oracle.jdbc.driver.T4CConnection.logon(T4CConnection.java:858)
+	at oracle.jdbc.driver.PhysicalConnection.connect(PhysicalConnection.java:793)
+	at oracle.jdbc.driver.T4CDriverExtension.getConnection(T4CDriverExtension.java:57)
+	at oracle.jdbc.driver.OracleDriver.connect(OracleDriver.java:747)
+	at oracle.jdbc.driver.OracleDriver.connect(OracleDriver.java:562)
+	at java.sql/java.sql.DriverManager.getConnection(DriverManager.java:677)
+	at java.sql/java.sql.DriverManager.getConnection(DriverManager.java:228)
+	at hippos.database.Database.getConnection(Database.java:49)
+	at hippos.HarnessApp.main(HarnessApp.java:305)
+Caused by: oracle.net.ns.NetException: Listener refused the connection with the following error:
+ORA-12505, TNS:listener does not currently know of SID given in connect descriptor
+ 
+	at oracle.net.ns.NSProtocolNIO.negotiateConnection(NSProtocolNIO.java:284)
+	at oracle.net.ns.NSProtocol.connect(NSProtocol.java:340)
+	at oracle.jdbc.driver.T4CConnection.connect(T4CConnection.java:1600)
+	at oracle.jdbc.driver.T4CConnection.logon(T4CConnection.java:592)
+	... 8 more
