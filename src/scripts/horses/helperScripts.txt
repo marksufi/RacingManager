@@ -1,0 +1,342 @@
+select e.hid,e.kuljettaja,e.aika,e.x,d.hid,d.kuljettaja,d.aika,d.x from substart e,substart d where e.kuljettaja='A Teivainen' and d.kuljettaja='A Moilanen' and e.x is null and d.x is null and e.kerroin is not null and d.kerroin is not null and e.hid=d.hid;
+select e.hid,e.kuljettaja,e.sijoitus,e.x,d.hid,d.kuljettaja,d.sijoitus,d.x from substart e,substart d where e.kuljettaja='A Teivainen' and d.kuljettaja='A Moilanen' and e.x is null and d.x is null and e.kerroin is not null and d.kerroin is not null and e.hid=d.hid;
+select avg(rate) from horseresult where prize=1 and raceTrack=1;
+
+// kuljettajatilastot
+select hr.ohjelmakuljettaja, avg(hr.palkinto) avg_award, count(*) from subresult hr group by hr.ohjelmakuljettaja having avg(palkinto) > 2000 order by avg(palkinto) desc;
+select hr.ohjelmakuljettaja, avg(hr.sijoitus) avg_award, count(*) from subresult hr group by hr.ohjelmakuljettaja order by avg(hr.sijoitus) desc;
+select h.kuljettaja, avg(hr.palkinto) avg_award, count(*) from subresult hr, horse h where h.id = hr.hid and h.kuljettaja='O-P Miettinen' group by h.kuljettaja;
+
+
+// Paikkakuntakohtaiset
+select h.kuljettaja, count(*), sum(palkinto), avg(hr.palkinto), avg(hr.sijanumero), count(hr.x)/count(*) x_pros
+    from subresult hr, horse h, programfile p, lahto l
+    where h.id = hr.hid and h.lid = l.id and l.filename = p.filename and p.locality='Oulu'
+    group by h.kuljettaja
+    having count(*) > 100 order by avg(hr.sijanumero) desc;
+
+select avg(palkinto), sum(palkinto) from subresult where nimi='Licence Holder';
+select kuljettaja, avg(palkinto) from subresult where nimi='J.A. Monster' group by kuljettaja order by avg(palkinto);
+
+select hr.kuljettaja, hr.nimi, palkinto from subresult hr group by hr.nimi;
+
+select h1.kuljettaja, hr1.count(kuljettaja), hr1.sum(palkinto), hr1.avg(hr1.palkinto), hr1.count(hr1.x)/h1.count(h1.kuljettaja) h2.kuljettaja, hr2.count(h2.kuljettaja), hr2.sum(hr2.palkinto), hr2.avg(hr2.palkinto), hr2.count(hr2.x)/hr2.count(h2.kuljettaja) from subresult hr1, subresult hr2, horse h1, horse h2 where h1.id = hr1.hid and h2.id = hr2.hid and h1.kuljettaja='O-P Miettinen' and h2.kuljettaja='A Teivainen';
+
+
+select hr.*, h.*,l.* from HORSERESULT hr, HORSE h, LAHTO l where h.ID = hr.ID and h.lid = l.id hr.NAME = 'Asante' order by PVM;
+
+select originalTime, avg(money), count(*) from horseresult where timetype='Kke' group by originalTime order by originalTime desc;
+select originalTime, avg(money), count(*) from horseresult where timetype='Kke' and originalTime between 22 and 23 group by originalTime order by originalTime desc;
+select originalTime, avg(money), count(*) from horseresult where timetype='Kke' group by originalTime order by originalTime desc;
+
+select avg(originalTime), timetype, count(*) from horseresult group by timetype order by avg(originalTime);
+select min(originalTime), timetype, count(*) from horseresult group by timetype order by min(originalTime);
+
+select driver, sum(money), avg(money) from horseresult group by driver order by sum(money);
+
+select * from subresult where nimi='Lammin Plikka' and id='CF1325368800000_CEO_CC2_2120_8;
+select * from subresult;
+select * from horseresult where name='Lammin Plikka' and id = 'CF1325368800000_CEO_CC2_2120_8';
+select pvm, aika, sijoitus, lahtotyyppi from subresult where nimi='Tuiskuta';
+select pvm, expvm, aika, sijoitus, sijanumero, lahtotyyppi from subresult where nimi='Hataar First';
+
+select *  from HORSE where LID like 'CF1370034000000_CEKM_CC5';
+
+
+select sijanumero, aikaero from subresult where sijanumero=1;
+select rata, avg(va_0), avg(va_1), avg(va_2), avg(va_3), avg(va_4) from subresult where sijanumero=1 group by rata order by rata;
+
+select
+select pvm, aika, sijanumero, sijoitus, lahtorivi, taukoviikot from subresult where nimi='Not Afraid' order by pvm;
+select pvm, lahtotyyppi, lahtorivi, tasoitus, va_1, va_2, va_3, va_4, va_5, aika, sijoitus from subresult where nimi='Merran Emil' order by pvm;
+select pvm, aika, lahtorivi, va_1, va_r_1, va_2, va_r_2, sijoitus from subresult where nimi='Jamas Victor' order by pvm;
+select pvm, aika, lahtorivi, va_1, va_2, va_3, va_4, va_5, sijoitus from subresult where nimi='Guilty Pleasure' order by pvm;
+select pvm, aika, lahtorivi, va_r_1, va_r_2, va_r_3, va_r_4, va_r_5, sijoitus from subresult where nimi='Guilty Pleasure' order by pvm;
+
+select lahtorivi, va_0, avg(palkinto), avg(sijoitus) from subresult group by lahtorivi;
+
+select sr.NIMI, sr.PVM, sr.LAHTOTYYPPI, sr.MATKA, sr.AIKA, sr.SIJANUMERO, sr.SIJOITUS, sr.PALKINTO, l.MATKA
+    from subresult sr, horse h, lahto l
+    where h.id = sr.hid and h.lid = l.id
+    order by sr.nimi, sr.pvm
+
+select pvm, paikka, nimi, tasoitus, hevosen_numero, count(nimi) from subresult where nimi='A Piece of Cake';
+select  from subresult where nimi='Little Lily';
+Shes so Lovely U.S
+
+select lahtotyyppi, matka, count(matka) from subresult group by matka;
+
+select sr.NIMI, sr.VA_1, sr.VA_2 ,l.VALIAIKA_1, l.VALIAIKA_2 from SUBRESULT sr, HORSE h, LAHTOTULOKSET l where sr.NIMI='Asante' and h.ID = sr.HID and h.lid = l.id order by PVM;
+
+select paikka, count(paikka), count(palkinto), sum(palkinto)/count(palkinto) from subresult where lahtotyyppi='Lake' group by paikka;
+select lahtotyyppi, count(lahtotyyppi), sum(palkinto)/count(palkinto) from subresult where paikka='H' group by lahtotyyppi;
+select lahtotyyppi, count(*), sum(palkinto)/count(palkinto) from subresult where paikka='O' group by lahtotyyppi;
+
+
+
+select id, pvm, paikka, matka, tasoitus, lahtotyyppi, laji, lahtorivi, aika, sijanumero, sijoitus, x, aikaero, palkinto from subresult where nimi='Grainfield Oz' order by pvm;
+select id, pvm, paikka, matka, tasoitus, lahtotyyppi, laji, lahtorivi, aika, sijanumero, sijoitus, x, aikaero, palkinto from subresult where nimi='Mr Noon' order by pvm;
+
+select pvm, paikka, OHJELMAKULJETTAJA, k_s, k_r, lahtotyyppi, aika, sijoitus, palkinto, tasoitus from subresult where nimi='Siporitar' order by pvm;
+select pvm, valmentaja, paikka, taukoviikot, matka, rata, aika, x, sijoitus, kerroin, palkinto from subresult where nimi='Stormysky' order by pvm;
+
+select * from subresult where nimi='In High Spirits' order by pvm;
+select * from subresult where id='CF1454191200000_CEVN_CC6_2700_0':
+
+select sijoitus from subresult group by sijoitus;
+
+// Paikkakuntakohtaiset
+select h.kuljettaja, count(hr.kuljettaja), count(hr2.kuljettaja), sum(hr.kerroin), sum(hr.kerroin) / count(hr2.kuljettaja)
+    from subresult hr, subresult hr2, horse h, programfile p, lahto l
+    where h.id = hr.hid and h.lid = l.id and l.filename = p.filename and p.locality='Oulu' and hr.sijanumero='1' and h.kuljettaja=hr2.kuljettaja
+    group by h.kuljettaja
+    having count(*) > 10 order by sum(hr.kerroin) desc;
+
+select sr1.ohjelmakuljettaja, count(sr2.ohjelmakuljettaja), count(sr1.ohjelmakuljettaja), sum(sr1.kerroin)
+    from subresult sr1, subresult sr2 where sr1.paikka='O' and sr1.sijanumero='1' and sr2.paikka='O'
+    group by sr1.ohjelmakuljettaja
+    having count(sr1.ohjelmakuljettaja) > 10
+    order by count(sr1.ohjelmakuljettaja) desc;
+
+select valmentaja, count(valmentaja), sum(kerroin)
+    from subresult where paikka='O' and sijanumero='1'
+    group by valmentaja
+    having count(valmentaja) > 1
+    order by count(valmentaja) desc;
+
+select filename, resultfile from programfile where filename='CF1420581600000_CEH_CC1.php';
+select filename, resultfile from programfile where filename LIKE 'CF1606687200000_CEJO%';
+SELECT filename, locality, pvm, trackcondition FROM resultfile WHERE filename LIKE 'CF1591909200000_CET%';
+select id from LAHTOTULOKSET where id LIKE 'CF1591909200000_CET%';
+
+
+select count(palkinto), sum(palkinto) from SUBRESULT where kuljettaja='A Teivainen';
+select count(palkinto) from SUBRESULT where kuljettaja='A Teivainen' and sijanumero='1';
+select count(palkinto) from SUBRESULT where kuljettaja='A Teivainen' and sijanumero='2';
+select count(palkinto) from SUBRESULT where kuljettaja='A Teivainen' and sijanumero='3';
+
+select pvm, nimi, ohjelmakuljettaja, k_s, k_r from subresult where nimi='Brown Royal' order by pvm;
+select pvm, nimi, ohjelmakuljettaja, k_s, k_r from subresult where k_s is not null order by pvm;
+select count(*), sum(S_1), sum(S_2), sum(S_3), sum(palkinto), sum(KCODE), count(XCODE) from SUBRESULT where ohjelmakuljettaja = ? and pvm < ? and lahtotyyppi = ?
+
+select paikka, count(*), count(S_1), count(S_2), count(S_3), avg(palkinto) from SUBRESULT where ohjelmakuljettaja='A Teivainen' group by paikka;
+select count(*), count(S_1)/count(*), avg(palkinto) from SUBRESULT where ohjelmakuljettaja='A Moilanen' and paikka='K';
+select count(*), count(S_1)/count(*), avg(palkinto) from SUBRESULT where ohjelmakuljettaja='E Holopainen' and paikka='Y';
+select count(*), count(S_1), avg(palkinto) from SUBRESULT where ohjelmakuljettaja='I F�hr' and paikka='La';
+select count(*), avg(S_1), avg(palkinto) from SUBRESULT where ohjelmakuljettaja='Ari Moilanen' and lahtotyyppi='Lake';
+select count(*), avg(S_1), avg(palkinto) from SUBRESULT where ohjelmakuljettaja='Esa Holopainen' and lahtotyyppi='Lake';
+
+
+// l�ht�tyyppikohtaiset
+select aika, count(aika), count(palkinto), sum(palkinto)/count(palkinto) from subresult where lahtotyyppi='Lake' group by aika order by aika;
+select aika, count(aika), count(palkinto), sum(palkinto)/count(palkinto) from subresult where lahtotyyppi='Lke' and aika<20.0group by aika order by aika;
+select aika, avg(aika), avg(palkinto) from subresult where lahtotyyppi='Lke' and avg(palkinto)<1000.0 group by aika;
+
+select id, paikka, pvm, hevosen_numero, nimi from subresult order by id;
+select id, paikka, hevosen_numero, nimi, ohjelmakuljettaja, aika, lahtotyyppi, x, sijoitus from subresult order by id;
+select id, paikka, hevosen_numero, nimi, ohjelmakuljettaja, k_s, k_1, k_2, k_3, k_r, aika, lahtotyyppi, x, sijoitus from subresult where nimi='Madrid' order by id;
+select id, paikka, hevosen_numero, nimi, ohjelmakuljettaja, k_s, k_1, k_2, k_3, k_r, aika, lahtotyyppi, x, sijoitus from subresult where ohjelmakuljettaja='A Moilanen' order by id;
+
+
+select lahtorivi, count(*), count(s_1)/count(*), avg(palkinto) from subresult where paikka='O' and laji='L' group by lahtorivi;
+select paikka, lahtorivi, count(*), count(s_1)/count(*) from subresult where paikka='O' and laji='K' group by lahtorivi;
+
+select paikka, hevosen_numero, count(*), count(s_1)/count(*) from subresult where paikka='O' and laji='K' group by hevosen_numero;
+
+select id, hevosen_numero, nimi from subresult order by id;
+
+select pvm, paikka, va_1, va_2, aika, lahtotyyppi, sijoitus, aikaero, palkinto from subresult where nimi='Passing Game' order by pvm;
+select id, pvm, paikka, lahtonumero, HEVOSEN_NUMERO, ohjelmakuljettaja, aika, lahtotyyppi, sijoitus, kerroin, palkinto from subresult where nimi='In High Spirits' order by pvm;
+select ID, HID, HEVOSEN_NUMERO, NIMI from SUBRESULT where ID like 'CF1325368800000_CEO_CC01_%';
+
+select pvm, expvm, taukopaivat, paikka, hevosen_numero, lahtorivi, tasoitus, aika, x, lahtotyyppi, sijoitus, kerroin, palkinto from subresult where nimi='Adventures Wily' order by pvm;
+
+select id, pvm, hid, nimi from subresult where id like 'CF1347742800000_CEV_CC01_01%' order by id;
+select id, pvm, hid, nimi from subresult order by id;
+select id, lid, numero, nimi from horse order by id;
+
+select paikka, pvm, matka, rata, aika, lahtotyyppi, sijoitus, xcode, kcode from subresult where nimi='Maljan Nosto';
+select paikka, pvm, matka, rata, aika, lahtotyyppi, sijoitus, xcode, kcode from subresult where nimi='In High Spirits' order by id desc;
+select id, paikka, hevosen_numero, nimi, ohjelmakuljettaja, aika, lahtotyyppi, x, sijoitus from subresult where ohjelmakuljettaja like 'J%-P% Vilkman' order by id;
+select sum(s_1)/count(*) from subresult where valmentaja='Tuija Irri';
+
+delete from SUBRESULT where NIMI='Dance With Caster';
+
+select pvm, paikka, aika, lahtotyyppi, sijoitus, from subresult where id='CF1331157600000_CEBO_CC09_2140_8' order by id desc;
+select pvm, nimi, paikka, aika, lahtotyyppi, sijoitus, from subresult where sijoitus=0;
+select count(*) from subresult where id like 'CF1350680400000_CES_CC11_%' and nimi='Bosses Lily';
+select id from subresult where nimi='Dance With Caster';
+
+/* P J Korhonen */
+select count(*) from subresult where OHJELMAKULJETTAJA like 'CF1350680400000_CES_CC11_%'';
+select id, nimi from subresult where id='CF1338066000000_CEF_CC09_02';
+select id, nimi from subresult where lahtotyyppi='LmLly';
+
+select id, pvm from subresult where nimi='Lilla Alexandra';
+
+select id, pvm, aika, lahtotyyppi, sijoitus from subresult where id like 'CF1346187600000_CEH_CC05_%' and nimi='Citius S';
+select pvm, aika, lahtotyyppi, sijoitus from subresult where nimi='Southeast King';
+select id, pvm, aika, lahtotyyppi, sijoitus from subresult where nimi='Citius';
+select id, pvm, aika, lahtotyyppi, sijoitus from subresult where nimi='Orion d\'\Eoul';
+select pvm, aika, lahtotyyppi, sijoitus, xcode from subresult where nimi='Saran Vappu' order by pvm desc;
+
+select id, pvm, nimi, palkinto from subresult where palkinto > 100000;
+select id, pvm, nimi, aika, lahtotyyppi, sijoitus from subresult where id='CF1482876000000_CEH_CC03_2100_04';
+
+update SUBRESULT set PALKINTO = PALKINTO/100000.0 where PALKINTO > 1000000;
+update SUBRESULT set LAHTOTYYPPI = 'Lke' where LAHTOTYYPPI = 'LLke';
+
+select id, pvm, sijoitus, aika, va_1, va_2, v500 from RESULThorse where SIJOITUS > 16;
+
+delete from lahto where id like 'CF1614376800000_CET_%';
+delete from programfile where filename like 'CF1614376800000_CET%';
+
+/* Valmentajakohtaiset tiedot */
+select avg(palkinto) from SUBRESULT where valmentaja='Juha Utata' and nimi='Millikka';
+
+/*********************************
+* ALTER
+**********************************/
+alter table SUBRESULT add(
+    WEATHER VARCHAR( 2 )
+    );
+
+alter table RESULTHORSE add(
+	TASOITUS NUMBER ( 3 ),
+	RATA_TUNNISTE VARCHAR ( 6 )
+    );
+
+alter table LAHTOTULOKSET add(
+    VK1 NUMBER ( 4 ),
+    VK2 NUMBER ( 4 ),
+    KK1 NUMBER ( 4 ),
+    TK1 NUMBER ( 5 ),
+    TK2 NUMBER ( 5 )
+);
+
+ALTER TABLE PROGRAMHORSE DROP COLUMN V_PROS;
+
+alter table PROGRAMHORSE add(
+    K_X NUMBER ( 4 )
+    );
+
+
+
+alter table SUBRESULT rename column KULJETTAJA to OHJELMAKULJETTAJA;
+
+/*
+ * indexies
+ */
+DROP INDEX subresult_kuljettaja_idx;
+CREATE INDEX subresult_kuljettaja_idx ON subresult(ohjelmakuljettaja, pvm, lahtotyyppi);
+
+CREATE INDEX subresult_kuljettaja_idx ON subresult(ohjelmakuljettaja, lahtotyyppi);
+ALTER INDEX subresult_kuljettaja_idx REBUILD;
+
+DROP INDEX subresult_nimi_idx;
+DROP INDEX subresult_kuljettaja_idx;
+CREATE INDEX subresult_nimi_idx on subresult(nimi, laji, pvm, lahtonumero);
+ALTER INDEX subresult_nimi_idx REBUILD;
+
+explain plan for select * from subresult;
+select * from table(dbms_xplan.display);
+Select plan_table_output From table(dbms_xplan.display_cursor(null,null,'TYPICAL');
+
+select count(*), avg(S_1), avg(palkinto), lahtotyyppi from SUBRESULT where kuljettaja='Risto Väre' group by lahtotyyppi;
+select kuljettaja, count(*), avg(S_1), avg(palkinto) from SUBRESULT group by kuljettaja order by kuljettaja;
+
+
+explain plan for select count(*), sum(S_1), sum(S_2), sum(S_3), sum(palkinto), sum(KCODE), count(XCODE) from SUBRESULT where kuljettaja='Esa Holopainen' and pvm < '2021-1-1';
+explain plan for select count(*), avg(S_1), avg(palkinto) from SUBRESULT where kuljettaja='Esa Holopainen' and pvm < '2021-1-1' and lahtotyyppi='Lake';
+
+select count(*), sum(S_1), sum(S_2), sum(S_3), sum(palkinto), sum(KCODE), count(XCODE) from SUBRESULT where ohjelmakuljettaja = 'Esa Holopainen' and lahtotyyppi = 'Lake';
+
+
+/* Clear Screen */
+SQL>clear scr;
+
+CREATE TABLE TEST (
+	COL_1 VARCHAR ( 2 ),
+	COL_2 VARCHAR ( 2 ),
+	COL_3 VARCHAR ( 2 ),
+  CONSTRAINT PK_TEST PRIMARY KEY (COL_1, COL_2)
+  );
+
+/**
+    PROGRAMHORSE
+
+    select trackid from programhorse where nimi='Bobbi Jones';
+    select * from programhorse where nimi='Kiss of Judas' and id like 'CF1614376800000_CET_CC03_%';
+    select substart_1, substart_2, substart_3, substart_4, substart_5, substart_6, substart_7, substart_8 from PROGRAMHORSE where lid='CF1451426400000_CEH_CC02' and NUMERO=2;
+    select * from PROGRAMHORSE where lid='CF1334523600000_CEJ_CC09' and NUMERO=15;
+    select LID, NUMERO, NIMI, KULJETTAJA, K_S, K_R from PROGRAMHORSE where NIMI='Sunbeam' orfer by LID;
+    select NUMERO, NIMI from PROGRAMHORSE where lid='CF1616536800000_CEH_CC01';
+
+    ALTER TABLE PROGRAMHORSE DROP CONSTRAINT PK_PROGRAMHORSE;
+    ALTER TABLE PROGRAMHORSE ADD CONSTRAINT PK_PROGRAMHORSE PRIMARY KEY (LID, NUMERO);
+    ALTER TABLE PROGRAMHORSE DROP COLUMN ID;
+
+    ALTER TABLE SUBRESULT DROP CONSTRAINT PK_SUBRESULT;
+    ALTER TABLE SUBRESULT ADD CONSTRAINT PK_SUBRESULT PRIMARY KEY (NIMI, LAJI, PVM, LAHTONUMERO);
+    ALTER TABLE SUBRESULT DROP COLUMN ID;
+
+
+
+
+**/
+
+select count(*), sum(S_1), sum(S_2), sum(S_3), sum(palkinto), sum(KCODE), count(XCODE) from SUBRESULT where kuljettaja = 'Jarmo Saarela' and LAHTOTYYPPI='Kke';
+
+select PVM, AIKA, SIJOITUS, VA_1, VA_2, V500 from RESULTHORSE where NIMI='True Lance' order by PVM;
+
+select count(*), sum(S_1), sum(S_2), sum(S_3), sum(palkinto), sum(KCODE), count(XCODE) from SUBRESULT where kuljettaja = 'Jenni Koskela' and PVM<'2021-01-12' and lahtotyyppi = 'Lmake';
+select count(*), sum(S_1), sum(S_2), sum(S_3), sum(palkinto), sum(KCODE), count(XCODE) from SUBRESULT where kuljettaja = 'Jenni Koskela' and PVM<'2021-01-12' and lahtotyyppi = 'Lmake';
+
+select * from lahto where id like 'CF1616536800000_CEH%';
+select * from PROGRAMFILE where FILENAME like 'CF1616536800000_CEH%';
+
+select PVM, SIJOITUS, AIKA, LAHTOTYYPPI, VA_1, VA_2, V500 from RESULTHORSE where NIMI='Final Match' order by PVM;
+select * from RESULTHORSE where NIMI='Aarian Hermanni' order by PVM;
+
+select lahtotyyppi, tasoitus, min(VA_1), count(va_1), min(VA_2), count(VA_2), min(V500), count(V500), count(*) from RESULTHORSE where NIMI='Too Macho For You' group by lahtotyyppi, tasoitus;
+select lahtotyyppi, tasoitus, min(VA_1), count(va_1), min(VA_2), count(VA_2), min(V500), count(V500), min(aika), count(*) from RESULTHORSE where NIMI='Pica-Pica Oak' group by lahtotyyppi, tasoitus;
+select lahtotyyppi, tasoitus, min(VA_1), count(va_1), min(VA_2), count(VA_2), min(V500), count(V500), min(aika), count(*), avg(palkinto) from RESULTHORSE where NIMI='Ambriel' group by lahtotyyppi, tasoitus;
+select avg(palkinto) from RESULTHORSE where NIMI='Case By Case' and VA_1 is not null;
+select avg(palkinto) from RESULTHORSE where NIMI='Cover Prince' and VA_1 is null;
+
+select kcode, count(*), sum(S_1), sum(S_2), sum(S_3), avg(palkinto), sum(KCODE), count(XCODE) from SUBRESULT where nimi = 'Cover Prince' group by KCODE;
+select kcode, count(*), sum(S_1), sum(S_2), sum(S_3), avg(palkinto), sum(KCODE), count(XCODE) from SUBRESULT where nimi = 'Cover Prince' and pvm < '2021-1-1' group by KCODE;
+select tyyppi, lahtotyyppi, count(*), sum(S_1), sum(S_2), sum(S_3), sum(palkinto), sum(KCODE), count(XCODE), min(AIKA) Aika from SUBRESULT where nimi = 'Raplinki' group by TYYPPI, lahtotyyppi;
+explain plan for select count(*), sum(S_1), sum(S_2), sum(S_3), sum(palkinto), sum(KCODE), count(XCODE) from SUBRESULT where ohjelmakuljettaja='Esa Holopainen' and pvm < '2021-1-1';
+
+SELECT rata, avg(kcode) FROM subresult WHERE lahtotyyppi='Lake' AND lahtonumero=rata GROUP BY rata ORDER BY rata;
+SELECT rata_tunniste, count(va_1)/count(*) avg, avg(va_1), avg(va_2), avg(aika) FROM resulthorse WHERE lahtotyyppi='Lake' GROUP BY rata_tunniste ORDER BY rata_tunniste;
+
+select RATA_TUNNISTE, LAJI, PVM, AIKA, LAHTOTYYPPI, SIJOITUS from RESULTHORSE where NIMI='Up Up and Away' and laji='L' order by PVM;
+select r.RATA_TUNNISTE, r.LAJI, s.LAJI, s.PVM, s.AIKA, s.LAHTOTYYPPI, s.SIJOITUS from RESULTHORSE r right outer join SUBRESULT s on r.NIMI=s.NIMI and r.LAJI = s.LAJI and r.PVM = s.PVM where s.NIMI='Up Up and Away' and s.PVM < '30-DEC-15' and ROWNUM <= 8 order by s.PVM desc;
+
+select NIMI, PVM from SUBRESULT where NIMI='Up Up and Away' and laji='L' and ROWNUM <= 8 order by PVM;
+select laji, pvm, aika, lahtotyyppi, sijoitus from subresult where nimi='Up Up and Away' order by PVM;
+
+/* tämä toimii */
+select r.RATA_TUNNISTE, s.PVM, s.AIKA, s.LAHTOTYYPPI, s.SIJOITUS from RESULTHORSE r right outer join SUBRESULT s on r.NIMI=s.NIMI and s.LAJI = s.LAJI and r.PVM = s.PVM where s.NIMI='Up Up and Away' and s.laji='L' and s.PVM < '30-DEC-15' and ROWNUM <= 8 order by s.PVM desc;
+select * from (select r.RATA_TUNNISTE, s.PVM, s.AIKA, s.LAHTOTYYPPI, s.SIJOITUS from RESULTHORSE r right outer join SUBRESULT s on r.NIMI=s.NIMI and r.LAJI = s.LAJI and r.PVM = s.PVM and r.LAHTONUMERO=s.LAHTONUMERO where s.NIMI='Saran Vappu' and s.laji='K' and s.PVM < '1-JAN-12' order by s.PVM desc) where ROWNUM <= 8;
+select * from (select r.RATA_TUNNISTE, s.WEATHER, s.KULJETTAJA, s.VALMENTAJA, s.PAIKKA, s.PVM, s.AIKA, s.LAHTONUMERO, s.MATKA, s.RATA, s.TYYPPI, s.LAHTOTYYPPI, s.SIJOITUS from RESULTHORSE r right outer join SUBRESULT s on r.NIMI=s.NIMI and r.LAJI = s.LAJI and r.PVM = s.PVM and r.LAHTONUMERO=s.LAHTONUMERO where s.NIMI='Saran Vappu' and s.laji='K' and s.PVM < '1-JAN-12' order by s.PVM desc) where ROWNUM <= 8;
+select * from (select r.RATA_TUNNISTE, s.WEATHER, s.KULJETTAJA, s.VALMENTAJA, s.PAIKKA, s.PVM, s.AIKA, s.LAHTONUMERO, s.MATKA, s.RATA, s.TYYPPI, s.LAHTOTYYPPI, s.SIJOITUS, s.XCODE, s.KERROIN, s.PALKINTO, s.KCODE from RESULTHORSE r right outer join SUBRESULT s on r.NIMI=s.NIMI and r.LAJI=s.LAJI and r.PVM=s.PVM and r.LAHTONUMERO=s.LAHTONUMERO where s.NIMI='Saran Vappu' and s.LAJI='K' and s.PVM < '1-JAN-12' order by s.PVM desc) where rownum <= 8;
+
+and ROWNUM <= 8
+/* tämä ei */
+select r.RATA_TUNNISTE, s.PVM, s.AIKA, s.LAHTOTYYPPI, s.SIJOITUS from RESULTHORSE r right outer join SUBRESULT s on r.NIMI=s.NIMI and r.LAJI = s.LAJI and r.PVM = s.PVM where s.NIMI='Up Up and Away' and s.laji='L' and s.PVM < '30-DEC-15' and ROWNUM <= 8 order by s.PVM desc;
+
+/* tämä ei */
+select r.RATA_TUNNISTE, s.PVM, s.AIKA, s.LAHTOTYYPPI, s.SIJOITUS from RESULTHORSE r right outer join SUBRESULT s on PK_RESULTHORSE=PK_SUBRESULT where s.NIMI='Up Up and Away' and s.PVM < '30-DEC-15' and ROWNUM <= 8 order by s.PVM desc;
+
+select r.RATA_TUNNISTE, s.PVM, s.AIKA, s.LAHTOTYYPPI, s.SIJOITUS from RESULTHORSE r right outer join SUBRESULT s on r.NIMI=s.NIMI and s.LAJI = s.LAJI and r.PVM = s.PVM and s.LAHTONUMERO=r.LAHTONUMERO where s.NIMI='Callela Socrates' and s.laji='L' and s.PVM < '12-MAY-21' and ROWNUM <= 8 order by s.PVM desc;
+
+// Full statistics
+select yht_s, yht_1, yht_2, yht_3, yht_r, kcode, xcode from programhorse where nimi='Alma Cotter';
+select count(*), sum(S_1), sum(S_2), sum(S_3), sum(palkinto), sum(KCODE), count(XCODE), count(KCODE) from SUBRESULT where NIMI='Eräsmies';
+select count(*), sum(S_1), sum(S_2), sum(S_3), sum(palkinto), sum(KCODE), count(XCODE), min(AIKA) Aika, TYYPPI, LAHTOTYYPPI from SUBRESULT where NIMI='Alma Cotter' and laji='L' group by TYYPPI, LAHTOTYYPPI;
+select S_1, S_2, S_3, palkinto, KCODE, XCODE from SUBRESULT where NIMI='Alma Cotter';
+
+SELECT pvm, lahto, numero, nimi, sijoitus from resulthorse

@@ -1,0 +1,719 @@
+
+
+
+<!DOCTYPE html PUBLIC "-//W3C//DTD XHTML 1.0 Transitional//EN"
+  "http://www.w3.org/TR/xhtml1/DTD/xhtml1-transitional.dtd">
+<html id="htmlId">
+<head>
+  <title>Coverage Report :: RaceProgramHorseParser</title>
+  <style type="text/css">
+    @import "../../.css/coverage.css";
+  </style>
+</head>
+
+<body>
+<div class="header"></div>
+
+<div class="content">
+<div class="breadCrumbs">
+    [ <a href="../../index.html">all classes</a> ]
+    [ <a href="../index.html">hippos</a> ]
+</div>
+
+<h1>Coverage Summary for Class: RaceProgramHorseParser (hippos)</h1>
+
+<table class="coverageStats">
+<tr>
+  <th class="name">Class</th>
+<th class="coverageStat 
+">
+  Class, %
+</th>
+<th class="coverageStat 
+">
+  Method, %
+</th>
+<th class="coverageStat 
+">
+  Line, %
+</th>
+</tr>
+<tr>
+  <td class="name">RaceProgramHorseParser</td>
+<td class="coverageStat">
+  <span class="percent">
+    0%
+  </span>
+  <span class="absValue">
+    (0/ 1)
+  </span>
+</td>
+<td class="coverageStat">
+  <span class="percent">
+    0%
+  </span>
+  <span class="absValue">
+    (0/ 20)
+  </span>
+</td>
+<td class="coverageStat">
+  <span class="percent">
+    0%
+  </span>
+  <span class="absValue">
+    (0/ 226)
+  </span>
+</td>
+</tr>
+
+</table>
+
+<br/>
+<br/>
+
+
+<div class="sourceCode"><i>1</i>&nbsp;package hippos;
+<i>2</i>&nbsp;
+<i>3</i>&nbsp;import hippos.exception.*;
+<i>4</i>&nbsp;import hippos.io.FileParser;
+<i>5</i>&nbsp;import hippos.lang.stats.TimeStatistics;
+<i>6</i>&nbsp;import utils.HTMLParser;
+<i>7</i>&nbsp;import utils.Log;
+<i>8</i>&nbsp;
+<i>9</i>&nbsp;import java.io.IOException;
+<i>10</i>&nbsp;import java.math.BigDecimal;
+<i>11</i>&nbsp;import java.util.Date;
+<i>12</i>&nbsp;import java.util.Iterator;
+<i>13</i>&nbsp;import java.util.StringTokenizer;
+<i>14</i>&nbsp;
+<i>15</i>&nbsp;/**
+<i>16</i>&nbsp; * Created by IntelliJ IDEA.
+<i>17</i>&nbsp; * User: marktolo
+<i>18</i>&nbsp; * Date: Nov 25, 2004
+<i>19</i>&nbsp; * AlphaNumber: 4:12:00 PM
+<i>20</i>&nbsp; * To change this template use Options | File Templates.
+<i>21</i>&nbsp; */
+<i>22</i>&nbsp;public class RaceProgramHorseParser implements FileParser {
+<i>23</i>&nbsp;    RaceProgramHorse raceProgramHorse;
+<i>24</i>&nbsp;    //RaceResultHorse raceResultHorse;
+<i>25</i>&nbsp;    Date raceDate;
+<i>26</i>&nbsp;    Iterator lines;
+<i>27</i>&nbsp;    private RaceProgramStart raceProgramStart;
+<i>28</i>&nbsp;    static BigDecimal defaultDistance;
+<i>29</i>&nbsp;    static BigDecimal defaultTrack;
+<i>30</i>&nbsp;
+<b class="nc"><i>31</i>&nbsp;    private RaceProgramHorseParser(Iterator lines) {</b>
+<b class="nc"><i>32</i>&nbsp;        this.lines = lines;</b>
+<i>33</i>&nbsp;    }
+<i>34</i>&nbsp;
+<i>35</i>&nbsp;    public RaceProgramHorseParser(RaceProgramStart raceProgramStart, Iterator lines) {
+<b class="nc"><i>36</i>&nbsp;        this(lines);</b>
+<i>37</i>&nbsp;        //racebookHorse = new ValueHorse(raceProgramStart);
+<b class="nc"><i>38</i>&nbsp;        raceProgramHorse = new RaceProgramHorse(raceProgramStart);</b>
+<b class="nc"><i>39</i>&nbsp;        raceProgramHorse.setLid(raceProgramStart.id);</b>
+<b class="nc"><i>40</i>&nbsp;        raceDate = raceProgramStart.getDate();</b>
+<b class="nc"><i>41</i>&nbsp;        this.raceProgramStart = raceProgramStart;</b>
+<b class="nc"><i>42</i>&nbsp;        if(raceProgramStart.getRaceProgramHorses().isEmpty()) {</b>
+<b class="nc"><i>43</i>&nbsp;            defaultDistance = raceProgramStart.getRaceLength();</b>
+<b class="nc"><i>44</i>&nbsp;            defaultTrack = new BigDecimal(0);</b>
+<i>45</i>&nbsp;        }
+<i>46</i>&nbsp;    }
+<i>47</i>&nbsp;
+<i>48</i>&nbsp;    public Object parse() throws OutOfHorsesException, DataObjectException, AbsentException {
+<i>49</i>&nbsp;        try {
+<i>50</i>&nbsp;            // Etsii seuraavan hevosen aloituskohdan
+<b class="nc"><i>51</i>&nbsp;            HTMLParser.readBlock(lines, &quot;td&quot;, &quot;program_divider&quot;);</b>
+<i>52</i>&nbsp;
+<i>53</i>&nbsp;            // Parsii tiedot
+<b class="nc"><i>54</i>&nbsp;            while(lines.hasNext()) {</b>
+<i>55</i>&nbsp;                //waitForNewHorse((String)lines.next());
+<b class="nc"><i>56</i>&nbsp;                parseNumber();</b>
+<i>57</i>&nbsp;
+<i>58</i>&nbsp;                /*racebookHorse.hy = */
+<b class="nc"><i>59</i>&nbsp;                parseFormLine();</b>
+<i>60</i>&nbsp;                /*racebookHorse.hv = */
+<b class="nc"><i>61</i>&nbsp;                parseFormLine();</b>
+<i>62</i>&nbsp;                /*racebookHorse.he = */
+<b class="nc"><i>63</i>&nbsp;                parseFormLine();</b>
+<i>64</i>&nbsp;
+<b class="nc"><i>65</i>&nbsp;                parseNameLine();</b>
+<i>66</i>&nbsp;
+<i>67</i>&nbsp;                // vasta tässä vaiheessä pystyy hakemaan tuloksia
+<b class="nc"><i>68</i>&nbsp;                if (raceProgramStart.getRaceResultStart() != null) {</b>
+<b class="nc"><i>69</i>&nbsp;                    raceProgramHorse.raceResultHorse = raceProgramStart.getRaceResultStart().getRaceResultHorse(raceProgramHorse.getRaceHorseName());</b>
+<i>70</i>&nbsp;
+<b class="nc"><i>71</i>&nbsp;                    if (raceProgramHorse.raceResultHorse != null &amp;&amp; raceProgramHorse.raceResultHorse.present == false) {</b>
+<b class="nc"><i>72</i>&nbsp;                        throw new AbsentException(raceProgramHorse.getId());</b>
+<i>73</i>&nbsp;                    }
+<i>74</i>&nbsp;                }
+<i>75</i>&nbsp;
+<b class="nc"><i>76</i>&nbsp;                parseLength();</b>
+<b class="nc"><i>77</i>&nbsp;                parseRecords(new TimeStatistics(raceProgramHorse));</b>
+<b class="nc"><i>78</i>&nbsp;                parseAgeLine();</b>
+<b class="nc"><i>79</i>&nbsp;                parseDamLine();</b>
+<b class="nc"><i>80</i>&nbsp;                parseColorLine();</b>
+<b class="nc"><i>81</i>&nbsp;                parseOwnerLine();</b>
+<b class="nc"><i>82</i>&nbsp;                parseTraineeLine();</b>
+<b class="nc"><i>83</i>&nbsp;                parseJockeyLine();</b>
+<b class="nc"><i>84</i>&nbsp;                parseJockeyStatisticLine();</b>
+<b class="nc"><i>85</i>&nbsp;                parseJockeyYearStatisticLine();</b>
+<i>86</i>&nbsp;
+<i>87</i>&nbsp;                if(HarnessApp.useHorseRaceHistoryLink) {
+<b class="nc"><i>88</i>&nbsp;                    if(!raceProgramHorse.existsInDatabase() || HarnessApp.debugMode == true) {</b>
+<i>89</i>&nbsp;                        try {
+<b class="nc"><i>90</i>&nbsp;                            RaceHorseHistoryParser raceHorseHistoryParser = new RaceHorseHistoryParser(raceProgramHorse);</b>
+<i>91</i>&nbsp;
+<b class="nc"><i>92</i>&nbsp;                            raceProgramHorse = (RaceProgramHorse) raceHorseHistoryParser.parse();</b>
+<b class="nc"><i>93</i>&nbsp;                        } catch (Exception e) {</b>
+<b class="nc"><i>94</i>&nbsp;                            e.printStackTrace();</b>
+<b class="nc"><i>95</i>&nbsp;                        }</b>
+<i>96</i>&nbsp;                    } else {
+<b class="nc"><i>97</i>&nbsp;                        System.out.println(&quot;RaceProgramHorseParser.parse: &quot; + raceProgramHorse.getId());</b>
+<i>98</i>&nbsp;                    }
+<i>99</i>&nbsp;                }
+<i>100</i>&nbsp;
+<i>101</i>&nbsp;                break;
+<i>102</i>&nbsp;            }
+<b class="nc"><i>103</i>&nbsp;        } catch (AbsentException e) {</b>
+<b class="nc"><i>104</i>&nbsp;            throw e;</b>
+<b class="nc"><i>105</i>&nbsp;        } catch (OutOfHorsesException e) {</b>
+<b class="nc"><i>106</i>&nbsp;            throw e;</b>
+<b class="nc"><i>107</i>&nbsp;        } catch (DataObjectException e) {</b>
+<b class="nc"><i>108</i>&nbsp;            throw e;</b>
+<b class="nc"><i>109</i>&nbsp;        } catch (Exception e) {</b>
+<b class="nc"><i>110</i>&nbsp;            Log.write(e);</b>
+<b class="nc"><i>111</i>&nbsp;        }</b>
+<i>112</i>&nbsp;
+<b class="nc"><i>113</i>&nbsp;        return this.raceProgramHorse;</b>
+<i>114</i>&nbsp;    }
+<i>115</i>&nbsp;
+<i>116</i>&nbsp;    /**
+<i>117</i>&nbsp;     *
+<i>118</i>&nbsp;     * &lt;h1&gt;1&lt;/h1&gt;
+<i>119</i>&nbsp;     *
+<i>120</i>&nbsp;     * @throws OutOfHorsesException
+<i>121</i>&nbsp;     */
+<i>122</i>&nbsp;    private void parseNumber() throws OutOfHorsesException, AbsentException {
+<b class="nc"><i>123</i>&nbsp;        String td = HTMLParser.readBlock(lines, &quot;td&quot;);</b>
+<b class="nc"><i>124</i>&nbsp;        String number = HTMLParser.readBlock(td, &quot;h1&quot;);</b>
+<i>125</i>&nbsp;
+<i>126</i>&nbsp;        try {
+<b class="nc"><i>127</i>&nbsp;            raceProgramHorse.setHorseProgNumber(new BigDecimal(number.strip()));</b>
+<b class="nc"><i>128</i>&nbsp;        } catch (Exception e) {</b>
+<b class="nc"><i>129</i>&nbsp;            throw new OutOfHorsesException();</b>
+<b class="nc"><i>130</i>&nbsp;        }</b>
+<i>131</i>&nbsp;
+<b class="nc"><i>132</i>&nbsp;        raceProgramHorse.setId();</b>
+<i>133</i>&nbsp;    }
+<i>134</i>&nbsp;
+<i>135</i>&nbsp;    /**
+<i>136</i>&nbsp;     *   &lt;td&gt;yht:16 0-4-2&lt;/td&gt;
+<i>137</i>&nbsp;     *   &lt;td colspan=&quot;5&quot;&gt;13:15 0-3-2   31,1    2.270 €&lt;/td&gt;
+<i>138</i>&nbsp;     *   &lt;td colspan=&quot;7&quot;&gt;12:0 0-0-0        0 € &lt;/td&gt;
+<i>139</i>&nbsp;     *
+<i>140</i>&nbsp;    private Form parseFormLine(Form form) throws IOException {
+<i>141</i>&nbsp;        String line;
+<i>142</i>&nbsp;        while(lines.hasNext()) {
+<i>143</i>&nbsp;            line = (String)lines.next();
+<i>144</i>&nbsp;            if(line.indexOf(&quot;&lt;td&quot;) &gt;=0) {
+<i>145</i>&nbsp;                line = line.substring(line.indexOf(&quot;&gt;&quot;) + 1);
+<i>146</i>&nbsp;                line = line.substring(0, line.indexOf(&quot;&lt;&quot;));
+<i>147</i>&nbsp;                try {
+<i>148</i>&nbsp;                    form = new FormParser(this.raceProgramStart.getRaceLiteral()).parse(line);
+<i>149</i>&nbsp;                } catch (Exception e) {
+<i>150</i>&nbsp;                    throw new IOException(line);
+<i>151</i>&nbsp;                }
+<i>152</i>&nbsp;                return form;
+<i>153</i>&nbsp;            }
+<i>154</i>&nbsp;        }
+<i>155</i>&nbsp;        return form;
+<i>156</i>&nbsp;    }*/
+<i>157</i>&nbsp;
+<i>158</i>&nbsp;    /**
+<i>159</i>&nbsp;     *  Käsiohjelman tilastot ovat virheellistä tietoa. Rivi vain etsitään ja luetaan,
+<i>160</i>&nbsp;     *  mutta ei parsita mitenkään.
+<i>161</i>&nbsp;     *
+<i>162</i>&nbsp;     *   &lt;td&gt;yht:16 0-4-2&lt;/td&gt;
+<i>163</i>&nbsp;     *   &lt;td colspan=&quot;5&quot;&gt;13:15 0-3-2   31,1    2.270 €&lt;/td&gt;
+<i>164</i>&nbsp;     *   &lt;td colspan=&quot;7&quot;&gt;12:0 0-0-0        0 € &lt;/td&gt;
+<i>165</i>&nbsp;     *
+<i>166</i>&nbsp;     * @return palauttaa luetun rivin
+<i>167</i>&nbsp;     * @throws IOException
+<i>168</i>&nbsp;     */
+<i>169</i>&nbsp;    private String parseFormLine() {
+<b class="nc"><i>170</i>&nbsp;        String form = HTMLParser.readBlock(lines, &quot;td&quot;);</b>
+<i>171</i>&nbsp;
+<b class="nc"><i>172</i>&nbsp;        return form;</b>
+<i>173</i>&nbsp;    }
+<i>174</i>&nbsp;
+<i>175</i>&nbsp;    /**
+<i>176</i>&nbsp;     * @param line
+<i>177</i>&nbsp;     *
+<i>178</i>&nbsp;     * 		&lt;a href=&quot;/heppa/racing/RaceProgramOneRace,getHorse.$DirectLink.sdirect;jsessionid=p6+QtwpVje2pJ3mNO95X1Q**.app3?sp=l3465426026070201393&amp;amp;sp=X&quot; onclick=&quot;return setStatusAndEnsure(selectText, this);&quot; class=&quot;horse_normal&quot;&gt;
+<i>179</i>&nbsp;     *           Taikahippuli
+<i>180</i>&nbsp;     *       &lt;/a&gt;
+<i>181</i>&nbsp;     *
+<i>182</i>&nbsp;     *       &lt;a href=&quot;/heppa/racing/RaceProgramOneRace,getHorse.$DirectLink.sdirect;jsessionid=uYEnfYEbMk8RVz0vXpkLTA**.app3?sp=l1480482254062633010&amp;amp;sp=X&quot; onclick=&quot;return setStatusAndEnsure(selectText, this);&quot; class=&quot;horse_normal&quot;&gt;
+<i>183</i>&nbsp;     *           Paper Moon* (SE)
+<i>184</i>&nbsp;     *       &lt;/a&gt;
+<i>185</i>&nbsp;     *
+<i>186</i>&nbsp;     */
+<i>187</i>&nbsp;    private void parseNameLine() throws OutOfHorsesException, DataObjectException {
+<i>188</i>&nbsp;        //System.out.println(&quot;RaceProgramHorseParser.parseNameLine(&quot; + line + &quot;)&quot;);
+<i>189</i>&nbsp;        String line;
+<b class="nc"><i>190</i>&nbsp;        while(lines.hasNext()) {</b>
+<i>191</i>&nbsp;            // Etsii ja lukee seuraavan &lt;td&gt;-lohkon sisällön
+<b class="nc"><i>192</i>&nbsp;            line = HTMLParser.readBlock(lines, &quot;td&quot;, &quot;getHorse&quot;);</b>
+<b class="nc"><i>193</i>&nbsp;            if(line != null) {</b>
+<i>194</i>&nbsp;                try {
+<i>195</i>&nbsp;                    // Asettaa linkistä hevoselle rekisterinumeron
+<b class="nc"><i>196</i>&nbsp;                    raceProgramHorse.setRegisterNumber(parseRegisterId(line));</b>
+<i>197</i>&nbsp;
+<b class="nc"><i>198</i>&nbsp;                } catch (DataObjectException e) {</b>
+<i>199</i>&nbsp;
+<b class="nc"><i>200</i>&nbsp;                    Log.write(e, this.raceProgramHorse.getId());</b>
+<b class="nc"><i>201</i>&nbsp;                }</b>
+<i>202</i>&nbsp;
+<i>203</i>&nbsp;                // Lukee td-lohkosta &lt;a ref-lohkon sisällön
+<b class="nc"><i>204</i>&nbsp;                line = HTMLParser.readBlock(line, &quot;a&quot;);</b>
+<i>205</i>&nbsp;
+<b class="nc"><i>206</i>&nbsp;                raceProgramHorse.setRaceHorseName(line.strip());</b>
+<i>207</i>&nbsp;
+<b class="nc"><i>208</i>&nbsp;                if (raceProgramHorse.getRaceHorseName().isEmpty()) {</b>
+<b class="nc"><i>209</i>&nbsp;                    throw new DataObjectException(&quot;Horsename is empty: &quot; + line);</b>
+<i>210</i>&nbsp;                }
+<i>211</i>&nbsp;                return;
+<i>212</i>&nbsp;            } else {
+<b class="nc"><i>213</i>&nbsp;                throw new DataObjectException(&quot;Could not find &#39;getHorse&#39; keyword from horse name link: &quot; + line);</b>
+<i>214</i>&nbsp;            }
+<i>215</i>&nbsp;        }
+<b class="nc"><i>216</i>&nbsp;        throw new OutOfHorsesException();</b>
+<i>217</i>&nbsp;    }
+<i>218</i>&nbsp;
+<i>219</i>&nbsp;    private String parseRegisterId(String line) throws DataObjectException {
+<b class="nc"><i>220</i>&nbsp;        String registerIdStr = &quot;&quot;;</b>
+<b class="nc"><i>221</i>&nbsp;        int startIndex = line.indexOf(&quot;?sp=&quot;);</b>
+<b class="nc"><i>222</i>&nbsp;        if(startIndex &gt; 0) {</b>
+<b class="nc"><i>223</i>&nbsp;            int e = -1;</b>
+<b class="nc"><i>224</i>&nbsp;            registerIdStr = line.substring(startIndex + 4);</b>
+<i>225</i>&nbsp;            //int endIndex = registerIdStr.indexOf(&quot;&amp;amp;sp=X&quot;);
+<i>226</i>&nbsp;            //if(endIndex &gt; 0) {
+<b class="nc"><i>227</i>&nbsp;                registerIdStr = registerIdStr.substring(0, 20);</b>
+<b class="nc"><i>228</i>&nbsp;            if((e = registerIdStr.indexOf(&quot;&amp;&quot;)) &gt; 0) {</b>
+<b class="nc"><i>229</i>&nbsp;                registerIdStr = registerIdStr.substring(0, e);</b>
+<i>230</i>&nbsp;            }
+<i>231</i>&nbsp;            //} else throw new DataObjectException(&quot;Horse register number parsing failed: &quot; + line);
+<b class="nc"><i>232</i>&nbsp;        } else throw new DataObjectException(&quot;Horse register number parsing failed: &quot; + line);</b>
+<i>233</i>&nbsp;
+<b class="nc"><i>234</i>&nbsp;        return registerIdStr;</b>
+<i>235</i>&nbsp;    }
+<i>236</i>&nbsp;
+<i>237</i>&nbsp;    private void parseLength() throws OutOfHorsesException, DataObjectException, AbsentException {
+<i>238</i>&nbsp;
+<b class="nc"><i>239</i>&nbsp;        String line = HTMLParser.readBlock(lines, &quot;h2&quot;);</b>
+<i>240</i>&nbsp;
+<b class="nc"><i>241</i>&nbsp;        if(line.length() &gt; 0) {</b>
+<b class="nc"><i>242</i>&nbsp;            if(line.indexOf(&quot;POISSA&quot;) &gt;= 0) {</b>
+<b class="nc"><i>243</i>&nbsp;                defaultTrack = defaultTrack.add(BigDecimal.ONE);</b>
+<b class="nc"><i>244</i>&nbsp;                throw new AbsentException(this.raceProgramHorse.getId());</b>
+<i>245</i>&nbsp;            }
+<b class="nc"><i>246</i>&nbsp;            StringTokenizer st = new StringTokenizer(line, &quot;:&quot;);</b>
+<b class="nc"><i>247</i>&nbsp;            switch (st.countTokens()) {</b>
+<i>248</i>&nbsp;                case 1:
+<b class="nc"><i>249</i>&nbsp;                    raceProgramHorse.setRaceTrack(new BigDecimal(st.nextToken().trim()));</b>
+<b class="nc"><i>250</i>&nbsp;                    if(raceProgramHorse.getRaceTrack().compareTo(defaultTrack) &lt;= 0) {</b>
+<b class="nc"><i>251</i>&nbsp;                        defaultDistance = defaultDistance.add(new BigDecimal(&quot;20&quot;));</b>
+<i>252</i>&nbsp;                    }
+<b class="nc"><i>253</i>&nbsp;                    raceProgramHorse.setRaceLength(defaultDistance);</b>
+<b class="nc"><i>254</i>&nbsp;                    break;</b>
+<i>255</i>&nbsp;                case 2:
+<b class="nc"><i>256</i>&nbsp;                    raceProgramHorse.setRaceLength(new BigDecimal(st.nextToken().trim()));</b>
+<b class="nc"><i>257</i>&nbsp;                    defaultDistance = raceProgramHorse.getRaceLength();</b>
+<b class="nc"><i>258</i>&nbsp;                    raceProgramHorse.setRaceTrack(new BigDecimal(st.nextToken().trim()));</b>
+<b class="nc"><i>259</i>&nbsp;                    break;</b>
+<i>260</i>&nbsp;                default:
+<b class="nc"><i>261</i>&nbsp;                    throw new DataObjectException(&quot;not a raceLength:raceTrack data: &quot; + line);</b>
+<i>262</i>&nbsp;            }
+<b class="nc"><i>263</i>&nbsp;            defaultTrack = raceProgramHorse.getRaceTrack();</b>
+<b class="nc"><i>264</i>&nbsp;            raceProgramHorse.setRaceMode(raceProgramStart.getRaceMode());</b>
+<b class="nc"><i>265</i>&nbsp;            raceProgramStart.addRaceLength(raceProgramHorse.getRaceLength());</b>
+<i>266</i>&nbsp;
+<b class="nc"><i>267</i>&nbsp;            raceProgramHorse.setRaceHandicap(raceProgramStart);</b>
+<b class="nc"><i>268</i>&nbsp;            raceProgramHorse.initTrackId();</b>
+<i>269</i>&nbsp;
+<i>270</i>&nbsp;            return;
+<i>271</i>&nbsp;        }
+<b class="nc"><i>272</i>&nbsp;        throw new OutOfHorsesException();</b>
+<i>273</i>&nbsp;    }
+<i>274</i>&nbsp;
+<i>275</i>&nbsp;    /**
+<i>276</i>&nbsp;     *  &lt;td colspan=&quot;2&quot;&gt;&lt;h2&gt;&lt;/h2&gt;&lt;/td&gt;
+<i>277</i>&nbsp;     *  &lt;td colspan=&quot;3&quot;&gt;&lt;h2&gt;31,1ke&lt;/h2&gt;&lt;/td&gt;
+<i>278</i>&nbsp;     *  &lt;td colspan=&quot;5&quot;&gt;&lt;h2&gt;2.320 €&lt;/h2&gt;&lt;/td&gt;
+<i>279</i>&nbsp;     *
+<i>280</i>&nbsp;     *  &lt;/h2&gt;&lt;/td&gt;
+<i>281</i>&nbsp;     *  &lt;td&gt;&lt;h2&gt;
+<i>282</i>&nbsp;     *      2100:1
+<i>283</i>&nbsp;     *  &lt;/h2&gt;&lt;/td&gt;
+<i>284</i>&nbsp;     *  &lt;td colspan=&quot;2&quot;&gt;&lt;h2&gt;
+<i>285</i>&nbsp;     *      14,6aly
+<i>286</i>&nbsp;     *  &lt;/h2&gt;&lt;/td&gt;
+<i>287</i>&nbsp;     *  &lt;td colspan=&quot;3&quot;&gt;&lt;h2&gt;
+<i>288</i>&nbsp;     *      17,4ke
+<i>289</i>&nbsp;     *  &lt;/h2&gt;&lt;/td&gt;
+<i>290</i>&nbsp;     *  &lt;td colspan=&quot;6&quot;&gt;&lt;h2&gt;
+<i>291</i>&nbsp;     *      5.640 €
+<i>292</i>&nbsp;     *  &lt;/h2&gt;&lt;/td&gt;
+<i>293</i>&nbsp;     */
+<i>294</i>&nbsp;    private TimeStatistics parseRecords(TimeStatistics form) {
+<i>295</i>&nbsp;        String line;
+<i>296</i>&nbsp;
+<b class="nc"><i>297</i>&nbsp;        line = HTMLParser.readBlock(lines, &quot;h2&quot;);</b>
+<i>298</i>&nbsp;        // virheellistä tietoa ei kannata tallettaa
+<i>299</i>&nbsp;        //form.addaRecord(new AlphaNumber(line));
+<i>300</i>&nbsp;
+<b class="nc"><i>301</i>&nbsp;        line = HTMLParser.readBlock(lines, &quot;h2&quot;);</b>
+<i>302</i>&nbsp;        // virheellistä tietoa ei kannata tallettaa
+<i>303</i>&nbsp;        //form.addtRecord(new AlphaNumber(line));
+<i>304</i>&nbsp;
+<b class="nc"><i>305</i>&nbsp;        line = HTMLParser.readBlock(lines, &quot;h2&quot;);</b>
+<i>306</i>&nbsp;        //line = line.replace(&quot;.&quot;, &quot;&quot;);
+<i>307</i>&nbsp;        // virheellistä tietoa ei kannata tallettaa
+<i>308</i>&nbsp;        //form.setAwards(new AlphaNumber(line));
+<i>309</i>&nbsp;
+<b class="nc"><i>310</i>&nbsp;        return form;</b>
+<i>311</i>&nbsp;    }
+<i>312</i>&nbsp;
+<i>313</i>&nbsp;
+<i>314</i>&nbsp;
+<i>315</i>&nbsp;
+<i>316</i>&nbsp;
+<i>317</i>&nbsp;    /*
+<i>318</i>&nbsp;     * 9 v prt T
+<i>319</i>&nbsp;     * 4 v  O
+<i>320</i>&nbsp;     */
+<i>321</i>&nbsp;    private void parseAgeLine() throws AbsentException, DataObjectException {
+<b class="nc"><i>322</i>&nbsp;        String line = HTMLParser.readBlock(lines, &quot;td&quot;);</b>
+<i>323</i>&nbsp;
+<i>324</i>&nbsp;        try {
+<b class="nc"><i>325</i>&nbsp;            StringTokenizer st = new StringTokenizer(line, &quot; &quot;);</b>
+<i>326</i>&nbsp;
+<b class="nc"><i>327</i>&nbsp;            raceProgramHorse.age = new BigDecimal(st.nextToken());</b>
+<b class="nc"><i>328</i>&nbsp;            st.nextToken(); // v</b>
+<b class="nc"><i>329</i>&nbsp;            if(st.countTokens() &gt;= 2) {</b>
+<i>330</i>&nbsp;                // Väri saattaa puutua
+<b class="nc"><i>331</i>&nbsp;                raceProgramHorse.color = st.nextToken();</b>
+<i>332</i>&nbsp;            } else {
+<b class="nc"><i>333</i>&nbsp;                System.out.println(&quot;RaceProgramHorseParser.parseAgeLine&quot;);</b>
+<i>334</i>&nbsp;            }
+<b class="nc"><i>335</i>&nbsp;            raceProgramHorse.sex = st.nextToken();</b>
+<i>336</i>&nbsp;
+<i>337</i>&nbsp;            /* &lt;a href=&quot;/heppa/racing/RaceProgramOneRace,getSire.$DirectLink.sdirect;jsessionid=p6+QtwpVje2pJ3mNO95X1Q**.app3?sp=l8484551630642229556&amp;amp;sp=X&quot; onclick=&quot;return setStatusAndEnsure(selectText, this);&quot; class=&quot;&quot;&gt;
+<i>338</i>&nbsp;             *      Taikuri
+<i>339</i>&nbsp;             *      &lt;/a&gt;
+<i>340</i>&nbsp;             */
+<b class="nc"><i>341</i>&nbsp;            line = HTMLParser.readBlock(line, &quot;a&quot;);</b>
+<b class="nc"><i>342</i>&nbsp;            raceProgramHorse.sire = line.strip();</b>
+<i>343</i>&nbsp;
+<b class="nc"><i>344</i>&nbsp;            if(raceProgramHorse.sire.length() == 0) {</b>
+<b class="nc"><i>345</i>&nbsp;                Log.write(&quot;raceProgramHorse.sire of zero length: &quot; + this.raceProgramHorse.getId());</b>
+<i>346</i>&nbsp;            }
+<b class="nc"><i>347</i>&nbsp;        } catch (Exception e) {</b>
+<b class="nc"><i>348</i>&nbsp;            Log.write(&quot;Failed to parse Age line for the racebook horse &#39;&quot; + this.raceProgramHorse.getId() + &quot;&#39;: line = &quot; + line);</b>
+<i>349</i>&nbsp;            //throw new IOException(raceProgramHorse.getId());
+<b class="nc"><i>350</i>&nbsp;        }</b>
+<b class="nc"><i>351</i>&nbsp;        parseSubStart(line);</b>
+<i>352</i>&nbsp;    }
+<i>353</i>&nbsp;
+<i>354</i>&nbsp;    /**
+<i>355</i>&nbsp;     * Set the dam and mothers&#39; sire information and adds substart information if existsInDatabase
+<i>356</i>&nbsp;     *
+<i>357</i>&nbsp;     * 	&lt;a href=&quot;/heppa/racing/RaceProgramOneRace,getDam.$DirectLink.sdirect;jsessionid=p6+QtwpVje2pJ3mNO95X1Q**.app3?sp=l4384465477373875123&amp;amp;sp=X&quot; onclick=&quot;return setStatusAndEnsure(selectText, this);&quot; class=&quot;&quot;&gt;
+<i>358</i>&nbsp;     *      Kaikun Kaija
+<i>359</i>&nbsp;     *   &lt;/a&gt;
+<i>360</i>&nbsp;     *
+<i>361</i>&nbsp;     *  &lt;a href=&quot;/heppa/racing/RaceProgramOneRace,getSireOfDam.$DirectLink.sdirect;jsessionid=p6+QtwpVje2pJ3mNO95X1Q**.app3?sp=l7437605342387421828&amp;amp;sp=X&quot; onclick=&quot;return setStatusAndEnsure(selectText, this);&quot; class=&quot;&quot;&gt;
+<i>362</i>&nbsp;     *      Kaarlon-Kaiku
+<i>363</i>&nbsp;     *  &lt;/a&gt;
+<i>364</i>&nbsp;     *
+<i>365</i>&nbsp;     */
+<i>366</i>&nbsp;    private void parseDamLine() throws IOException, DataObjectException {
+<b class="nc"><i>367</i>&nbsp;        String line = &quot;&quot;;</b>
+<i>368</i>&nbsp;        try {
+<b class="nc"><i>369</i>&nbsp;            line = HTMLParser.readBlock(lines, &quot;a&quot;, &quot;getDam&quot;);</b>
+<b class="nc"><i>370</i>&nbsp;            raceProgramHorse.dam = line.strip();</b>
+<i>371</i>&nbsp;
+<b class="nc"><i>372</i>&nbsp;            if(raceProgramHorse.dam.length() == 0) {</b>
+<b class="nc"><i>373</i>&nbsp;                Log.write(&quot;Could not find getDam. raceProgramHorse.dam of zero length: &quot; + this.raceProgramHorse.getId());</b>
+<i>374</i>&nbsp;            }
+<i>375</i>&nbsp;
+<b class="nc"><i>376</i>&nbsp;            line = HTMLParser.readBlock(lines, &quot;a&quot;, &quot;getSireOfDam&quot;);</b>
+<b class="nc"><i>377</i>&nbsp;            raceProgramHorse.sireOfDam = line.strip();</b>
+<i>378</i>&nbsp;
+<b class="nc"><i>379</i>&nbsp;            if(raceProgramHorse.sireOfDam.length() == 0) {</b>
+<b class="nc"><i>380</i>&nbsp;                Log.write(&quot;Could not find getSireOfDam. raceProgramHorse.sireOfDam of zero length: &quot; + this.raceProgramHorse.getId());</b>
+<i>381</i>&nbsp;            }
+<i>382</i>&nbsp;
+<b class="nc"><i>383</i>&nbsp;        } catch (Exception e) {</b>
+<b class="nc"><i>384</i>&nbsp;            Log.write(e);</b>
+<b class="nc"><i>385</i>&nbsp;        }</b>
+<i>386</i>&nbsp;
+<b class="nc"><i>387</i>&nbsp;        parseSubStart(line);</b>
+<i>388</i>&nbsp;    }
+<i>389</i>&nbsp;
+<i>390</i>&nbsp;    public void parseSubStart(String line) throws DataObjectException, AbsentException {
+<i>391</i>&nbsp;        try {
+<b class="nc"><i>392</i>&nbsp;            if(HarnessApp.useHorseRaceHistoryLink == false || HarnessApp.debugMode == true) {</b>
+<b class="nc"><i>393</i>&nbsp;                SubStartParser subStartParser = new SubStartParser(lines, raceDate, raceProgramHorse);</b>
+<b class="nc"><i>394</i>&nbsp;                SubStart subStart = (SubStart)subStartParser.parse(line);</b>
+<i>395</i>&nbsp;
+<b class="nc"><i>396</i>&nbsp;                System.out.println(&quot;RaceProgramHorseParser.parseSubStart: &quot; + subStart.toString());</b>
+<i>397</i>&nbsp;                if(HarnessApp.useHorseRaceHistoryLink == false) {
+<i>398</i>&nbsp;                    // Ottaa lähtölistojen startit käyttöön, jos historialinkkiä ei käytetä
+<i>399</i>&nbsp;                    raceProgramHorse.add(subStart);
+<i>400</i>&nbsp;                }
+<b class="nc"><i>401</i>&nbsp;            } else {</b>
+<i>402</i>&nbsp;                // Etsii rivin loppukohdan
+<b class="nc"><i>403</i>&nbsp;                while(line.indexOf(&quot;&lt;/tr&gt;&quot;) &lt; 0 &amp;&amp; lines.hasNext()) {</b>
+<b class="nc"><i>404</i>&nbsp;                    line = (String) lines.next();</b>
+<i>405</i>&nbsp;                }
+<i>406</i>&nbsp;            }
+<i>407</i>&nbsp;
+<b class="nc"><i>408</i>&nbsp;        } catch (SubStartMissingException se) {</b>
+<i>409</i>&nbsp;            // do nothing
+<b class="nc"><i>410</i>&nbsp;        } catch (UnvalidStartException ue) {</b>
+<i>411</i>&nbsp;            // Tarkista jatkuuko ohjemla tästä oikein
+<b class="nc"><i>412</i>&nbsp;            System.out.println(&quot;RaceProgramHorseParser.parseSubStart: &quot; + ue.toString());</b>
+<i>413</i>&nbsp;
+<b class="nc"><i>414</i>&nbsp;        }</b>
+<i>415</i>&nbsp;    }
+<i>416</i>&nbsp;
+<i>417</i>&nbsp;    /**
+<i>418</i>&nbsp;     * Set the color information and adds substart information if existsInDatabase
+<i>419</i>&nbsp;     *
+<i>420</i>&nbsp;     * &lt;td&gt;vihr musta - vihr&lt;/td&gt;
+<i>421</i>&nbsp;     *
+<i>422</i>&nbsp;     * @param line string containing the required information
+<i>423</i>&nbsp;     * f.e. &quot;[VALK MUSTA PUN - VALK][C Mayr][T ][5.8.  ][3 ][2100/11][22,9a          ][11             ][309 ]&quot;
+<i>424</i>&nbsp;     * @throws IOException if line format doesn&#39;t match
+<i>425</i>&nbsp;     */
+<i>426</i>&nbsp;    private void parseColorLine() throws IOException {
+<i>427</i>&nbsp;        try {
+<b class="nc"><i>428</i>&nbsp;            String line = HTMLParser.readBlock(lines, &quot;td&quot;);</b>
+<b class="nc"><i>429</i>&nbsp;            StringTokenizer ct = new StringTokenizer(line, &quot;-&quot;);</b>
+<i>430</i>&nbsp;
+<b class="nc"><i>431</i>&nbsp;            if (ct.hasMoreTokens()) raceProgramHorse.color1 = ct.nextToken().trim();</b>
+<b class="nc"><i>432</i>&nbsp;            if (ct.hasMoreTokens()) raceProgramHorse.color2 = ct.nextToken().trim();</b>
+<i>433</i>&nbsp;
+<b class="nc"><i>434</i>&nbsp;            parseSubStart(line);</b>
+<b class="nc"><i>435</i>&nbsp;        } catch (Exception e) {</b>
+<b class="nc"><i>436</i>&nbsp;            throw new IOException(e);</b>
+<b class="nc"><i>437</i>&nbsp;        }</b>
+<i>438</i>&nbsp;    }
+<i>439</i>&nbsp;
+<i>440</i>&nbsp;    /**
+<i>441</i>&nbsp;     * Reads the owner and location information
+<i>442</i>&nbsp;     *
+<i>443</i>&nbsp;     ****Esimerkkki 1
+<i>444</i>&nbsp;     *  &lt;td&gt;
+<i>445</i>&nbsp;     *
+<i>446</i>&nbsp;     * 		&lt;a href=&quot;/heppa/racing/RaceProgramOneRace,getOwnersName.$DirectLink.sdirect;jsessionid=lbCRfokeu9uHCsIqqv4VTg**.app3?sp=l8844053822602338770&amp;amp;sp=SGROUP&amp;amp;sp=X&quot; onclick=&quot;setStatusText(selectText)&quot; class=&quot;&quot;&gt;
+<i>447</i>&nbsp;     * 						Team Press Photo
+<i>448</i>&nbsp;     * 		&lt;/a&gt;
+<i>449</i>&nbsp;     * ,&amp;nbsp;Vehkataipale
+<i>450</i>&nbsp;     * 	                    &lt;/td&gt;
+<i>451</i>&nbsp;     **** Esimerkki 2
+<i>452</i>&nbsp;     * 	&lt;td&gt;Team Kaalimaan Vartijat,&amp;nbsp;Sulkava&lt;/td&gt;
+<i>453</i>&nbsp;     *
+<i>454</i>&nbsp;     ****
+<i>455</i>&nbsp;     * @throws IOException if line format doesn&#39;t match
+<i>456</i>&nbsp;     */
+<i>457</i>&nbsp;    private void parseOwnerLine() throws IOException {
+<b class="nc"><i>458</i>&nbsp;        StringBuilder sbLine = new StringBuilder(HTMLParser.readBlock(lines, &quot;td&quot;));</b>
+<i>459</i>&nbsp;        try {
+<b class="nc"><i>460</i>&nbsp;            if(sbLine != null) {</b>
+<b class="nc"><i>461</i>&nbsp;                if (sbLine.toString().contains(&quot;getOwnersName&quot;)) {</b>
+<b class="nc"><i>462</i>&nbsp;                    String owner = HTMLParser.readBlock(sbLine, &quot;a&quot;);</b>
+<b class="nc"><i>463</i>&nbsp;                    if(owner != null) {</b>
+<b class="nc"><i>464</i>&nbsp;                        raceProgramHorse.setOwner(owner.strip());</b>
+<i>465</i>&nbsp;                    }
+<b class="nc"><i>466</i>&nbsp;                    if (sbLine.indexOf(&quot;,&quot;) &gt; 0) {</b>
+<b class="nc"><i>467</i>&nbsp;                        raceProgramHorse.setOwnerLocation(sbLine.substring(sbLine.indexOf(&quot;,&quot;) + 1).strip());</b>
+<i>468</i>&nbsp;                    }
+<b class="nc"><i>469</i>&nbsp;                } else {</b>
+<b class="nc"><i>470</i>&nbsp;                    if (sbLine.indexOf(&quot;,&quot;) &gt; 0) {</b>
+<b class="nc"><i>471</i>&nbsp;                        raceProgramHorse.setOwner(sbLine.substring(0, sbLine.indexOf(&quot;,&quot;)).strip());</b>
+<b class="nc"><i>472</i>&nbsp;                        raceProgramHorse.setOwnerLocation(sbLine.substring(sbLine.indexOf(&quot;,&quot;) + 1).strip());</b>
+<i>473</i>&nbsp;                    }
+<i>474</i>&nbsp;                }
+<i>475</i>&nbsp;            }
+<b class="nc"><i>476</i>&nbsp;            parseSubStart(&quot;&quot;);</b>
+<b class="nc"><i>477</i>&nbsp;        } catch (Exception e) {</b>
+<b class="nc"><i>478</i>&nbsp;            throw new IOException(this.raceProgramStart.getId() + &quot;:&quot; + sbLine);</b>
+<b class="nc"><i>479</i>&nbsp;        }</b>
+<i>480</i>&nbsp;    }
+<i>481</i>&nbsp;
+<i>482</i>&nbsp;    /**
+<i>483</i>&nbsp;     * Reads the trainer information and adds substart information if existsInDatabase
+<i>484</i>&nbsp;     *
+<i>485</i>&nbsp;     *  &lt;a href=&quot;/heppa/racing/RaceProgramOneRace,getTrainersName.$DirectLink.sdirect;jsessionid=p6+QtwpVje2pJ3mNO95X1Q**.app3?sp=l6963760377956648714&amp;amp;sp=SPERSON&amp;amp;sp=X&quot; onclick=&quot;setStatusText(selectText)&quot; class=&quot;&quot;&gt;
+<i>486</i>&nbsp;     *      Mia Käri
+<i>487</i>&nbsp;     *  &lt;/a&gt;
+<i>488</i>&nbsp;     *
+<i>489</i>&nbsp;     *  */
+<i>490</i>&nbsp;    private void parseTraineeLine() throws IOException {
+<b class="nc"><i>491</i>&nbsp;        String line = HTMLParser.readBlock(lines, &quot;td&quot;);</b>
+<i>492</i>&nbsp;        try {
+<b class="nc"><i>493</i>&nbsp;            if(line != null) {</b>
+<b class="nc"><i>494</i>&nbsp;                if(line.contains(&quot;getTrainersName&quot;)) {</b>
+<b class="nc"><i>495</i>&nbsp;                    line = HTMLParser.readBlock(line, &quot;a&quot;);</b>
+<i>496</i>&nbsp;                }
+<b class="nc"><i>497</i>&nbsp;                if(line != null &amp;&amp; !line.strip().isEmpty()) {</b>
+<i>498</i>&nbsp;                    // Valmentajatieto voi puuttua, jos kuljettaja on myös valmentaja
+<b class="nc"><i>499</i>&nbsp;                    raceProgramHorse.setCoach(line.strip());</b>
+<i>500</i>&nbsp;                }
+<i>501</i>&nbsp;            }
+<i>502</i>&nbsp;
+<b class="nc"><i>503</i>&nbsp;            parseSubStart(line);</b>
+<b class="nc"><i>504</i>&nbsp;        } catch (Exception e) {</b>
+<b class="nc"><i>505</i>&nbsp;            throw new IOException(line);</b>
+<b class="nc"><i>506</i>&nbsp;        }</b>
+<i>507</i>&nbsp;    }
+<i>508</i>&nbsp;
+<i>509</i>&nbsp;    /**
+<i>510</i>&nbsp;     * Set the raceDriverName and raceDriverName class information and adds substart information if existsInDatabase
+<i>511</i>&nbsp;     *
+<i>512</i>&nbsp;     * 		&lt;a href=&quot;/heppa/racing/RaceProgramOneRace,getDriverName.$DirectLink.sdirect;jsessionid=p6+QtwpVje2pJ3mNO95X1Q**.app3?sp=l1008590282525332929&amp;amp;sp=SPERSON&amp;amp;sp=X&quot; onclick=&quot;setStatusText(selectText)&quot; class=&quot;original_driver&quot;&gt;
+<i>513</i>&nbsp;     *          S Markkula
+<i>514</i>&nbsp;     *      &lt;/a&gt;
+<i>515</i>&nbsp;     *      (aA)&lt;/td&gt;
+<i>516</i>&nbsp;     */
+<i>517</i>&nbsp;    private void parseJockeyLine() throws IOException {
+<i>518</i>&nbsp;        try {
+<b class="nc"><i>519</i>&nbsp;            String line = HTMLParser.readBlock(lines, &quot;td&quot;, &quot;getDriverName&quot;);</b>
+<b class="nc"><i>520</i>&nbsp;            if(line != null) {</b>
+<b class="nc"><i>521</i>&nbsp;                String sDriver = HTMLParser.readBlock(line, &quot;a&quot;);</b>
+<b class="nc"><i>522</i>&nbsp;                String driverClass = null;</b>
+<b class="nc"><i>523</i>&nbsp;                if(line.contains(&quot;(&quot;)) {</b>
+<b class="nc"><i>524</i>&nbsp;                    driverClass = line.substring(line.lastIndexOf(&quot;(&quot;) + 1);</b>
+<b class="nc"><i>525</i>&nbsp;                    driverClass = driverClass.substring(0, driverClass.indexOf(&quot;)&quot;));</b>
+<i>526</i>&nbsp;                }
+<b class="nc"><i>527</i>&nbsp;                RaceProgramDriver raceProgramDriver = new RaceProgramDriver(sDriver.strip());</b>
+<i>528</i>&nbsp;
+<b class="nc"><i>529</i>&nbsp;                if(driverClass != null) {</b>
+<b class="nc"><i>530</i>&nbsp;                    if(driverClass.length() &lt; 4) {</b>
+<b class="nc"><i>531</i>&nbsp;                        raceProgramDriver.setJockeyClass(driverClass);</b>
+<i>532</i>&nbsp;                    } else {
+<b class="nc"><i>533</i>&nbsp;                        Log.write(&quot;Too long driverClass: &quot; + driverClass + &quot;: &quot; + raceProgramHorse.getId());</b>
+<i>534</i>&nbsp;                    }
+<i>535</i>&nbsp;                }
+<i>536</i>&nbsp;
+<b class="nc"><i>537</i>&nbsp;                raceProgramHorse.setRaceProgramDriver(raceProgramDriver);</b>
+<b class="nc"><i>538</i>&nbsp;            } else {</b>
+<b class="nc"><i>539</i>&nbsp;                System.out.println(&quot;RaceProgramHorseParser.parseJockeyLine&quot;);</b>
+<i>540</i>&nbsp;            }
+<i>541</i>&nbsp;
+<b class="nc"><i>542</i>&nbsp;            if (raceProgramHorse.getCoach() == null || raceProgramHorse.getCoach().toString().length() == 0) {</b>
+<b class="nc"><i>543</i>&nbsp;                raceProgramHorse.setCoach(formatName(raceProgramHorse.getRaceProgramDriver().toString()));</b>
+<i>544</i>&nbsp;            }
+<i>545</i>&nbsp;
+<b class="nc"><i>546</i>&nbsp;            parseSubStart(line);</b>
+<b class="nc"><i>547</i>&nbsp;        } catch (Exception e) {</b>
+<b class="nc"><i>548</i>&nbsp;            Log.write(e);</b>
+<b class="nc"><i>549</i>&nbsp;            throw new IOException();</b>
+<b class="nc"><i>550</i>&nbsp;        }</b>
+<i>551</i>&nbsp;    }
+<i>552</i>&nbsp;
+<i>553</i>&nbsp;    /**
+<i>554</i>&nbsp;     * Set the total statistics of the raceDriverName and adds substart information if existsInDatabase
+<i>555</i>&nbsp;     *
+<i>556</i>&nbsp;     * @param line string containing the required information
+<i>557</i>&nbsp;     * f.e. &quot;[Yht:31478 3877-3310-2940   8.958.423 e][H Koivunen][P ][19.12.][3 ][2100/ 4][23,7a          ][10             ][*52 ]&quot;
+<i>558</i>&nbsp;     * @throws IOException if line format doesn&#39;t match
+<i>559</i>&nbsp;     */
+<i>560</i>&nbsp;    //private void parseJockeyStatisticLine() throws IOException {
+<i>561</i>&nbsp;    private void parseJockeyStatisticLine() throws IOException {
+<b class="nc"><i>562</i>&nbsp;        String line = &quot;&quot;;</b>
+<i>563</i>&nbsp;        try {
+<b class="nc"><i>564</i>&nbsp;            String form = HTMLParser.readBlock(lines, &quot;td&quot;);</b>
+<i>565</i>&nbsp;            /*
+<i>566</i>&nbsp;            while(lines.hasNext()) {
+<i>567</i>&nbsp;                line = (String)lines.next();
+<i>568</i>&nbsp;                if(line.indexOf(&quot;&lt;td&gt;&quot;) &gt;=0) {
+<i>569</i>&nbsp;                    line = HTMLParser.clean(line);
+<i>570</i>&nbsp;                    //raceProgramHorse.getDriver().setTotalForm(new FormParser().parse(line));
+<i>571</i>&nbsp;                    break;
+<i>572</i>&nbsp;                }
+<i>573</i>&nbsp;            }*/
+<i>574</i>&nbsp;
+<b class="nc"><i>575</i>&nbsp;            parseSubStart(line);</b>
+<b class="nc"><i>576</i>&nbsp;        } catch (Exception e) {</b>
+<b class="nc"><i>577</i>&nbsp;            Log.write(e, line);</b>
+<i>578</i>&nbsp;            //throw new IOException(&quot;&#39;&quot; + line + &quot;&#39;&quot;);
+<b class="nc"><i>579</i>&nbsp;        }</b>
+<i>580</i>&nbsp;    }
+<i>581</i>&nbsp;
+<i>582</i>&nbsp;    /**
+<i>583</i>&nbsp;     * Set the year statistics of the raceDriverName and adds substart information if existsInDatabase
+<i>584</i>&nbsp;     *
+<i>585</i>&nbsp;     * @param line string containing the required information
+<i>586</i>&nbsp;     * f.e. &quot;[04 :   48    6-   5-   1      13.150 e][To Salo][T ][30.12.][8 ][2100/ 2][21,1a          ][7              ][160 ]&quot;
+<i>587</i>&nbsp;     * @throws IOException if line format doesn&#39;t match
+<i>588</i>&nbsp;     */
+<i>589</i>&nbsp;    //private void parseJockeyYearStatisticLine() throws IOException {
+<i>590</i>&nbsp;    private void parseJockeyYearStatisticLine() {
+<b class="nc"><i>591</i>&nbsp;        String line= &quot;&quot;;</b>
+<i>592</i>&nbsp;        try {
+<b class="nc"><i>593</i>&nbsp;            String form = HTMLParser.readBlock(lines, &quot;td&quot;);</b>
+<i>594</i>&nbsp;
+<i>595</i>&nbsp;            /*
+<i>596</i>&nbsp;            while(lines.hasNext()) {
+<i>597</i>&nbsp;                line = (String)lines.next();
+<i>598</i>&nbsp;                if(line.indexOf(&quot;&lt;td&gt;&quot;) &gt;=0) {
+<i>599</i>&nbsp;                    line = HTMLParser.clean(line);
+<i>600</i>&nbsp;                    //raceProgramHorse.getDriver().setYearForm( new FormParser().parse(line));
+<i>601</i>&nbsp;                    break;
+<i>602</i>&nbsp;                }
+<i>603</i>&nbsp;            }*/
+<i>604</i>&nbsp;
+<b class="nc"><i>605</i>&nbsp;            parseSubStart(line);</b>
+<b class="nc"><i>606</i>&nbsp;        } catch (Exception e) {</b>
+<b class="nc"><i>607</i>&nbsp;            Log.write(e, line);</b>
+<i>608</i>&nbsp;            //throw new IOException(&quot;&#39;&quot; + line + &quot;&#39;&quot;);
+<b class="nc"><i>609</i>&nbsp;        }</b>
+<i>610</i>&nbsp;    }
+<i>611</i>&nbsp;
+<i>612</i>&nbsp;    /**
+<i>613</i>&nbsp;     * Formats input string to a namecase format where first chars of the raceHorseName are uppercase and other lowercase
+<i>614</i>&nbsp;     *
+<i>615</i>&nbsp;     * @param unformalName unformatted string
+<i>616</i>&nbsp;     * @return A string with a namecase format
+<i>617</i>&nbsp;     */
+<i>618</i>&nbsp;    public static String formatName(String unformalName) {
+<i>619</i>&nbsp;        //System.out.println(&quot;Horse.formatName(&quot; + unformalName + &quot;)&quot;);
+<b class="nc"><i>620</i>&nbsp;        unformalName = unformalName.toLowerCase();</b>
+<b class="nc"><i>621</i>&nbsp;        StringBuffer formalName = new StringBuffer();</b>
+<b class="nc"><i>622</i>&nbsp;        StringTokenizer s = new StringTokenizer(unformalName, &quot; -&quot;, true);</b>
+<b class="nc"><i>623</i>&nbsp;        while(s.hasMoreTokens()) {</b>
+<b class="nc"><i>624</i>&nbsp;            String p = s.nextToken();</b>
+<b class="nc"><i>625</i>&nbsp;            formalName.append(Character.toUpperCase(p.charAt(0)));</b>
+<b class="nc"><i>626</i>&nbsp;            if(p.length() &gt; 1)</b>
+<b class="nc"><i>627</i>&nbsp;                formalName.append(p.substring(1));</b>
+<b class="nc"><i>628</i>&nbsp;        }</b>
+<i>629</i>&nbsp;        //System.out.println(&quot;-&gt; formalName: &quot; + formalName);
+<b class="nc"><i>630</i>&nbsp;        return formalName.toString();</b>
+<i>631</i>&nbsp;    }
+<i>632</i>&nbsp;
+<i>633</i>&nbsp;    public RaceProgramStart getRaceProgramStart() {
+<b class="nc"><i>634</i>&nbsp;        return raceProgramStart;</b>
+<i>635</i>&nbsp;    }
+<i>636</i>&nbsp;}
+</div>
+</div>
+
+<div class="footer">
+    
+    <div style="float:right;">generated on 2021-04-26 13:09</div>
+</div>
+</body>
+</html>

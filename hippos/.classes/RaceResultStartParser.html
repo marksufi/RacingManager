@@ -1,0 +1,473 @@
+
+
+
+<!DOCTYPE html PUBLIC "-//W3C//DTD XHTML 1.0 Transitional//EN"
+  "http://www.w3.org/TR/xhtml1/DTD/xhtml1-transitional.dtd">
+<html id="htmlId">
+<head>
+  <title>Coverage Report :: RaceResultStartParser</title>
+  <style type="text/css">
+    @import "../../.css/coverage.css";
+  </style>
+</head>
+
+<body>
+<div class="header"></div>
+
+<div class="content">
+<div class="breadCrumbs">
+    [ <a href="../../index.html">all classes</a> ]
+    [ <a href="../index.html">hippos</a> ]
+</div>
+
+<h1>Coverage Summary for Class: RaceResultStartParser (hippos)</h1>
+
+<table class="coverageStats">
+<tr>
+  <th class="name">Class</th>
+<th class="coverageStat 
+">
+  Class, %
+</th>
+<th class="coverageStat 
+">
+  Method, %
+</th>
+<th class="coverageStat 
+">
+  Line, %
+</th>
+</tr>
+<tr>
+  <td class="name">RaceResultStartParser</td>
+<td class="coverageStat">
+  <span class="percent">
+    0%
+  </span>
+  <span class="absValue">
+    (0/ 1)
+  </span>
+</td>
+<td class="coverageStat">
+  <span class="percent">
+    0%
+  </span>
+  <span class="absValue">
+    (0/ 8)
+  </span>
+</td>
+<td class="coverageStat">
+  <span class="percent">
+    0%
+  </span>
+  <span class="absValue">
+    (0/ 184)
+  </span>
+</td>
+</tr>
+
+</table>
+
+<br/>
+<br/>
+
+
+<div class="sourceCode"><i>1</i>&nbsp;package hippos;
+<i>2</i>&nbsp;
+<i>3</i>&nbsp;import hippos.exception.*;
+<i>4</i>&nbsp;import hippos.io.RaceResultFile;
+<i>5</i>&nbsp;import hippos.math.AlphaNumber;
+<i>6</i>&nbsp;import hippos.math.betting.BetRate;
+<i>7</i>&nbsp;import hippos.math.racing.SectionalTime;
+<i>8</i>&nbsp;import hippos.utils.HorsesHelper;
+<i>9</i>&nbsp;import utils.HTMLParser;
+<i>10</i>&nbsp;import utils.Log;
+<i>11</i>&nbsp;
+<i>12</i>&nbsp;import java.io.IOException;
+<i>13</i>&nbsp;import java.math.BigDecimal;
+<i>14</i>&nbsp;import java.util.*;
+<i>15</i>&nbsp;
+<i>16</i>&nbsp;public class RaceResultStartParser {
+<i>17</i>&nbsp;    RaceResultStart raceResultStart;
+<i>18</i>&nbsp;    RaceResultFile raceResultFile;
+<i>19</i>&nbsp;
+<b class="nc"><i>20</i>&nbsp;    public RaceResultStartParser(RaceResultFile raceResultFile) {</b>
+<b class="nc"><i>21</i>&nbsp;        this.raceResultFile = raceResultFile;</b>
+<b class="nc"><i>22</i>&nbsp;        this.raceResultStart = new RaceResultStart(raceResultFile);</b>
+<i>23</i>&nbsp;    }
+<i>24</i>&nbsp;
+<i>25</i>&nbsp;    public Object parse(Iterator lines) throws RacesCancelledException, OutOfStartsException, UnvalidStartException {
+<i>26</i>&nbsp;        try {
+<b class="nc"><i>27</i>&nbsp;            parseStartData(lines);</b>
+<i>28</i>&nbsp;
+<i>29</i>&nbsp;            String line;
+<b class="nc"><i>30</i>&nbsp;            while((line = HTMLParser.readBlock(lines, &quot;td&quot;, &quot;raceResultPlacing&quot;, &quot;&lt;/div&gt;&quot;)) != null) {</b>
+<b class="nc"><i>31</i>&nbsp;                if(line.contains(&quot;&lt;/div&gt;&quot;))</b>
+<b class="nc"><i>32</i>&nbsp;                    break;</b>
+<i>33</i>&nbsp;
+<b class="nc"><i>34</i>&nbsp;                BigDecimal raceResultPlacing = null;</b>
+<b class="nc"><i>35</i>&nbsp;                if(line.contains(&quot;.&quot;)) {</b>
+<i>36</i>&nbsp;                    // Hevoselta löytyy sijoitus, hylätyillä ei ole
+<b class="nc"><i>37</i>&nbsp;                    line = line.strip();</b>
+<b class="nc"><i>38</i>&nbsp;                    line = line.substring(0, line.indexOf(&#39;.&#39;));</b>
+<b class="nc"><i>39</i>&nbsp;                    raceResultPlacing = new BigDecimal(line);</b>
+<i>40</i>&nbsp;                }
+<b class="nc"><i>41</i>&nbsp;                RaceResultHorseParser parser = new RaceResultHorseParser(raceResultStart, raceResultPlacing);</b>
+<i>42</i>&nbsp;
+<b class="nc"><i>43</i>&nbsp;                RaceResultHorse raceResultHorse = (RaceResultHorse)parser.parse(lines);</b>
+<b class="nc"><i>44</i>&nbsp;                if(raceResultHorse.present) {</b>
+<b class="nc"><i>45</i>&nbsp;                    raceResultStart.add(raceResultHorse);</b>
+<i>46</i>&nbsp;                } else {
+<b class="nc"><i>47</i>&nbsp;                    raceResultStart.add(raceResultHorse);</b>
+<i>48</i>&nbsp;                }
+<b class="nc"><i>49</i>&nbsp;            }</b>
+<i>50</i>&nbsp;
+<i>51</i>&nbsp;            /*
+<i>52</i>&nbsp;                Asettaa hevosille tasoituksen, ei voi asettaa muualla kuin nyt lopussa, koska
+<i>53</i>&nbsp;                tulostiedostossa lähdön esittelyssä matka usein virheellinen
+<i>54</i>&nbsp;             */
+<b class="nc"><i>55</i>&nbsp;            for(RaceResultHorse raceResultHorse : raceResultStart.getRaceResultHorses()) {</b>
+<b class="nc"><i>56</i>&nbsp;                raceResultHorse.setRaceHandicap(raceResultStart);</b>
+<b class="nc"><i>57</i>&nbsp;                raceResultHorse.initTrackId();</b>
+<b class="nc"><i>58</i>&nbsp;            }</b>
+<i>59</i>&nbsp;
+<b class="nc"><i>60</i>&nbsp;            parsePartTimes(lines);</b>
+<b class="nc"><i>61</i>&nbsp;            parseBetRates(lines);</b>
+<i>62</i>&nbsp;
+<b class="nc"><i>63</i>&nbsp;        } catch (RacesCancelledException e) {</b>
+<b class="nc"><i>64</i>&nbsp;            throw e;</b>
+<b class="nc"><i>65</i>&nbsp;        } catch (OutOfStartsException e) {</b>
+<b class="nc"><i>66</i>&nbsp;            throw e;</b>
+<b class="nc"><i>67</i>&nbsp;        } catch (OutOfHorsesException e) {</b>
+<i>68</i>&nbsp;            //System.out.print(&quot;&quot;);
+<b class="nc"><i>69</i>&nbsp;        } catch (UnvalidStartException e) {</b>
+<b class="nc"><i>70</i>&nbsp;            throw e;</b>
+<b class="nc"><i>71</i>&nbsp;        } catch (Exception e) {</b>
+<b class="nc"><i>72</i>&nbsp;            Log.write(e, this.raceResultFile.getId());</b>
+<b class="nc"><i>73</i>&nbsp;        }</b>
+<i>74</i>&nbsp;
+<b class="nc"><i>75</i>&nbsp;        return raceResultStart;</b>
+<i>76</i>&nbsp;    }
+<i>77</i>&nbsp;
+<i>78</i>&nbsp;    /**
+<i>79</i>&nbsp;     * Initializes a raceResultStart with values at line
+<i>80</i>&nbsp;     *
+<i>81</i>&nbsp;     * &lt;h3&gt;1. lähtö  klo 15:00 Kylmäveriset tasoitusajo 2120 m Etus. Suom. synt. Hyv. enint. 4-v. 20 m. p. 100e, 20 m/ 500e, 40 m/ 1200e,
+<i>82</i>&nbsp;     * &lt;h3&gt;1. ponilähtö A-Ponit tasoitusajo 1060 m KIINTEISTÖHUOLTO MIKKILÄ TMI p. 3.20.0 + 20 m/ 4,0 s P. 100 e.&lt;/h3&gt;
+<i>83</i>&nbsp;     * &lt;h3&gt;1. koelähtö  klo 17:20 Yhdistetty tasoitusajo 2100 m Avoin P. 0 e.&lt;/h3&gt;
+<i>84</i>&nbsp;     * &lt;h3&gt;1. nuoret-lähtö  klo 17:00 Yhdistetty (nuoret) tasoitusajo 2100 m Avoin P. 300 e. (300-200-100-100-100-100)&lt;/h3&gt;
+<i>85</i>&nbsp;     *
+<i>86</i>&nbsp;     * @throws IOException if the line syntax does not match
+<i>87</i>&nbsp;     */
+<i>88</i>&nbsp;    //private void parseStartData(Iterator lines) throws OutOfStartsException, UnvalidStartException, RacesCancelledException, FileFormatException {
+<i>89</i>&nbsp;    private void parseStartData(Iterator lines) throws FileFormatException, OutOfStartsException, UnvalidStartException, RacesCancelledException {
+<i>90</i>&nbsp;        try {
+<b class="nc"><i>91</i>&nbsp;            while (lines.hasNext()) {</b>
+<b class="nc"><i>92</i>&nbsp;                String line = HTMLParser.readBlock(lines, &quot;h3&quot;, &quot;lähtö&quot;, &quot;Ravipäivä on peruttu&quot;);</b>
+<b class="nc"><i>93</i>&nbsp;                if (line != null &amp;&amp; line.contains(&quot; lähtö&quot;)) {</b>
+<b class="nc"><i>94</i>&nbsp;                    StringTokenizer st = new StringTokenizer(line, &quot; \t.&quot;);</b>
+<b class="nc"><i>95</i>&nbsp;                    StringBuffer racemode = new StringBuffer();</b>
+<i>96</i>&nbsp;                    String token;
+<i>97</i>&nbsp;
+<i>98</i>&nbsp;                    /*
+<i>99</i>&nbsp;                        Lähdön numero
+<i>100</i>&nbsp;                     */
+<b class="nc"><i>101</i>&nbsp;                    token = st.nextToken().strip();</b>
+<b class="nc"><i>102</i>&nbsp;                    raceResultStart.setStartNumber(new BigDecimal(token));</b>
+<i>103</i>&nbsp;
+<i>104</i>&nbsp;                    /*
+<i>105</i>&nbsp;                        Lähtötieto
+<i>106</i>&nbsp;                     */
+<b class="nc"><i>107</i>&nbsp;                    String startType = st.nextToken().strip();</b>
+<b class="nc"><i>108</i>&nbsp;                    if (startType == null || startType.toLowerCase().trim().indexOf(&quot;lähtö&quot;) &lt; 0) {</b>
+<b class="nc"><i>109</i>&nbsp;                        throw new FileFormatException(&quot;lähtö word missing:\n &quot; + raceResultFile.getName() + &quot;\n&quot; + line);</b>
+<i>110</i>&nbsp;                    }
+<i>111</i>&nbsp;
+<b class="nc"><i>112</i>&nbsp;                    if (startType.indexOf(&quot;poni&quot;) &gt;= 0) {</b>
+<b class="nc"><i>113</i>&nbsp;                        throw new UnvalidStartException();</b>
+<i>114</i>&nbsp;                    }
+<b class="nc"><i>115</i>&nbsp;                    if (startType.indexOf(&quot;opetus&quot;) &gt;= 0) {</b>
+<b class="nc"><i>116</i>&nbsp;                        throw new UnvalidStartException();</b>
+<i>117</i>&nbsp;                    }
+<b class="nc"><i>118</i>&nbsp;                    if (startType.indexOf(&quot;koelähtö&quot;) &gt;= 0 &amp;&amp; raceResultStart.getStartNumber().compareTo(new BigDecimal(&quot;20&quot;)) &lt; 0) {</b>
+<b class="nc"><i>119</i>&nbsp;                        raceResultStart.setStartNumber(raceResultStart.getStartNumber().add(BigDecimal.valueOf(20)));</b>
+<i>120</i>&nbsp;                    }
+<b class="nc"><i>121</i>&nbsp;                    if (startType.indexOf(&quot;nuoret&quot;) &gt;= 0 &amp;&amp; raceResultStart.getStartNumber().compareTo(new BigDecimal(&quot;20&quot;)) &lt; 0) {</b>
+<b class="nc"><i>122</i>&nbsp;                        raceResultStart.setStartNumber(raceResultStart.getStartNumber().add(BigDecimal.valueOf(50)));</b>
+<i>123</i>&nbsp;                    }
+<i>124</i>&nbsp;
+<i>125</i>&nbsp;                    /*
+<i>126</i>&nbsp;                        Kellonaika
+<i>127</i>&nbsp;                     */
+<i>128</i>&nbsp;
+<b class="nc"><i>129</i>&nbsp;                    token = st.nextToken().strip();</b>
+<b class="nc"><i>130</i>&nbsp;                    if (token.contains(&quot;klo&quot;)) {</b>
+<b class="nc"><i>131</i>&nbsp;                        token = st.nextToken().strip();</b>
+<b class="nc"><i>132</i>&nbsp;                        token = st.nextToken().strip();</b>
+<i>133</i>&nbsp;                    }
+<i>134</i>&nbsp;
+<b class="nc"><i>135</i>&nbsp;                    racemode.append(getHorseRaceId(token));</b>
+<b class="nc"><i>136</i>&nbsp;                    raceResultStart.setHorseRace(token);</b>
+<i>137</i>&nbsp;
+<b class="nc"><i>138</i>&nbsp;                    token = st.nextToken();</b>
+<b class="nc"><i>139</i>&nbsp;                    if (token.contains(&quot;nuoret&quot;)) {</b>
+<b class="nc"><i>140</i>&nbsp;                        token = st.nextToken();</b>
+<i>141</i>&nbsp;                    }
+<i>142</i>&nbsp;
+<b class="nc"><i>143</i>&nbsp;                    StringBuffer mode = new StringBuffer();</b>
+<b class="nc"><i>144</i>&nbsp;                    if (token.contains(&quot;Monte&quot;)) {</b>
+<b class="nc"><i>145</i>&nbsp;                        racemode.append(&quot;m&quot;);</b>
+<b class="nc"><i>146</i>&nbsp;                        mode.append(token);</b>
+<b class="nc"><i>147</i>&nbsp;                        mode.append(&quot;/&quot;);</b>
+<b class="nc"><i>148</i>&nbsp;                        token = st.nextToken();</b>
+<b class="nc"><i>149</i>&nbsp;                        mode.append(token);</b>
+<i>150</i>&nbsp;                    }
+<i>151</i>&nbsp;
+<b class="nc"><i>152</i>&nbsp;                    racemode.append(getRaceTypeId(token));</b>
+<i>153</i>&nbsp;
+<i>154</i>&nbsp;                    /*
+<i>155</i>&nbsp;                    if (raceResultStart.setMode(mode.toString()) == null) {
+<i>156</i>&nbsp;                        Log.write(&quot;Cannon set raceResultHorse horseRace mode for &quot; + raceResultStart.id + &quot;:&quot; + line);
+<i>157</i>&nbsp;                    }*/
+<i>158</i>&nbsp;
+<i>159</i>&nbsp;                    /*
+<i>160</i>&nbsp;                        Matkan pituus
+<i>161</i>&nbsp;                     */
+<b class="nc"><i>162</i>&nbsp;                    token = st.nextToken().strip();</b>
+<b class="nc"><i>163</i>&nbsp;                    BigDecimal raceLength = new BigDecimal(token);</b>
+<b class="nc"><i>164</i>&nbsp;                    racemode.append(HorsesHelper.raceLengthId(raceLength));</b>
+<i>165</i>&nbsp;
+<b class="nc"><i>166</i>&nbsp;                    raceResultStart.setRaceMode(racemode.toString());</b>
+<b class="nc"><i>167</i>&nbsp;                    raceResultStart.addRaceLength(raceLength);</b>
+<b class="nc"><i>168</i>&nbsp;                    raceResultStart.setId(raceResultFile, raceResultStart.getStartNumber());</b>
+<i>169</i>&nbsp;
+<i>170</i>&nbsp;                    return;
+<i>171</i>&nbsp;
+<i>172</i>&nbsp;                }
+<b class="nc"><i>173</i>&nbsp;                if (line != null &amp;&amp; line.indexOf(&quot;Ravipäivä on peruttu&quot;) &gt;= 0) {</b>
+<b class="nc"><i>174</i>&nbsp;                    throw new RacesCancelledException();</b>
+<i>175</i>&nbsp;                }
+<b class="nc"><i>176</i>&nbsp;            }</b>
+<b class="nc"><i>177</i>&nbsp;            throw new OutOfStartsException();</b>
+<b class="nc"><i>178</i>&nbsp;        } catch (FileFormatException e) {</b>
+<b class="nc"><i>179</i>&nbsp;            throw e;</b>
+<b class="nc"><i>180</i>&nbsp;        } catch (OutOfStartsException e) {</b>
+<b class="nc"><i>181</i>&nbsp;            throw e;</b>
+<b class="nc"><i>182</i>&nbsp;        } catch (UnvalidStartException e) {</b>
+<b class="nc"><i>183</i>&nbsp;            throw e;</b>
+<b class="nc"><i>184</i>&nbsp;        } catch (RacesCancelledException e) {</b>
+<b class="nc"><i>185</i>&nbsp;                throw e;</b>
+<b class="nc"><i>186</i>&nbsp;        } catch (Exception e) {</b>
+<b class="nc"><i>187</i>&nbsp;            Log.write(e);</b>
+<b class="nc"><i>188</i>&nbsp;            throw e;</b>
+<i>189</i>&nbsp;        }
+<i>190</i>&nbsp;    }
+<i>191</i>&nbsp;
+<i>192</i>&nbsp;    private String getRaceTypeId(String racetype) {
+<b class="nc"><i>193</i>&nbsp;        if(racetype.contains(&quot;tasoitus&quot;))</b>
+<b class="nc"><i>194</i>&nbsp;            return &quot;&quot;;</b>
+<i>195</i>&nbsp;
+<b class="nc"><i>196</i>&nbsp;        if(racetype.contains(&quot;ryhmä&quot;))</b>
+<b class="nc"><i>197</i>&nbsp;            return &quot;a&quot;;</b>
+<i>198</i>&nbsp;
+<b class="nc"><i>199</i>&nbsp;        if(racetype.contains(&quot;linja&quot;))</b>
+<b class="nc"><i>200</i>&nbsp;            return &quot;a&quot;;</b>
+<i>201</i>&nbsp;
+<b class="nc"><i>202</i>&nbsp;        Log.write(&quot;RaceProgramStartParser.getRaceTypeId - outo lähtötyyppi: &quot; + racetype);</b>
+<i>203</i>&nbsp;
+<b class="nc"><i>204</i>&nbsp;        return &quot;&quot;;</b>
+<i>205</i>&nbsp;
+<i>206</i>&nbsp;    }
+<i>207</i>&nbsp;
+<i>208</i>&nbsp;    private String getHorseRaceId(String token) {
+<i>209</i>&nbsp;        try {
+<b class="nc"><i>210</i>&nbsp;            char fc = token.charAt(0);</b>
+<b class="nc"><i>211</i>&nbsp;            switch (fc) {</b>
+<i>212</i>&nbsp;                case &#39;L&#39;:
+<b class="nc"><i>213</i>&nbsp;                    return &quot;L&quot;;</b>
+<i>214</i>&nbsp;                case &#39;K&#39;:
+<b class="nc"><i>215</i>&nbsp;                    return &quot;K&quot;;</b>
+<i>216</i>&nbsp;                case &#39;S&#39;:
+<b class="nc"><i>217</i>&nbsp;                    return &quot;K&quot;;</b>
+<i>218</i>&nbsp;                default:
+<b class="nc"><i>219</i>&nbsp;                    Log.write(&quot;RaceResultStartParser.parseNumber - Unrecognizable horse race: &quot; + token);</b>
+<i>220</i>&nbsp;            }
+<b class="nc"><i>221</i>&nbsp;        } catch (Exception e) {</b>
+<b class="nc"><i>222</i>&nbsp;            Log.write(e);</b>
+<b class="nc"><i>223</i>&nbsp;        }</b>
+<b class="nc"><i>224</i>&nbsp;        return &quot;&quot;;</b>
+<i>225</i>&nbsp;    }
+<i>226</i>&nbsp;
+<i>227</i>&nbsp;    /**
+<i>228</i>&nbsp;     * Parses raceResultStart raceProgNumber string
+<i>229</i>&nbsp;     *
+<i>230</i>&nbsp;     * @param str
+<i>231</i>&nbsp;     *      1.
+<i>232</i>&nbsp;     *      6.
+<i>233</i>&nbsp;     * @return the decimal raceProgNumber of the raceResultStart raceProgNumber
+<i>234</i>&nbsp;     */
+<i>235</i>&nbsp;    private BigDecimal parseNumber(String str) {
+<i>236</i>&nbsp;        //System.out.println(&quot;RaceResultStartParser.parseNumber(&quot; + str + &quot;)&quot;);
+<b class="nc"><i>237</i>&nbsp;         return new BigDecimal(str.substring(0, str.indexOf(&quot;.&quot;)));</b>
+<i>238</i>&nbsp;    }
+<i>239</i>&nbsp;
+<i>240</i>&nbsp;
+<i>241</i>&nbsp;    /**
+<i>242</i>&nbsp;     * Searches and parses parttime row if found
+<i>243</i>&nbsp;     *
+<i>244</i>&nbsp;     * &lt;label&gt;Väliajat (lämminveriset):&lt;/label&gt;
+<i>245</i>&nbsp;     *      27,0/Jaro&#39;s Domaine 27,0/Firebolt Fasett 24,0 26,0
+<i>246</i>&nbsp;     *
+<i>247</i>&nbsp;     * &lt;label&gt;Väliajat (suomenhevoset):&lt;/label&gt;
+<i>248</i>&nbsp;     *       Ei väliaikoja.
+<i>249</i>&nbsp;     *
+<i>250</i>&nbsp;     * 15,5/Supertoy&#39;s Jen19,5/Grainfield Oz 15,0  21,5
+<i>251</i>&nbsp;     *
+<i>252</i>&nbsp;     * 33,5/Tähden Leevi 32,5 29,5 31,5/Tähti Kepu
+<i>253</i>&nbsp;     *
+<i>254</i>&nbsp;     * 12,5/Scarlet Collection14,5/Crossover 16,5  19,0
+<i>255</i>&nbsp;     *
+<i>256</i>&nbsp;     */
+<i>257</i>&nbsp;
+<i>258</i>&nbsp;    private void parsePartTimes(Iterator lines) {
+<b class="nc"><i>259</i>&nbsp;        String line = new String();</b>
+<i>260</i>&nbsp;
+<i>261</i>&nbsp;        try {
+<b class="nc"><i>262</i>&nbsp;            StringBuilder sbLine = new StringBuilder(HTMLParser.readBlock(lines, &quot;p&quot;));</b>
+<i>263</i>&nbsp;
+<b class="nc"><i>264</i>&nbsp;            HTMLParser.readBlock(sbLine, &quot;label&quot;);</b>
+<i>265</i>&nbsp;
+<b class="nc"><i>266</i>&nbsp;            line = sbLine.toString();</b>
+<b class="nc"><i>267</i>&nbsp;            line = line.strip();</b>
+<i>268</i>&nbsp;
+<b class="nc"><i>269</i>&nbsp;            if(!line.contains(&quot;Ei väliaikoja&quot;)) {</b>
+<i>270</i>&nbsp;
+<b class="nc"><i>271</i>&nbsp;                StringBuffer sbTime = new StringBuffer();</b>
+<b class="nc"><i>272</i>&nbsp;                StringBuffer sbName = new StringBuffer();</b>
+<i>273</i>&nbsp;
+<b class="nc"><i>274</i>&nbsp;                for(char c : line.toCharArray()) {</b>
+<b class="nc"><i>275</i>&nbsp;                    if(Character.isDigit(c) || c == &#39;,&#39;) {</b>
+<b class="nc"><i>276</i>&nbsp;                        if(sbTime.length() &gt; 2</b>
+<b class="nc"><i>277</i>&nbsp;                                &amp;&amp; Character.isDigit(sbTime.charAt(sbTime.length() - 1))</b>
+<b class="nc"><i>278</i>&nbsp;                                &amp;&amp; sbTime.charAt(sbTime.length() - 2) ==&#39;,&#39;) {</b>
+<i>279</i>&nbsp;
+<i>280</i>&nbsp;                                // Tallentaa edellisen ajan ja alustaa uuden
+<b class="nc"><i>281</i>&nbsp;                                String time = sbTime.toString().replace(&#39;,&#39;, &#39;.&#39;);</b>
+<b class="nc"><i>282</i>&nbsp;                                String horse = sbName.toString().strip();</b>
+<i>283</i>&nbsp;
+<b class="nc"><i>284</i>&nbsp;                                AlphaNumber racemodeTime = new AlphaNumber(new BigDecimal(time), this.raceResultStart.getRaceMode());</b>
+<b class="nc"><i>285</i>&nbsp;                                SectionalTime sectionalTime = new SectionalTime(horse, racemodeTime);</b>
+<b class="nc"><i>286</i>&nbsp;                                raceResultStart.add(sectionalTime);</b>
+<i>287</i>&nbsp;
+<b class="nc"><i>288</i>&nbsp;                                sbTime = new StringBuffer();</b>
+<i>289</i>&nbsp;                        }
+<b class="nc"><i>290</i>&nbsp;                        sbTime.append(c);</b>
+<b class="nc"><i>291</i>&nbsp;                    } else if(c == &#39;/&#39;) {</b>
+<i>292</i>&nbsp;                        // alustaa uuden nimen
+<b class="nc"><i>293</i>&nbsp;                        sbName = new StringBuffer();</b>
+<i>294</i>&nbsp;                    } else {
+<i>295</i>&nbsp;                        // lisää merkin nimeen
+<b class="nc"><i>296</i>&nbsp;                        sbName.append(c);</b>
+<i>297</i>&nbsp;                    }
+<i>298</i>&nbsp;                }
+<i>299</i>&nbsp;
+<i>300</i>&nbsp;
+<i>301</i>&nbsp;                // Viimeiset 500 metriä voittajahevoselle
+<b class="nc"><i>302</i>&nbsp;                List winnerHorses = (List) raceResultStart.getOrderMap().get(BigDecimal.ONE);</b>
+<i>303</i>&nbsp;
+<b class="nc"><i>304</i>&nbsp;                if(winnerHorses != null &amp;&amp; sbTime.length() &gt; 0) {</b>
+<b class="nc"><i>305</i>&nbsp;                    String time = sbTime.toString().replace(&#39;,&#39;, &#39;.&#39;);</b>
+<b class="nc"><i>306</i>&nbsp;                    RaceResultHorse winnerHorse = (RaceResultHorse) winnerHorses.get(0);</b>
+<b class="nc"><i>307</i>&nbsp;                    AlphaNumber racemodeTime = new AlphaNumber(new BigDecimal(time), this.raceResultStart.getRaceMode());</b>
+<b class="nc"><i>308</i>&nbsp;                    SectionalTime sectionalTime = new SectionalTime(winnerHorse.getRaceHorseName(), racemodeTime);</b>
+<b class="nc"><i>309</i>&nbsp;                    raceResultStart.add(sectionalTime);</b>
+<i>310</i>&nbsp;                }
+<i>311</i>&nbsp;
+<b class="nc"><i>312</i>&nbsp;                Iterator &lt;SectionalTime&gt; itr = raceResultStart.getSectionalTimes().iterator();</b>
+<i>313</i>&nbsp;
+<i>314</i>&nbsp;                /*
+<i>315</i>&nbsp;                    Lisää väliajat niille hevosille jotka
+<i>316</i>&nbsp;                 */
+<i>317</i>&nbsp;                try {
+<b class="nc"><i>318</i>&nbsp;                    SectionalTime sTime1 = raceResultStart.getSectionalTimes().get(0);</b>
+<b class="nc"><i>319</i>&nbsp;                    String horse1 = sTime1.getHorse();</b>
+<b class="nc"><i>320</i>&nbsp;                    raceResultStart.getRaceResultHorse(horse1).setVA_1(sTime1.getHorseSplit().getNumber());</b>
+<i>321</i>&nbsp;
+<b class="nc"><i>322</i>&nbsp;                    SectionalTime sTime2 = raceResultStart.getSectionalTimes().get(1);</b>
+<b class="nc"><i>323</i>&nbsp;                    String horse2 = sTime2.getHorse();</b>
+<b class="nc"><i>324</i>&nbsp;                    raceResultStart.getRaceResultHorse(horse2).setVA_2(sTime2.getHorseSplit().getNumber());</b>
+<i>325</i>&nbsp;
+<b class="nc"><i>326</i>&nbsp;                } catch (IndexOutOfBoundsException e) {</b>
+<b class="nc"><i>327</i>&nbsp;                } catch (Exception e) {</b>
+<b class="nc"><i>328</i>&nbsp;                    e.printStackTrace();</b>
+<b class="nc"><i>329</i>&nbsp;                }</b>
+<i>330</i>&nbsp;            }
+<b class="nc"><i>331</i>&nbsp;        } catch (Exception e) {</b>
+<b class="nc"><i>332</i>&nbsp;            Log.write(e);</b>
+<b class="nc"><i>333</i>&nbsp;        }</b>
+<i>334</i>&nbsp;    }
+<i>335</i>&nbsp;
+<i>336</i>&nbsp;
+<i>337</i>&nbsp;    /**
+<i>338</i>&nbsp;     * Parsii Toto-pelien tulokset. Huomioitavaa että kaikki lähdöt eivät sisällä totopelejä.
+<i>339</i>&nbsp;     *
+<i>340</i>&nbsp;     * @param lines
+<i>341</i>&nbsp;     * @throws OutOfHorsesException
+<i>342</i>&nbsp;     */
+<i>343</i>&nbsp;    private void parseBetRates(Iterator lines) throws OutOfHorsesException {
+<b class="nc"><i>344</i>&nbsp;        Map oddsMap = new HashMap();</b>
+<i>345</i>&nbsp;
+<i>346</i>&nbsp;        try {
+<b class="nc"><i>347</i>&nbsp;            StringBuilder table = new StringBuilder(HTMLParser.readBlock(lines, &quot;table&quot;, null, &quot;published&quot;));</b>
+<i>348</i>&nbsp;
+<b class="nc"><i>349</i>&nbsp;            if (!table.toString().contains(&quot;published&quot;)) {</b>
+<i>350</i>&nbsp;                String tr;
+<b class="nc"><i>351</i>&nbsp;                while ((tr = HTMLParser.readBlock(table, &quot;tr&quot;)) != null) {</b>
+<b class="nc"><i>352</i>&nbsp;                    StringBuilder sbtr = new StringBuilder(tr);</b>
+<i>353</i>&nbsp;
+<b class="nc"><i>354</i>&nbsp;                    String tdNimi = HTMLParser.readBlock(sbtr, &quot;td&quot;);</b>
+<b class="nc"><i>355</i>&nbsp;                    String tdKerroin = HTMLParser.readBlock(sbtr, &quot;td&quot;);</b>
+<b class="nc"><i>356</i>&nbsp;                    String tdVaihto = HTMLParser.readBlock(sbtr, &quot;td&quot;);</b>
+<i>357</i>&nbsp;
+<b class="nc"><i>358</i>&nbsp;                    List kertoimet = new ArrayList();</b>
+<i>359</i>&nbsp;
+<b class="nc"><i>360</i>&nbsp;                    if (tdNimi != null &amp;&amp; tdKerroin != null &amp;&amp; tdVaihto != null) {</b>
+<b class="nc"><i>361</i>&nbsp;                        String nimi = tdNimi.strip();</b>
+<i>362</i>&nbsp;
+<b class="nc"><i>363</i>&nbsp;                        if (nimi.contains(&quot;Lähtövaihto&quot;)) {</b>
+<b class="nc"><i>364</i>&nbsp;                            raceResultStart.setOddsMap(oddsMap);</b>
+<b class="nc"><i>365</i>&nbsp;                            throw new OutOfHorsesException();</b>
+<i>366</i>&nbsp;                        }
+<i>367</i>&nbsp;
+<b class="nc"><i>368</i>&nbsp;                        StringTokenizer stKerroin = new StringTokenizer(tdKerroin, &quot;-&quot;);</b>
+<b class="nc"><i>369</i>&nbsp;                        while (stKerroin.hasMoreTokens()) {</b>
+<b class="nc"><i>370</i>&nbsp;                            String kerroin = stKerroin.nextToken();</b>
+<b class="nc"><i>371</i>&nbsp;                            AlphaNumber aKerroin = new AlphaNumber(kerroin);</b>
+<b class="nc"><i>372</i>&nbsp;                            kertoimet.add(aKerroin.getBigDecimal());</b>
+<b class="nc"><i>373</i>&nbsp;                        }</b>
+<i>374</i>&nbsp;
+<b class="nc"><i>375</i>&nbsp;                        BigDecimal vaihto = new AlphaNumber(tdVaihto).getBigDecimal();</b>
+<i>376</i>&nbsp;
+<b class="nc"><i>377</i>&nbsp;                        BetRate betRate = new BetRate(nimi, kertoimet, vaihto);</b>
+<i>378</i>&nbsp;
+<b class="nc"><i>379</i>&nbsp;                        oddsMap.put(nimi, betRate);</b>
+<b class="nc"><i>380</i>&nbsp;                        raceResultStart.add(betRate);</b>
+<i>381</i>&nbsp;                    }
+<b class="nc"><i>382</i>&nbsp;                }</b>
+<i>383</i>&nbsp;            }
+<b class="nc"><i>384</i>&nbsp;        } catch (OutOfHorsesException e) {</b>
+<b class="nc"><i>385</i>&nbsp;            throw e;</b>
+<b class="nc"><i>386</i>&nbsp;        } catch (Exception e) {</b>
+<b class="nc"><i>387</i>&nbsp;            Log.write(e);</b>
+<b class="nc"><i>388</i>&nbsp;        }</b>
+<i>389</i>&nbsp;    }
+<i>390</i>&nbsp;}
+</div>
+</div>
+
+<div class="footer">
+    
+    <div style="float:right;">generated on 2021-04-26 13:09</div>
+</div>
+</body>
+</html>

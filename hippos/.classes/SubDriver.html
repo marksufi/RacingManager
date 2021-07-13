@@ -1,0 +1,140 @@
+
+
+
+<!DOCTYPE html PUBLIC "-//W3C//DTD XHTML 1.0 Transitional//EN"
+  "http://www.w3.org/TR/xhtml1/DTD/xhtml1-transitional.dtd">
+<html id="htmlId">
+<head>
+  <title>Coverage Report :: SubDriver</title>
+  <style type="text/css">
+    @import "../../.css/coverage.css";
+  </style>
+</head>
+
+<body>
+<div class="header"></div>
+
+<div class="content">
+<div class="breadCrumbs">
+    [ <a href="../../index.html">all classes</a> ]
+    [ <a href="../index.html">hippos</a> ]
+</div>
+
+<h1>Coverage Summary for Class: SubDriver (hippos)</h1>
+
+<table class="coverageStats">
+<tr>
+  <th class="name">Class</th>
+<th class="coverageStat 
+">
+  Class, %
+</th>
+<th class="coverageStat 
+">
+  Method, %
+</th>
+<th class="coverageStat 
+">
+  Line, %
+</th>
+</tr>
+<tr>
+  <td class="name">SubDriver</td>
+<td class="coverageStat">
+  <span class="percent">
+    0%
+  </span>
+  <span class="absValue">
+    (0/ 1)
+  </span>
+</td>
+<td class="coverageStat">
+  <span class="percent">
+    0%
+  </span>
+  <span class="absValue">
+    (0/ 2)
+  </span>
+</td>
+<td class="coverageStat">
+  <span class="percent">
+    0%
+  </span>
+  <span class="absValue">
+    (0/ 2)
+  </span>
+</td>
+</tr>
+
+</table>
+
+<br/>
+<br/>
+
+
+<div class="sourceCode"><i>1</i>&nbsp;package hippos;
+<i>2</i>&nbsp;
+<i>3</i>&nbsp;import hippos.lang.stats.Form;
+<i>4</i>&nbsp;import hippos.utils.DateUtils;
+<i>5</i>&nbsp;
+<i>6</i>&nbsp;import java.sql.Connection;
+<i>7</i>&nbsp;import java.sql.PreparedStatement;
+<i>8</i>&nbsp;import java.sql.ResultSet;
+<i>9</i>&nbsp;import java.sql.SQLException;
+<i>10</i>&nbsp;import java.util.Date;
+<i>11</i>&nbsp;
+<i>12</i>&nbsp;public class SubDriver extends Driver {
+<i>13</i>&nbsp;
+<i>14</i>&nbsp;    public SubDriver(String value) {
+<b class="nc"><i>15</i>&nbsp;        super(value);</b>
+<i>16</i>&nbsp;    }
+<i>17</i>&nbsp;
+<i>18</i>&nbsp;    public SubDriver(ResultSet raceSet) throws SQLException {
+<b class="nc"><i>19</i>&nbsp;        super(raceSet);</b>
+<i>20</i>&nbsp;    }
+<i>21</i>&nbsp;
+<i>22</i>&nbsp;    /*
+<i>23</i>&nbsp;    public Form fetchFullYearForm(Connection conn, Date date) {
+<i>24</i>&nbsp;        PreparedStatement stmt = null;
+<i>25</i>&nbsp;        ResultSet rs = null;
+<i>26</i>&nbsp;        //fullYearForm = new Form(&quot;1 year&quot;);
+<i>27</i>&nbsp;        try {
+<i>28</i>&nbsp;            Date startDate = DateUtils.rollYears(date, -1);
+<i>29</i>&nbsp;            java.sql.Date sqlStartDate = DateUtils.toSQLDate(startDate);
+<i>30</i>&nbsp;            java.sql.Date sqlEndDate = DateUtils.toSQLDate(date);
+<i>31</i>&nbsp;
+<i>32</i>&nbsp;            stmt = conn.prepareStatement(&quot;select count(*), sum(S_1), sum(S_2), sum(S_3), sum(palkinto), sum(KCODE), count(XCODE) from SUBRESULT where ohjelmakuljettaja = ? and pvm &gt; ? and pvm &lt; ?&quot;);
+<i>33</i>&nbsp;
+<i>34</i>&nbsp;            stmt.setString(1, name);
+<i>35</i>&nbsp;            stmt.setDate(2, sqlStartDate);
+<i>36</i>&nbsp;            stmt.setDate(3, sqlEndDate);
+<i>37</i>&nbsp;            rs = stmt.executeQuery();
+<i>38</i>&nbsp;
+<i>39</i>&nbsp;            fullYearForm.init(rs);
+<i>40</i>&nbsp;
+<i>41</i>&nbsp;            stmt.close();
+<i>42</i>&nbsp;        } catch (SQLException e) {
+<i>43</i>&nbsp;            e.printStackTrace();
+<i>44</i>&nbsp;        } finally {
+<i>45</i>&nbsp;            try {
+<i>46</i>&nbsp;                stmt.close();
+<i>47</i>&nbsp;            } catch (Exception e) {
+<i>48</i>&nbsp;            }
+<i>49</i>&nbsp;            try {
+<i>50</i>&nbsp;                rs.close();
+<i>51</i>&nbsp;            } catch (Exception e) {
+<i>52</i>&nbsp;            }
+<i>53</i>&nbsp;        }
+<i>54</i>&nbsp;        return fullYearForm;
+<i>55</i>&nbsp;    }*/
+<i>56</i>&nbsp;
+<i>57</i>&nbsp;}
+</div>
+</div>
+
+<div class="footer">
+    
+    <div style="float:right;">generated on 2021-04-26 13:09</div>
+</div>
+</body>
+</html>

@@ -1,0 +1,298 @@
+
+
+
+<!DOCTYPE html PUBLIC "-//W3C//DTD XHTML 1.0 Transitional//EN"
+  "http://www.w3.org/TR/xhtml1/DTD/xhtml1-transitional.dtd">
+<html id="htmlId">
+<head>
+  <title>Coverage Report :: Horse</title>
+  <style type="text/css">
+    @import "../../.css/coverage.css";
+  </style>
+</head>
+
+<body>
+<div class="header"></div>
+
+<div class="content">
+<div class="breadCrumbs">
+    [ <a href="../../index.html">all classes</a> ]
+    [ <a href="../index.html">hippos</a> ]
+</div>
+
+<h1>Coverage Summary for Class: Horse (hippos)</h1>
+
+<table class="coverageStats">
+<tr>
+  <th class="name">Class</th>
+<th class="coverageStat 
+">
+  Class, %
+</th>
+<th class="coverageStat 
+">
+  Method, %
+</th>
+<th class="coverageStat 
+">
+  Line, %
+</th>
+</tr>
+<tr>
+  <td class="name">Horse</td>
+<td class="coverageStat">
+  <span class="percent">
+    0%
+  </span>
+  <span class="absValue">
+    (0/ 1)
+  </span>
+</td>
+<td class="coverageStat">
+  <span class="percent">
+    0%
+  </span>
+  <span class="absValue">
+    (0/ 27)
+  </span>
+</td>
+<td class="coverageStat">
+  <span class="percent">
+    0%
+  </span>
+  <span class="absValue">
+    (0/ 53)
+  </span>
+</td>
+</tr>
+
+</table>
+
+<br/>
+<br/>
+
+
+<div class="sourceCode"><i>1</i>&nbsp;package hippos;
+<i>2</i>&nbsp;
+<i>3</i>&nbsp;import utils.Log;
+<i>4</i>&nbsp;
+<i>5</i>&nbsp;import java.math.BigDecimal;
+<i>6</i>&nbsp;import java.util.Date;
+<i>7</i>&nbsp;
+<i>8</i>&nbsp;public abstract class Horse {
+<i>9</i>&nbsp;    //List subStarts;
+<i>10</i>&nbsp;    protected RaceStart raceStart;
+<i>11</i>&nbsp;    //RaceResultHorse raceResultHorse;
+<i>12</i>&nbsp;
+<i>13</i>&nbsp;    private String id;
+<i>14</i>&nbsp;    private String lid;
+<i>15</i>&nbsp;    private BigDecimal horseProgNumber;
+<i>16</i>&nbsp;    private String raceHorseName;
+<i>17</i>&nbsp;    //private Driver driver;
+<i>18</i>&nbsp;    private String racePlace;
+<i>19</i>&nbsp;    //private Date raceDate;
+<i>20</i>&nbsp;    private BigDecimal raceLength;
+<i>21</i>&nbsp;    private BigDecimal raceTrack;
+<i>22</i>&nbsp;    private String trackId;
+<i>23</i>&nbsp;    private String raceMode;
+<i>24</i>&nbsp;    //BigDecimal tasoitettuAika;
+<i>25</i>&nbsp;    private BigDecimal raceHandicap;
+<i>26</i>&nbsp;    //SetValue value;
+<i>27</i>&nbsp;    //BigDecimal myRanking;
+<i>28</i>&nbsp;
+<b class="nc"><i>29</i>&nbsp;    public Horse() {</b>
+<i>30</i>&nbsp;    }
+<i>31</i>&nbsp;
+<b class="nc"><i>32</i>&nbsp;    public Horse(RaceStart raceStart) {</b>
+<b class="nc"><i>33</i>&nbsp;        this.raceStart = raceStart;</b>
+<b class="nc"><i>34</i>&nbsp;        this.raceMode = raceStart.getRaceMode();</b>
+<b class="nc"><i>35</i>&nbsp;        this.lid = raceStart.getId();</b>
+<i>36</i>&nbsp;    }
+<i>37</i>&nbsp;
+<i>38</i>&nbsp;    /*
+<i>39</i>&nbsp;    public RaceResultHorse getRaceResultHorse() {
+<i>40</i>&nbsp;        return raceResultHorse;
+<i>41</i>&nbsp;    }
+<i>42</i>&nbsp;
+<i>43</i>&nbsp;    public void setRaceResultHorse(RaceResultHorse raceResultHorse) {
+<i>44</i>&nbsp;        this.raceResultHorse = raceResultHorse;
+<i>45</i>&nbsp;    }*/
+<i>46</i>&nbsp;
+<i>47</i>&nbsp;    public void setRaceHorseName(String raceHorseName) {
+<b class="nc"><i>48</i>&nbsp;        if(raceHorseName.indexOf(&quot;(&quot;) &gt;= 0) {</b>
+<b class="nc"><i>49</i>&nbsp;            raceHorseName = raceHorseName.substring(0, raceHorseName.indexOf(&quot;(&quot;));</b>
+<i>50</i>&nbsp;        }
+<b class="nc"><i>51</i>&nbsp;        if(raceHorseName.indexOf(&quot;*&quot;) &gt;= 0) {</b>
+<b class="nc"><i>52</i>&nbsp;            raceHorseName = raceHorseName.substring(0, raceHorseName.indexOf(&quot;*&quot;));</b>
+<i>53</i>&nbsp;        }
+<b class="nc"><i>54</i>&nbsp;        this.raceHorseName = raceHorseName.trim();</b>
+<i>55</i>&nbsp;    }
+<i>56</i>&nbsp;
+<i>57</i>&nbsp;    public BigDecimal getHorseProgNumber() {
+<b class="nc"><i>58</i>&nbsp;        return horseProgNumber;</b>
+<i>59</i>&nbsp;    }
+<i>60</i>&nbsp;
+<i>61</i>&nbsp;    public void setHorseProgNumber(BigDecimal horseProgNumber) {
+<b class="nc"><i>62</i>&nbsp;        this.horseProgNumber = horseProgNumber;</b>
+<i>63</i>&nbsp;    }
+<i>64</i>&nbsp;
+<i>65</i>&nbsp;    public String getRaceHorseName() {
+<b class="nc"><i>66</i>&nbsp;        return raceHorseName;</b>
+<i>67</i>&nbsp;    }
+<i>68</i>&nbsp;
+<i>69</i>&nbsp;    public void setName(String name) {
+<b class="nc"><i>70</i>&nbsp;        this.raceHorseName = name;</b>
+<i>71</i>&nbsp;    }
+<i>72</i>&nbsp;
+<i>73</i>&nbsp;    /*
+<i>74</i>&nbsp;    public Driver getDriver() {
+<i>75</i>&nbsp;        return driver;
+<i>76</i>&nbsp;    }
+<i>77</i>&nbsp;
+<i>78</i>&nbsp;    public void setDriver(Driver driver) {
+<i>79</i>&nbsp;        this.driver = driver;
+<i>80</i>&nbsp;    }
+<i>81</i>&nbsp;
+<i>82</i>&nbsp;    public void setDriver(String driver) {
+<i>83</i>&nbsp;        this.driver = new Driver(driver);
+<i>84</i>&nbsp;    }
+<i>85</i>&nbsp;    */
+<i>86</i>&nbsp;    /*
+<i>87</i>&nbsp;    public void setRaceDriverName(String raceResultDriverName) {
+<i>88</i>&nbsp;        this.driver = new HorseJockey(raceResultDriverName);
+<i>89</i>&nbsp;    } */
+<i>90</i>&nbsp;
+<i>91</i>&nbsp;    public BigDecimal getRaceLength() {
+<b class="nc"><i>92</i>&nbsp;        return raceLength;</b>
+<i>93</i>&nbsp;    }
+<i>94</i>&nbsp;
+<i>95</i>&nbsp;    public void setRaceLength(BigDecimal raceLength) {
+<b class="nc"><i>96</i>&nbsp;        this.raceLength = raceLength;</b>
+<i>97</i>&nbsp;    }
+<i>98</i>&nbsp;
+<i>99</i>&nbsp;    public BigDecimal getRaceTrack() {
+<b class="nc"><i>100</i>&nbsp;        return raceTrack;</b>
+<i>101</i>&nbsp;    }
+<i>102</i>&nbsp;
+<i>103</i>&nbsp;    public void setRaceTrack(BigDecimal raceTrack) {
+<b class="nc"><i>104</i>&nbsp;        this.raceTrack = raceTrack;</b>
+<i>105</i>&nbsp;    }
+<i>106</i>&nbsp;
+<i>107</i>&nbsp;    public abstract String toString();
+<i>108</i>&nbsp;
+<i>109</i>&nbsp;    public RaceStart getRaceStart() {
+<b class="nc"><i>110</i>&nbsp;        return raceStart;</b>
+<i>111</i>&nbsp;    }
+<i>112</i>&nbsp;
+<i>113</i>&nbsp;    public String getRaceMode() {
+<b class="nc"><i>114</i>&nbsp;        return raceMode;</b>
+<i>115</i>&nbsp;    }
+<i>116</i>&nbsp;
+<i>117</i>&nbsp;    public BigDecimal getRaceHandicap() {
+<b class="nc"><i>118</i>&nbsp;        return raceHandicap;</b>
+<i>119</i>&nbsp;    }
+<i>120</i>&nbsp;
+<i>121</i>&nbsp;    public void setRaceHandicap(BigDecimal raceHandicap) {
+<b class="nc"><i>122</i>&nbsp;        this.raceHandicap = raceHandicap;</b>
+<i>123</i>&nbsp;    }
+<i>124</i>&nbsp;
+<i>125</i>&nbsp;    public String getId() {
+<b class="nc"><i>126</i>&nbsp;        return id;</b>
+<i>127</i>&nbsp;    }
+<i>128</i>&nbsp;
+<i>129</i>&nbsp;    /*
+<i>130</i>&nbsp;    public void setId(String id) {
+<i>131</i>&nbsp;        this.id = id;
+<i>132</i>&nbsp;    }*/
+<i>133</i>&nbsp;
+<i>134</i>&nbsp;
+<i>135</i>&nbsp;    public String getLid() {
+<b class="nc"><i>136</i>&nbsp;        return lid;</b>
+<i>137</i>&nbsp;    }
+<i>138</i>&nbsp;
+<i>139</i>&nbsp;    public void setLid(String lid) {
+<b class="nc"><i>140</i>&nbsp;        this.lid = lid;</b>
+<i>141</i>&nbsp;    }
+<i>142</i>&nbsp;
+<i>143</i>&nbsp;    public String getRacePlace() {
+<b class="nc"><i>144</i>&nbsp;        return racePlace;</b>
+<i>145</i>&nbsp;    }
+<i>146</i>&nbsp;
+<i>147</i>&nbsp;    public void setRacePlace(String racePlace) {
+<b class="nc"><i>148</i>&nbsp;        this.racePlace = racePlace;</b>
+<i>149</i>&nbsp;    }
+<i>150</i>&nbsp;
+<i>151</i>&nbsp;    public Date getRaceDate() {
+<b class="nc"><i>152</i>&nbsp;        return raceStart.getDate();</b>
+<i>153</i>&nbsp;    }
+<i>154</i>&nbsp;
+<i>155</i>&nbsp;    /*
+<i>156</i>&nbsp;    public void setRaceDate(Date raceDate) {
+<i>157</i>&nbsp;        this.raceDate = raceDate;
+<i>158</i>&nbsp;    }*/
+<i>159</i>&nbsp;
+<i>160</i>&nbsp;    public void setId() {
+<i>161</i>&nbsp;        try {
+<b class="nc"><i>162</i>&nbsp;            StringBuffer sb = new StringBuffer();</b>
+<b class="nc"><i>163</i>&nbsp;            sb.append(lid);</b>
+<b class="nc"><i>164</i>&nbsp;            sb.append(&quot;_&quot;);</b>
+<b class="nc"><i>165</i>&nbsp;            if(getHorseProgNumber().intValue() &lt; 10) {</b>
+<b class="nc"><i>166</i>&nbsp;                sb.append(&quot;0&quot;);</b>
+<i>167</i>&nbsp;            }
+<b class="nc"><i>168</i>&nbsp;            sb.append(getHorseProgNumber().toString());</b>
+<b class="nc"><i>169</i>&nbsp;            this.id = sb.toString();</b>
+<b class="nc"><i>170</i>&nbsp;        } catch(Exception e) {</b>
+<b class="nc"><i>171</i>&nbsp;            Log.write(e, &quot;Horse.setId: Cannot set horseId&quot;);</b>
+<b class="nc"><i>172</i>&nbsp;        }</b>
+<i>173</i>&nbsp;    }
+<i>174</i>&nbsp;
+<i>175</i>&nbsp;    public void setId(String id) {
+<b class="nc"><i>176</i>&nbsp;        this.id = id;</b>
+<i>177</i>&nbsp;    }
+<i>178</i>&nbsp;
+<i>179</i>&nbsp;    public void setRaceMode(String raceMode) {
+<b class="nc"><i>180</i>&nbsp;        this.raceMode = raceMode;</b>
+<i>181</i>&nbsp;    }
+<i>182</i>&nbsp;
+<i>183</i>&nbsp;    public String getTrackId() {
+<b class="nc"><i>184</i>&nbsp;        if(trackId == null)</b>
+<b class="nc"><i>185</i>&nbsp;            initTrackId();</b>
+<b class="nc"><i>186</i>&nbsp;        return trackId;</b>
+<i>187</i>&nbsp;    }
+<i>188</i>&nbsp;
+<i>189</i>&nbsp;    public void setTrackId(String trackId) {
+<b class="nc"><i>190</i>&nbsp;        this.trackId = trackId;</b>
+<i>191</i>&nbsp;    }
+<i>192</i>&nbsp;
+<i>193</i>&nbsp;    public void initTrackId() {
+<i>194</i>&nbsp;        try {
+<b class="nc"><i>195</i>&nbsp;            StringBuffer sb = new StringBuffer();</b>
+<b class="nc"><i>196</i>&nbsp;            sb.append(raceHandicap.toString());</b>
+<i>197</i>&nbsp;
+<b class="nc"><i>198</i>&nbsp;            sb.append(&quot;:&quot;);</b>
+<b class="nc"><i>199</i>&nbsp;            sb.append(raceTrack.toString());</b>
+<i>200</i>&nbsp;
+<b class="nc"><i>201</i>&nbsp;            if (raceMode.contains(&quot;a&quot;)) {</b>
+<b class="nc"><i>202</i>&nbsp;                sb.append(&quot;a&quot;);</b>
+<i>203</i>&nbsp;            }
+<i>204</i>&nbsp;
+<b class="nc"><i>205</i>&nbsp;            this.trackId = sb.toString();</b>
+<i>206</i>&nbsp;
+<b class="nc"><i>207</i>&nbsp;        } catch (Exception e) {</b>
+<i>208</i>&nbsp;            // TODO: ota käyttöön, kun kanta on ajettu uudelleen
+<i>209</i>&nbsp;            //e.printStackTrace();
+<i>210</i>&nbsp;            //Log.write(e);
+<b class="nc"><i>211</i>&nbsp;        }</b>
+<i>212</i>&nbsp;    }
+<i>213</i>&nbsp;}
+<i>214</i>&nbsp;
+<i>215</i>&nbsp;
+</div>
+</div>
+
+<div class="footer">
+    
+    <div style="float:right;">generated on 2021-04-26 13:09</div>
+</div>
+</body>
+</html>

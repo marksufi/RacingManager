@@ -1,0 +1,151 @@
+
+
+
+<!DOCTYPE html PUBLIC "-//W3C//DTD XHTML 1.0 Transitional//EN"
+  "http://www.w3.org/TR/xhtml1/DTD/xhtml1-transitional.dtd">
+<html id="htmlId">
+<head>
+  <title>Coverage Report :: HorseName</title>
+  <style type="text/css">
+    @import "../../.css/coverage.css";
+  </style>
+</head>
+
+<body>
+<div class="header"></div>
+
+<div class="content">
+<div class="breadCrumbs">
+    [ <a href="../../index.html">all classes</a> ]
+    [ <a href="../index.html">hippos</a> ]
+</div>
+
+<h1>Coverage Summary for Class: HorseName (hippos)</h1>
+
+<table class="coverageStats">
+<tr>
+  <th class="name">Class</th>
+<th class="coverageStat 
+">
+  Class, %
+</th>
+<th class="coverageStat 
+">
+  Method, %
+</th>
+<th class="coverageStat 
+">
+  Line, %
+</th>
+</tr>
+<tr>
+  <td class="name">HorseName</td>
+<td class="coverageStat">
+  <span class="percent">
+    0%
+  </span>
+  <span class="absValue">
+    (0/ 1)
+  </span>
+</td>
+<td class="coverageStat">
+  <span class="percent">
+    0%
+  </span>
+  <span class="absValue">
+    (0/ 8)
+  </span>
+</td>
+<td class="coverageStat">
+  <span class="percent">
+    0%
+  </span>
+  <span class="absValue">
+    (0/ 18)
+  </span>
+</td>
+</tr>
+
+</table>
+
+<br/>
+<br/>
+
+
+<div class="sourceCode"><i>1</i>&nbsp;package hippos;
+<i>2</i>&nbsp;
+<i>3</i>&nbsp;import hippos.lang.ComparableCrossTableMapField;
+<i>4</i>&nbsp;import hippos.math.FileContainer;
+<i>5</i>&nbsp;import hippos.util.CrossTableMap;
+<i>6</i>&nbsp;import hippos.util.UnionCrossMapCompareMethod;
+<i>7</i>&nbsp;
+<i>8</i>&nbsp;import java.io.IOException;
+<i>9</i>&nbsp;import java.math.BigDecimal;
+<i>10</i>&nbsp;
+<i>11</i>&nbsp;/**
+<i>12</i>&nbsp; * Created by IntelliJ IDEA.
+<i>13</i>&nbsp; * User: marktolo
+<i>14</i>&nbsp; * Date: Mar 10, 2006
+<i>15</i>&nbsp; * Time: 3:15:33 PM
+<i>16</i>&nbsp; * To change this template use Options | File Templates.
+<i>17</i>&nbsp; */
+<i>18</i>&nbsp;public class HorseName extends ComparableCrossTableMapField {
+<i>19</i>&nbsp;    static CrossTableMap valueMap;
+<i>20</i>&nbsp;    private String name;
+<i>21</i>&nbsp;
+<i>22</i>&nbsp;    public HorseName(String value) {
+<b class="nc"><i>23</i>&nbsp;        super(value);</b>
+<b class="nc"><i>24</i>&nbsp;        this.name = name;</b>
+<i>25</i>&nbsp;    }
+<i>26</i>&nbsp;
+<i>27</i>&nbsp;    public CrossTableMap getCrossTableMap() {
+<b class="nc"><i>28</i>&nbsp;        return valueMap;  //To change body of implemented methods use File | Settings | File Templates.</b>
+<i>29</i>&nbsp;    }
+<i>30</i>&nbsp;
+<i>31</i>&nbsp;    public static void load() {
+<i>32</i>&nbsp;        try {
+<b class="nc"><i>33</i>&nbsp;            if(valueMap == null) {</b>
+<b class="nc"><i>34</i>&nbsp;                valueMap = (CrossTableMap)new FileContainer(HarnessApp.dataPath, &quot;horseName.dat&quot;).load();</b>
+<b class="nc"><i>35</i>&nbsp;                if(valueMap == null) {</b>
+<i>36</i>&nbsp;                    //valueMap = new CrossTableMap(new ProcentualDataEntry());
+<b class="nc"><i>37</i>&nbsp;                    valueMap = new CrossTableMap(new UnionCrossMapCompareMethod(HarnessApp.trustLimit), HarnessApp.trustLimit);</b>
+<i>38</i>&nbsp;                }
+<i>39</i>&nbsp;            }
+<b class="nc"><i>40</i>&nbsp;        } catch (IOException e) {</b>
+<b class="nc"><i>41</i>&nbsp;            e.printStackTrace();</b>
+<b class="nc"><i>42</i>&nbsp;        }</b>
+<i>43</i>&nbsp;    }
+<i>44</i>&nbsp;
+<i>45</i>&nbsp;    public static void save() {
+<i>46</i>&nbsp;        try {
+<b class="nc"><i>47</i>&nbsp;            new FileContainer(HarnessApp.dataPath, &quot;horseName.dat&quot;).save(valueMap);</b>
+<b class="nc"><i>48</i>&nbsp;        } catch (IOException e) {</b>
+<b class="nc"><i>49</i>&nbsp;            e.printStackTrace();</b>
+<b class="nc"><i>50</i>&nbsp;        }</b>
+<i>51</i>&nbsp;    }
+<i>52</i>&nbsp;
+<i>53</i>&nbsp;    public void compareTo(Object o, BigDecimal result) {
+<b class="nc"><i>54</i>&nbsp;        compareTo(valueMap, o, result);</b>
+<i>55</i>&nbsp;    }
+<i>56</i>&nbsp;
+<i>57</i>&nbsp;    public BigDecimal compareTo(Object o) {
+<b class="nc"><i>58</i>&nbsp;        return compareTo(valueMap, o);</b>
+<i>59</i>&nbsp;    }
+<i>60</i>&nbsp;
+<i>61</i>&nbsp;    public BigDecimal getShare() {
+<b class="nc"><i>62</i>&nbsp;        return new BigDecimal(1);</b>
+<i>63</i>&nbsp;    }
+<i>64</i>&nbsp;
+<i>65</i>&nbsp;    public String getName() {
+<b class="nc"><i>66</i>&nbsp;        return name;</b>
+<i>67</i>&nbsp;    }
+<i>68</i>&nbsp;}
+</div>
+</div>
+
+<div class="footer">
+    
+    <div style="float:right;">generated on 2021-04-26 13:09</div>
+</div>
+</body>
+</html>

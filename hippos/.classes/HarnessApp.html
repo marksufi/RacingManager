@@ -1,0 +1,480 @@
+
+
+
+<!DOCTYPE html PUBLIC "-//W3C//DTD XHTML 1.0 Transitional//EN"
+  "http://www.w3.org/TR/xhtml1/DTD/xhtml1-transitional.dtd">
+<html id="htmlId">
+<head>
+  <title>Coverage Report :: HarnessApp</title>
+  <style type="text/css">
+    @import "../../.css/coverage.css";
+  </style>
+</head>
+
+<body>
+<div class="header"></div>
+
+<div class="content">
+<div class="breadCrumbs">
+    [ <a href="../../index.html">all classes</a> ]
+    [ <a href="../index.html">hippos</a> ]
+</div>
+
+<h1>Coverage Summary for Class: HarnessApp (hippos)</h1>
+
+<table class="coverageStats">
+<tr>
+  <th class="name">Class</th>
+<th class="coverageStat 
+">
+  Class, %
+</th>
+<th class="coverageStat 
+">
+  Method, %
+</th>
+<th class="coverageStat 
+">
+  Line, %
+</th>
+</tr>
+<tr>
+  <td class="name">HarnessApp</td>
+<td class="coverageStat">
+  <span class="percent">
+    0%
+  </span>
+  <span class="absValue">
+    (0/ 1)
+  </span>
+</td>
+<td class="coverageStat">
+  <span class="percent">
+    0%
+  </span>
+  <span class="absValue">
+    (0/ 10)
+  </span>
+</td>
+<td class="coverageStat">
+  <span class="percent">
+    0%
+  </span>
+  <span class="absValue">
+    (0/ 146)
+  </span>
+</td>
+</tr>
+
+</table>
+
+<br/>
+<br/>
+
+
+<div class="sourceCode"><i>1</i>&nbsp;package hippos;
+<i>2</i>&nbsp;
+<i>3</i>&nbsp;import hippos.database.Database;
+<i>4</i>&nbsp;import hippos.exception.DatabaseException;
+<i>5</i>&nbsp;import hippos.exception.RacesCancelledException;
+<i>6</i>&nbsp;import hippos.exception.UnvalidStartException;
+<i>7</i>&nbsp;import hippos.io.*;
+<i>8</i>&nbsp;import hippos.lang.Pointer;
+<i>9</i>&nbsp;import hippos.lang.stats.Form;
+<i>10</i>&nbsp;import hippos.lang.toto.TotoEngine;
+<i>11</i>&nbsp;import hippos.lang.toto.Voittajapeli;
+<i>12</i>&nbsp;import hippos.math.betting.GameFactory;
+<i>13</i>&nbsp;import hippos.math.regression.HipposUpdatingRegression;
+<i>14</i>&nbsp;import hippos.utils.DateUtils;
+<i>15</i>&nbsp;import hippos.utils.HipposProperties;
+<i>16</i>&nbsp;import hippos.web.ProgramListener;
+<i>17</i>&nbsp;import hippos.web.ResultListener;
+<i>18</i>&nbsp;import utils.Log;
+<i>19</i>&nbsp;
+<i>20</i>&nbsp;import java.io.FileNotFoundException;
+<i>21</i>&nbsp;import java.io.IOException;
+<i>22</i>&nbsp;import java.sql.Connection;
+<i>23</i>&nbsp;import java.sql.PreparedStatement;
+<i>24</i>&nbsp;import java.sql.ResultSet;
+<i>25</i>&nbsp;import java.sql.SQLException;
+<i>26</i>&nbsp;import java.util.*;
+<i>27</i>&nbsp;
+<i>28</i>&nbsp;/**
+<i>29</i>&nbsp; * Raviohjelman pääluokka
+<i>30</i>&nbsp; *
+<i>31</i>&nbsp; * kuljettajamuutoksen jälkeen:
+<i>32</i>&nbsp; * Hits:   21.21%
+<i>33</i>&nbsp; * Profit: -13087.4?/56347 = -0.23?/startti
+<i>34</i>&nbsp; *
+<i>35</i>&nbsp; * Ennen kuljettajamuutosta
+<i>36</i>&nbsp; * Hits:   20.84%
+<i>37</i>&nbsp; * Profit: -14233.9?/56068 = -0.25?/startti
+<i>38</i>&nbsp; *
+<i>39</i>&nbsp; */
+<b class="nc"><i>40</i>&nbsp;public class HarnessApp {</b>
+<i>41</i>&nbsp;    public static final boolean includeConstant = true;
+<i>42</i>&nbsp;    // Constants
+<b class="nc"><i>43</i>&nbsp;    private static HarnessApp instance = null;</b>
+<b class="nc"><i>44</i>&nbsp;    public static final String raceCalendarEarliestYearUrl = HipposProperties.get(&quot;RACE_CALENDAR_EARLIEST_YEAR&quot;);</b>
+<b class="nc"><i>45</i>&nbsp;    public static final String raceCalendarEarlierYearUrl = HipposProperties.get(&quot;RACE_CALENDAR_EARLIER_YEAR&quot;);</b>
+<b class="nc"><i>46</i>&nbsp;    public static final String RaceResultsUrl = HipposProperties.get(&quot;RaceResultsUrl&quot;);</b>
+<b class="nc"><i>47</i>&nbsp;    public static final String RaceProgramMainUrl = HipposProperties.get(&quot;RaceProgramMainUrl&quot;);</b>
+<b class="nc"><i>48</i>&nbsp;    public static final String HipposUrl = HipposProperties.get(&quot;HipposUrl&quot;);</b>
+<b class="nc"><i>49</i>&nbsp;    public static final String dataPath = HipposProperties.get(&quot;DATA_FILE_PATH&quot;);</b>
+<i>50</i>&nbsp;    public static final int trustLimit = 100;
+<i>51</i>&nbsp;    public static final boolean useNr = true;
+<i>52</i>&nbsp;    public static final boolean useKp = true;
+<i>53</i>&nbsp;
+<i>54</i>&nbsp;    /**
+<i>55</i>&nbsp;     * Käytetäänkö hevosten vertailussa lähtörataa avainarvona
+<i>56</i>&nbsp;     */
+<i>57</i>&nbsp;    public static final boolean useTrackKey = false;
+<i>58</i>&nbsp;
+<i>59</i>&nbsp;    /**
+<i>60</i>&nbsp;     * Haetaanko uudet käsiohjelma- ja tulostiedostot Hippoksen sivuilta
+<i>61</i>&nbsp;     */
+<b class="nc"><i>62</i>&nbsp;    public static boolean create_files = false;</b>
+<i>63</i>&nbsp;
+<i>64</i>&nbsp;    /**
+<i>65</i>&nbsp;     * Luetaako hevosen aiemmat startit Hippoksen kilpailuhistoria-sivuilta
+<i>66</i>&nbsp;     */
+<i>67</i>&nbsp;    public static final boolean useHorseRaceHistoryLink = true;
+<i>68</i>&nbsp;
+<i>69</i>&nbsp;    /**
+<i>70</i>&nbsp;     * Parsitaanko myös lähtölistan taulu? jos true, niin parsitaan
+<i>71</i>&nbsp;     */
+<b class="nc"><i>72</i>&nbsp;    public static boolean debugMode = false;</b>
+<i>73</i>&nbsp;
+<i>74</i>&nbsp;    /**
+<i>75</i>&nbsp;     * Määrittää kumpaa hakemistoa käytetään, Filebase vai TestBase
+<i>76</i>&nbsp;     */
+<i>77</i>&nbsp;    public static final boolean testMode = false;
+<i>78</i>&nbsp;
+<i>79</i>&nbsp;    public static final double WEEKDIFF_MAX = 5.0;
+<i>80</i>&nbsp;
+<i>81</i>&nbsp;    public static RaceProgramDirectory raceProgramDirectory;
+<i>82</i>&nbsp;    public static GameDirectory gameDirectory;
+<i>83</i>&nbsp;    public static RaceResultDirectory raceResultDirectory;
+<i>84</i>&nbsp;
+<b class="nc"><i>85</i>&nbsp;    public static TotoEngine totoEngine = new TotoEngine();</b>
+<i>86</i>&nbsp;
+<i>87</i>&nbsp;    public static final int REGSIZE = 7;
+<i>88</i>&nbsp;
+<b class="nc"><i>89</i>&nbsp;    public static TreeMap&lt;String, HipposUpdatingRegression&gt; linregMap = new TreeMap&lt;&gt;();</b>
+<i>90</i>&nbsp;
+<i>91</i>&nbsp;    //public static TreeMap&lt;String, Form&gt; driverFullYearFormPool = new TreeMap();
+<b class="nc"><i>92</i>&nbsp;    public static TreeMap&lt;String, Form&gt; driverRaceTypePool = new TreeMap();</b>
+<i>93</i>&nbsp;
+<i>94</i>&nbsp;
+<i>95</i>&nbsp;    public static HarnessApp getInstance() throws FileNotFoundException {
+<b class="nc"><i>96</i>&nbsp;        if(instance == null) {</b>
+<b class="nc"><i>97</i>&nbsp;            instance = new HarnessApp();</b>
+<i>98</i>&nbsp;        }
+<b class="nc"><i>99</i>&nbsp;        return instance;</b>
+<i>100</i>&nbsp;    }
+<i>101</i>&nbsp;
+<i>102</i>&nbsp;    public static boolean isRunning() {
+<b class="nc"><i>103</i>&nbsp;        return instance != null ? true : false;</b>
+<i>104</i>&nbsp;    }
+<i>105</i>&nbsp;
+<i>106</i>&nbsp;    /**
+<i>107</i>&nbsp;     * Alustaa, ja tarkastaa yhden lähdön
+<i>108</i>&nbsp;     *
+<i>109</i>&nbsp;     * @param conn
+<i>110</i>&nbsp;     * @param lid   Lähdön id
+<i>111</i>&nbsp;     * @param date  Lähdön päivämäärä
+<i>112</i>&nbsp;     */
+<i>113</i>&nbsp;    private RaceProgramStart initialize(Connection conn, String lid, java.sql.Date date) {
+<b class="nc"><i>114</i>&nbsp;        RaceProgramStart raceProgramStart = null;</b>
+<i>115</i>&nbsp;
+<i>116</i>&nbsp;        try {
+<i>117</i>&nbsp;                /*
+<i>118</i>&nbsp;                    Yrittää hakea lähdön tulokset tietokannasta
+<i>119</i>&nbsp;                 */
+<b class="nc"><i>120</i>&nbsp;                RaceResultStart raceResultStart = null;</b>
+<i>121</i>&nbsp;                try {
+<b class="nc"><i>122</i>&nbsp;                    raceResultStart = new RaceResultStart(conn, lid, date);</b>
+<b class="nc"><i>123</i>&nbsp;                } catch (DatabaseException de) {</b>
+<i>124</i>&nbsp;                    // RaceResultStart not in database
+<b class="nc"><i>125</i>&nbsp;                }</b>
+<i>126</i>&nbsp;
+<i>127</i>&nbsp;
+<i>128</i>&nbsp;                /*
+<i>129</i>&nbsp;                    Hakee käsohjelman lähtö ja hevokohtaiset tiedot, aiempiem lähtöjen tilastot ja
+<i>130</i>&nbsp;                    ja lähdöt tietokannasta.
+<i>131</i>&nbsp;                 */
+<b class="nc"><i>132</i>&nbsp;                raceProgramStart = new RaceProgramStart(conn, lid, date, raceResultStart);</b>
+<i>133</i>&nbsp;
+<b class="nc"><i>134</i>&nbsp;                raceProgramStart.initValueHorses(linregMap);</b>
+<i>135</i>&nbsp;
+<i>136</i>&nbsp;                /**
+<i>137</i>&nbsp;                 *  Jos lähtölistalle löytyy tulokset, niin päivittää toto-pelien tiedot.
+<i>138</i>&nbsp;                 *  Jos ei löydyy, niin tulostaa vihjeet
+<i>139</i>&nbsp;                 */
+<b class="nc"><i>140</i>&nbsp;                if(raceResultStart != null) {</b>
+<b class="nc"><i>141</i>&nbsp;                        totoEngine.submit(raceProgramStart);</b>
+<b class="nc"><i>142</i>&nbsp;                        totoEngine.check(raceResultStart);</b>
+<b class="nc"><i>143</i>&nbsp;                        System.out.println(totoEngine.toString());</b>
+<i>144</i>&nbsp;
+<b class="nc"><i>145</i>&nbsp;                        raceResultStart.updateStatistics();</b>
+<i>146</i>&nbsp;                } else {
+<b class="nc"><i>147</i>&nbsp;                    System.out.print(&quot;&quot;);</b>
+<i>148</i>&nbsp;                }
+<b class="nc"><i>149</i>&nbsp;        } catch (Exception e) {</b>
+<b class="nc"><i>150</i>&nbsp;            e.printStackTrace();</b>
+<b class="nc"><i>151</i>&nbsp;        }</b>
+<b class="nc"><i>152</i>&nbsp;        return raceProgramStart;</b>
+<i>153</i>&nbsp;    }
+<i>154</i>&nbsp;
+<i>155</i>&nbsp;    private void initialize(Connection conn, TreeMap&lt;String, HipposUpdatingRegression&gt; linregMap, TotoEngine totoEngine, java.sql.Date limitDate) {
+<b class="nc"><i>156</i>&nbsp;        Pointer pointer = new Pointer(&quot;Initialising Effects&quot;);</b>
+<b class="nc"><i>157</i>&nbsp;        pointer.start();</b>
+<i>158</i>&nbsp;
+<b class="nc"><i>159</i>&nbsp;        PreparedStatement raceStmt = null;</b>
+<b class="nc"><i>160</i>&nbsp;        ResultSet raceSet = null;</b>
+<i>161</i>&nbsp;
+<i>162</i>&nbsp;        try {
+<b class="nc"><i>163</i>&nbsp;            raceStmt = conn.prepareStatement(getRaceStatement(limitDate));</b>
+<b class="nc"><i>164</i>&nbsp;            raceSet = raceStmt.executeQuery();</b>
+<i>165</i>&nbsp;
+<b class="nc"><i>166</i>&nbsp;            while (raceSet.next()) {</b>
+<b class="nc"><i>167</i>&nbsp;                String lid = raceSet.getString(&quot;ID&quot;);</b>
+<b class="nc"><i>168</i>&nbsp;                java.sql.Date date = raceSet.getDate(&quot;PVM&quot;);</b>
+<i>169</i>&nbsp;                //String raceMode = raceSet.getString(&quot;LYHENNE&quot;);
+<i>170</i>&nbsp;
+<b class="nc"><i>171</i>&nbsp;                initialize(conn, lid, date);</b>
+<i>172</i>&nbsp;
+<b class="nc"><i>173</i>&nbsp;            }</b>
+<i>174</i>&nbsp;
+<b class="nc"><i>175</i>&nbsp;        } catch (Exception e) {</b>
+<b class="nc"><i>176</i>&nbsp;            e.printStackTrace();</b>
+<i>177</i>&nbsp;        } finally {
+<b class="nc"><i>178</i>&nbsp;            try { raceSet.close();} catch (SQLException e) { e.printStackTrace(); }</b>
+<b class="nc"><i>179</i>&nbsp;            try { raceStmt.close();} catch (SQLException e) { e.printStackTrace(); }</b>
+<b class="nc"><i>180</i>&nbsp;            pointer.interrupt();</b>
+<b class="nc"><i>181</i>&nbsp;        }</b>
+<i>182</i>&nbsp;    }
+<i>183</i>&nbsp;
+<i>184</i>&nbsp;    private void parseNewFiles(List newFiles, Connection conn) throws IOException {
+<b class="nc"><i>185</i>&nbsp;        System.out.println(&quot;HarnessApp.parseNewFiles&quot;);</b>
+<i>186</i>&nbsp;
+<b class="nc"><i>187</i>&nbsp;        Iterator fileItr = newFiles.iterator();</b>
+<b class="nc"><i>188</i>&nbsp;        List parsedProgramFiles = new ArrayList();</b>
+<b class="nc"><i>189</i>&nbsp;        RaceResultFile raceResultFile = null;</b>
+<b class="nc"><i>190</i>&nbsp;        String oldDate = null;</b>
+<i>191</i>&nbsp;
+<b class="nc"><i>192</i>&nbsp;        while(fileItr.hasNext()) {</b>
+<b class="nc"><i>193</i>&nbsp;            String filename = (String)fileItr.next();</b>
+<b class="nc"><i>194</i>&nbsp;            if(filename.indexOf(&quot;_&quot;) &lt; filename.lastIndexOf(&quot;_&quot;)) {</b>
+<b class="nc"><i>195</i>&nbsp;                RaceProgramFile raceProgramFile = null;</b>
+<b class="nc"><i>196</i>&nbsp;                RaceResultStart raceResultStart = null;</b>
+<i>197</i>&nbsp;                try {
+<b class="nc"><i>198</i>&nbsp;                    raceProgramFile = (RaceProgramFile) raceProgramDirectory.createFile(filename);</b>
+<b class="nc"><i>199</i>&nbsp;                    String newdate = filename.substring(2, filename.indexOf(&quot;_&quot;));</b>
+<i>200</i>&nbsp;
+<b class="nc"><i>201</i>&nbsp;                    if(oldDate == null || !newdate.equals(oldDate)) {</b>
+<i>202</i>&nbsp;                        //driverFullYearFormPool = new TreeMap&lt;&gt;();
+<b class="nc"><i>203</i>&nbsp;                        driverRaceTypePool = new TreeMap&lt;&gt;();</b>
+<b class="nc"><i>204</i>&nbsp;                        oldDate = newdate;</b>
+<i>205</i>&nbsp;                    }
+<i>206</i>&nbsp;
+<b class="nc"><i>207</i>&nbsp;                    String resultFilename = filename.substring(0, filename.lastIndexOf(&#39;_&#39;)) + &quot;.php&quot;;</b>
+<i>208</i>&nbsp;
+<b class="nc"><i>209</i>&nbsp;                    if (raceProgramFile.exists() &amp;&amp; raceProgramFile.isValid()) {</b>
+<b class="nc"><i>210</i>&nbsp;                        System.out.println(&quot;HarnessApp.parseNewFiles: &quot; + raceProgramFile.getAbsolutePath());</b>
+<i>211</i>&nbsp;
+<i>212</i>&nbsp;                        /**
+<i>213</i>&nbsp;                         * Tarkistaa löytyykö lähtölistalle tulostiedostoa, jos löytyy niin parsii sen
+<i>214</i>&nbsp;                         * ja tallettaa tietokantaan.
+<i>215</i>&nbsp;                         */
+<b class="nc"><i>216</i>&nbsp;                        if (raceResultFile == null || !raceResultFile.getName().equals(resultFilename)) {</b>
+<b class="nc"><i>217</i>&nbsp;                            raceResultFile = (RaceResultFile) raceResultDirectory.createFile(resultFilename);</b>
+<b class="nc"><i>218</i>&nbsp;                            if(raceResultFile.exists()) {</b>
+<b class="nc"><i>219</i>&nbsp;                                raceResultFile = (RaceResultFile) raceResultFile.parse();</b>
+<i>220</i>&nbsp;                                //if (!raceResultFile.existsInDatabase(conn)) {
+<b class="nc"><i>221</i>&nbsp;                                    raceResultFile.insert(conn);</b>
+<i>222</i>&nbsp;                                //}
+<i>223</i>&nbsp;                            } else {
+<b class="nc"><i>224</i>&nbsp;                                raceResultFile = null;</b>
+<i>225</i>&nbsp;                            }
+<i>226</i>&nbsp;                        }
+<i>227</i>&nbsp;
+<i>228</i>&nbsp;                        /* Parsii uuden ohjelmatiedon */
+<b class="nc"><i>229</i>&nbsp;                        RaceProgramFileParser raceProgramFileParser = new RaceProgramFileParser(raceProgramFile, raceResultFile, conn);</b>
+<b class="nc"><i>230</i>&nbsp;                        raceProgramFile = (RaceProgramFile) raceProgramFileParser.parse();</b>
+<b class="nc"><i>231</i>&nbsp;                        raceProgramFile.insert(conn);</b>
+<i>232</i>&nbsp;
+<b class="nc"><i>233</i>&nbsp;                        RaceProgramStart raceProgramStart = raceProgramFile.getRaceProgramStart();</b>
+<i>234</i>&nbsp;
+<i>235</i>&nbsp;                        /*
+<i>236</i>&nbsp;                        if(raceResultFile != null &amp;&amp; raceProgramStart != null) {
+<i>237</i>&nbsp;                            raceResultStart = raceResultFile.getRaceResultStart(raceProgramStart);
+<i>238</i>&nbsp;                            //raceProgramStart.setRaceResultStart(raceResultStart);
+<i>239</i>&nbsp;                        }*/
+<i>240</i>&nbsp;
+<b class="nc"><i>241</i>&nbsp;                        raceProgramStart = initialize(conn, raceProgramStart.getId(), DateUtils.toSQLDate(raceProgramStart.getDate()));</b>
+<i>242</i>&nbsp;
+<b class="nc"><i>243</i>&nbsp;                        if(!raceProgramStart.getValueHorseSet().isEmpty()) {</b>
+<b class="nc"><i>244</i>&nbsp;                            GameFactory gameFactory = new GameFactory(raceProgramStart, conn);</b>
+<b class="nc"><i>245</i>&nbsp;                            GameFile gameFile = gameDirectory.createFile((raceProgramFile));</b>
+<i>246</i>&nbsp;
+<b class="nc"><i>247</i>&nbsp;                            gameFile.write(raceProgramStart, gameFactory);</b>
+<i>248</i>&nbsp;                            //System.out.println(raceProgramFile.toString());
+<i>249</i>&nbsp;                            //System.out.println(gameFactory.toString());
+<b class="nc"><i>250</i>&nbsp;                        } else {</b>
+<b class="nc"><i>251</i>&nbsp;                            Log.write(&quot;Empty programfile: &quot; + filename);</b>
+<i>252</i>&nbsp;                        }
+<i>253</i>&nbsp;
+<b class="nc"><i>254</i>&nbsp;                        if (raceProgramStart.getRaceResultStart() != null) {</b>
+<i>255</i>&nbsp;
+<i>256</i>&nbsp;                            //totoEngine.check(raceResultStart);
+<i>257</i>&nbsp;                            //System.out.println(totoEngine.toString());
+<i>258</i>&nbsp;
+<b class="nc"><i>259</i>&nbsp;                            raceProgramFile.update(raceResultFile, conn);</b>
+<i>260</i>&nbsp;
+<i>261</i>&nbsp;                        }
+<i>262</i>&nbsp;
+<b class="nc"><i>263</i>&nbsp;                        conn.commit();</b>
+<i>264</i>&nbsp;
+<b class="nc"><i>265</i>&nbsp;                    } else {</b>
+<b class="nc"><i>266</i>&nbsp;                        System.out.println(&quot;HarnessApp.parseNewFiles: &quot; + raceProgramFile.getName());</b>
+<i>267</i>&nbsp;                    }
+<b class="nc"><i>268</i>&nbsp;                } catch (RacesCancelledException re) {</b>
+<i>269</i>&nbsp;                    // Ravit peruttu
+<b class="nc"><i>270</i>&nbsp;                    System.out.println(&quot;HarnessApp.parseNewFiles: races cancelled&quot;);</b>
+<b class="nc"><i>271</i>&nbsp;                } catch (UnvalidStartException e) {</b>
+<i>272</i>&nbsp;                    // 5. lähtö  klo 18:44 Yhdistetty tasoitusajo 1640 m Avoin GLi Fire ’n Ice, Kylmäveriset vs. Lämminveriset P. 4000 e. (4000-2000-1200-800-400-400)
+<b class="nc"><i>273</i>&nbsp;                } catch (Exception e) {</b>
+<b class="nc"><i>274</i>&nbsp;                    try { conn.rollback(); } catch (SQLException e1) { e1.printStackTrace(); }</b>
+<b class="nc"><i>275</i>&nbsp;                    Log.write( new Exception( raceProgramFile.getName(), e));</b>
+<b class="nc"><i>276</i>&nbsp;                }</b>
+<i>277</i>&nbsp;            }
+<b class="nc"><i>278</i>&nbsp;            System.out.print(&quot;&quot;); // stop here if don&#39;t  want to loose data</b>
+<b class="nc"><i>279</i>&nbsp;        }</b>
+<i>280</i>&nbsp;        //Log.write(GameFactory.toBettingsString(conn));
+<i>281</i>&nbsp;    }
+<i>282</i>&nbsp;
+<i>283</i>&nbsp;    private String getRaceStatement(java.sql.Date limitDate) {
+<b class="nc"><i>284</i>&nbsp;        StringBuffer sb = new StringBuffer();</b>
+<b class="nc"><i>285</i>&nbsp;        sb.append(&quot;select LAHTO.id, LAHTO.lyhenne, PROGRAMFILE.pvm &quot;);</b>
+<b class="nc"><i>286</i>&nbsp;        sb.append(&quot;from LAHTO, PROGRAMFILE &quot;);</b>
+<b class="nc"><i>287</i>&nbsp;        sb.append(&quot;where LAHTO.filename = PROGRAMFILE.filename &quot;);</b>
+<b class="nc"><i>288</i>&nbsp;        sb.append(&quot;order by LAHTO.id&quot;);</b>
+<i>289</i>&nbsp;
+<b class="nc"><i>290</i>&nbsp;        return sb.toString();</b>
+<i>291</i>&nbsp;    }
+<i>292</i>&nbsp;
+<i>293</i>&nbsp;    public static void main(String args[]) {
+<b class="nc"><i>294</i>&nbsp;        long startTime = System.currentTimeMillis();</b>
+<b class="nc"><i>295</i>&nbsp;        Connection conn = null;</b>
+<b class="nc"><i>296</i>&nbsp;        List newFiles = new Vector();</b>
+<i>297</i>&nbsp;
+<i>298</i>&nbsp;        try {
+<i>299</i>&nbsp;            /* avaa tietokantayhteyden */
+<b class="nc"><i>300</i>&nbsp;            conn = Database.getConnection();</b>
+<i>301</i>&nbsp;
+<b class="nc"><i>302</i>&nbsp;            raceProgramDirectory = new RaceProgramDirectory();</b>
+<b class="nc"><i>303</i>&nbsp;            gameDirectory = new GameDirectory();</b>
+<b class="nc"><i>304</i>&nbsp;            raceResultDirectory = new RaceResultDirectory();</b>
+<i>305</i>&nbsp;
+<i>306</i>&nbsp;            /**
+<i>307</i>&nbsp;             * Puhdistaaa logitiedoston
+<i>308</i>&nbsp;             */
+<b class="nc"><i>309</i>&nbsp;            Log.clear();</b>
+<i>310</i>&nbsp;
+<b class="nc"><i>311</i>&nbsp;            if(!HarnessApp.isRunning()) {</b>
+<b class="nc"><i>312</i>&nbsp;                HarnessApp app = HarnessApp.getInstance();</b>
+<b class="nc"><i>313</i>&nbsp;                if (HarnessApp.create_files) {</b>
+<i>314</i>&nbsp;                    // Edellinen cuori
+<i>315</i>&nbsp;                    //app.haeUudetTiedostot(raceCalendarEarliestYearUrl, conn);
+<i>316</i>&nbsp;
+<i>317</i>&nbsp;                    // Kuluva vuosi
+<b class="nc"><i>318</i>&nbsp;                    app.haeUudetTiedostot(raceCalendarEarlierYearUrl, conn);</b>
+<i>319</i>&nbsp;                }
+<i>320</i>&nbsp;
+<i>321</i>&nbsp;                /* hakee uudet käsiohjelmat joita ei ole vielä tietokannassa */
+<b class="nc"><i>322</i>&nbsp;                newFiles = raceProgramDirectory.listNewFiles(conn, newFiles);</b>
+<i>323</i>&nbsp;
+<i>324</i>&nbsp;                /* hakee uudet tulokset joita ei ole vielä tietokannassa */
+<i>325</i>&nbsp;                //newFiles  = raceResultDirectory.listNewFiles(conn, newFiles);
+<i>326</i>&nbsp;
+<b class="nc"><i>327</i>&nbsp;                Collections.sort(newFiles, new FileComparator());</b>
+<i>328</i>&nbsp;
+<b class="nc"><i>329</i>&nbsp;                if(!newFiles.isEmpty()) {</b>
+<b class="nc"><i>330</i>&nbsp;                    String firstFile = (String) newFiles.get(0);</b>
+<b class="nc"><i>331</i>&nbsp;                    long dateasnumber = Double.valueOf(firstFile.substring(2, 15)).longValue();</b>
+<b class="nc"><i>332</i>&nbsp;                    java.sql.Date limitDate = new java.sql.Date(dateasnumber);</b>
+<i>333</i>&nbsp;
+<i>334</i>&nbsp;                    // Alustaa pelit
+<b class="nc"><i>335</i>&nbsp;                    totoEngine.add(new Voittajapeli(&quot;Voittaja yhdellä&quot;));</b>
+<i>336</i>&nbsp;
+<i>337</i>&nbsp;                    //effectEngine.initialize(conn, linregMap, totoEngine, limitDate);
+<b class="nc"><i>338</i>&nbsp;                    app.initialize(conn, linregMap, totoEngine, limitDate);</b>
+<i>339</i>&nbsp;
+<b class="nc"><i>340</i>&nbsp;                    app.parseNewFiles(newFiles, conn);</b>
+<i>341</i>&nbsp;
+<b class="nc"><i>342</i>&nbsp;                    Log.write(totoEngine.toString());</b>
+<i>343</i>&nbsp;                }
+<b class="nc"><i>344</i>&nbsp;            } else {</b>
+<b class="nc"><i>345</i>&nbsp;                System.out.println(&quot;You can have only one instance of this application running&quot;);</b>
+<i>346</i>&nbsp;            }
+<b class="nc"><i>347</i>&nbsp;        } catch (Exception e) {</b>
+<b class="nc"><i>348</i>&nbsp;            e.printStackTrace();</b>
+<b class="nc"><i>349</i>&nbsp;            Log.write(e);</b>
+<i>350</i>&nbsp;        } finally {
+<b class="nc"><i>351</i>&nbsp;            System.out.println(&quot;HarnessApp.main: &quot; + (System.currentTimeMillis() - startTime) / 1000 + &quot; seconds&quot;);</b>
+<b class="nc"><i>352</i>&nbsp;            try { conn.close(); } catch (SQLException e) { e.printStackTrace(); }</b>
+<b class="nc"><i>353</i>&nbsp;        }</b>
+<i>354</i>&nbsp;    }
+<i>355</i>&nbsp;
+<i>356</i>&nbsp;    /**
+<i>357</i>&nbsp;     * Hakee Hippoksen sivuilta uudet käsiohjelma- ja tulostiedostot
+<i>358</i>&nbsp;     *
+<i>359</i>&nbsp;     * @param raceCalendarEarlierYearUrl
+<i>360</i>&nbsp;     *      Linkki luettavaan Hippoksen kantaan
+<i>361</i>&nbsp;     *
+<i>362</i>&nbsp;     * @param conn
+<i>363</i>&nbsp;     *      Tietokantayhteys
+<i>364</i>&nbsp;     */
+<i>365</i>&nbsp;    private void haeUudetTiedostot(String raceCalendarUrl, Connection conn) {
+<i>366</i>&nbsp;        try {
+<b class="nc"><i>367</i>&nbsp;            ProgramListener programListener = new ProgramListener();</b>
+<b class="nc"><i>368</i>&nbsp;            ResultListener resultListener = new ResultListener();</b>
+<i>369</i>&nbsp;
+<b class="nc"><i>370</i>&nbsp;            List newResultFiles = new ArrayList();</b>
+<b class="nc"><i>371</i>&nbsp;            List newRaceFiles = new ArrayList();</b>
+<b class="nc"><i>372</i>&nbsp;            List newFiles = new Vector();</b>
+<i>373</i>&nbsp;
+<i>374</i>&nbsp;            /* hakee hippoksen sivuilta käsiohjelma- ja tulostiedostot */
+<b class="nc"><i>375</i>&nbsp;            newFiles = raceProgramDirectory.listResultlessFiles(conn);</b>
+<i>376</i>&nbsp;            //newFiles = raceResultDirectory.listResultFiles(newFiles);
+<i>377</i>&nbsp;
+<i>378</i>&nbsp;
+<b class="nc"><i>379</i>&nbsp;            programListener.createProgramFiles(raceCalendarUrl, newRaceFiles, newResultFiles, newFiles);</b>
+<i>380</i>&nbsp;
+<b class="nc"><i>381</i>&nbsp;        } catch (FileNotFoundException e) {</b>
+<b class="nc"><i>382</i>&nbsp;            e.printStackTrace();</b>
+<b class="nc"><i>383</i>&nbsp;        }</b>
+<i>384</i>&nbsp;
+<i>385</i>&nbsp;    }
+<i>386</i>&nbsp;}
+<i>387</i>&nbsp;/*
+<i>388</i>&nbsp;Hits:   20.85%
+<i>389</i>&nbsp;        Profit: -15207.6?/57024 = -0.27?/startti
+<i>390</i>&nbsp;*/
+<i>391</i>&nbsp;
+<i>392</i>&nbsp;/*
+<i>393</i>&nbsp;Hits:   20.95%
+<i>394</i>&nbsp;Profit: -15946.3?/57101 = -0.28?/startti
+<i>395</i>&nbsp;
+<i>396</i>&nbsp; */
+<i>397</i>&nbsp;
+</div>
+</div>
+
+<div class="footer">
+    
+    <div style="float:right;">generated on 2021-04-26 13:09</div>
+</div>
+</body>
+</html>

@@ -1,0 +1,60 @@
+CREATE TABLE Teos (
+    Id INT AUTOINCREMENT,
+    Nimi VARCHAR(100) NOT NULL,
+    Kirjoittaja VARCHAR(50),
+    Kustantaja VARCHAR (100),
+    Kustannusvuosi INT,
+    Kirjasto INT,
+    Tila ENUM('Vapaa', Lainassa', 'Varattu', 'Varastossa', 'Korjaamolla'),
+    CONSTRAINT pk_teos PRIMARY KEY (Id),
+    CONSTRAINT fk_kirjasto FOREIGN KEY (Kirjasto) REFERENCES Kirjasto(Id),
+)
+
+CREATE TABLE Varaus (
+    Id int AUTOINCREMENT,
+    Teos VARCHAR(100) NOT NULL,
+    VarausPvm DATE,
+    Varaaja INT,
+    Tila ENUM('Odottaa', 'Noudettavissa'),
+    ViimNoutopäivä DATE,
+    CONSTRAINT pk_varaus PRIMARY KEY (Id),
+    CONSTRAINT fk_varaaja FOREIGN KEY (Varaaja) REFERENCES Asiakas(Id)
+)
+
+CREATE TABLE Lainaus (
+    Id INT AUTOINCREMENT,
+    Teos INT,
+    Lainaaja INT,
+    LainausPvm DATE,
+    PalautusPvm DATE,
+    CONSTRAINT pk_lainaus PRIMARY KEY (Id),
+    CONSTRAINT fk_teos FOREIGN KEY (Teos) REFERENCES Teos(Id),
+    CONSTRAINT fk_lainaja FOREIGN KEY (Lainaaja) REFERENCES Asiakas(Id)
+)
+
+CREATE TABLE Asiakas (
+    Id INT AUTOINCREMENT,
+    Nimi VARHAR(50) NOT NULL,
+    Osoite VARCHAR(100) NOT NULL,
+    Sakko DECIMAL(6,2),
+    CONSTRAINT pk_asiakas REFERENCES Id
+)
+
+CREATE TABLE Kirjasto (
+    Id INT AUTOINCREMENT,
+    Nimi VARCHAR(50) NOT NULL,
+    Osoite VARCHAR(100),
+    CONSTRAINT pk_kirjasto PRIMARY KEY (Id)
+}
+
+CREATE TABLE Varasto (
+    Id INT AUTOINCREMENT,
+    Osoite VARCHAR(100) NOT NULL,
+    CONSTRAINT pk_varasto PRIMARY KEY (Id)
+ }
+
+CREATE TABLE Korjaamo (
+    Id INT AUTOINCREMENT,
+    Osoite VARCHAR(100),
+    CONSTRAINT pk_korjaamo PRIMARY KEY (Id)
+}
