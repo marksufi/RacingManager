@@ -55,7 +55,7 @@ public class RaceHorseHistoryParser implements FileParser {
 
             this.raceLinkPage = new WebPage(raceHistoryPageUrl);
 
-            System.out.println("RaceHorseHistoryParser.RaceHorseHistoryParser: " + raceHistoryPageUrl.toString());
+            System.out.println("RaceHorseHistoryParser.RaceHorseHistoryParser: " + raceHistoryPageUrl);
 
             // Miksi tämä?
             SubStart.deleteAll(this.raceProgramHorse);
@@ -72,7 +72,7 @@ public class RaceHorseHistoryParser implements FileParser {
 
             this.raceLinkPage = new WebPage(raceHistoryPageUrl);
 
-            System.out.println("RaceHorseHistoryParser.RaceHorseHistoryParser: " + raceHistoryPageUrl.toString());
+            System.out.println("RaceHorseHistoryParser.RaceHorseHistoryParser: " + raceHistoryPageUrl);
 
         } catch (MalformedURLException e) {
             e.printStackTrace();
@@ -91,11 +91,9 @@ public class RaceHorseHistoryParser implements FileParser {
 
                 String line;
 
-                if ((line = raceLinkPage.SearchBlockLine("h4", "Startit")) != null) {
-                    //System.out.println("RaceHorseHistoryParser.parse: " + line);
-                    if ((line = raceLinkPage.readBlock("tr")) != null) {
-                        //System.out.println("RaceHorseHistoryParser.parse: " + line);
-                        while ((line = raceLinkPage.findBefore("tr", "</div>")) != null) {
+                if (raceLinkPage.SearchBlockLine("h4", "Startit") != null) {
+                    if (raceLinkPage.readBlock("tr") != null) {
+                        while (raceLinkPage.findBefore("tr", "</div>") != null) {
                             SubStart subStart = new SubStart(raceProgramHorse);
                             try {
                                 for (int i = 0; i < 15; i++) {
@@ -162,7 +160,7 @@ public class RaceHorseHistoryParser implements FileParser {
                                                     time.setNumber(time.getNumber().subtract(BigDecimal.valueOf(100)));
                                                 }
                                                 subStart.setSubTime(time);
-                                                if (line.indexOf("P") >= 0) {
+                                                if (line.contains("P")) {
                                                     // Poissa
                                                     //i = 15;
                                                     throw new AbsentException(subStart.toString());
@@ -182,11 +180,11 @@ public class RaceHorseHistoryParser implements FileParser {
                                             case 10: // X koodi
                                                 line = line.strip();
                                                 line = HTMLParser.removeBlock(line, "span");
-                                                StringBuffer sb = new StringBuffer();
+                                                StringBuilder sb = new StringBuilder();
                                                 StringTokenizer st = new StringTokenizer(line);
                                                 while (st.hasMoreTokens()) {
                                                     String t = st.nextToken();
-                                                    if(t.indexOf("hy") < 0) {
+                                                    if(!t.contains("hy")) {
                                                         // ei hyv eikä hyl
                                                         sb.append(t);
                                                         if (st.hasMoreTokens()) {
@@ -205,6 +203,13 @@ public class RaceHorseHistoryParser implements FileParser {
                                                     subStart.setxCode(xCode);
                                                 } else {
                                                     subStart.setxCode(null);
+
+                                                    // Tarkistaa onko hevosella jo aika tai sijoitus, jos ei ole, niin
+                                                    // lähtöä ei ole vielä ajetta ja vajaata tulosta ei voi tallettaa
+
+                                                    if(subStart.getSubRank() == null && subStart.getSubTime().getNumber() == null) {
+                                                        throw new AbsentException();
+                                                    }
                                                 }
                                                 break;
 
@@ -253,7 +258,6 @@ public class RaceHorseHistoryParser implements FileParser {
                                             */
 
                                         }
-                                        ;
                                     }
                                 }
 
@@ -272,9 +276,9 @@ public class RaceHorseHistoryParser implements FileParser {
                                     subStart.getSubTime().setAlpha(subStart.getRaceMode().toString());
 
                                     if(subStart.getSubTime().getAlpha().lastIndexOf('L') > 0)
-                                        Log.write("Incorrect subStart racemode: " + subStart.toString());
+                                        Log.write("Incorrect subStart racemode: " + subStart);
                                     if(subStart.getSubTime().getAlpha().lastIndexOf('K') > 0)
-                                        Log.write("Incorrect subStart racemode: " + subStart.toString());
+                                        Log.write("Incorrect subStart racemode: " + subStart);
 
                                 }
 
@@ -304,7 +308,7 @@ public class RaceHorseHistoryParser implements FileParser {
                                 throw e;
                             } catch (Exception e) {
                                 if(raceProgramHorse != null)
-                                    Log.write(e, "RaceHorseHistoryParser.parse(" + raceProgramHorse.getRaceHorseName() + ") " + subStart.toString());
+                                    Log.write(e, "RaceHorseHistoryParser.parse(" + raceProgramHorse.getRaceHorseName() + ") " + subStart);
                                 else
                                     e.printStackTrace();
                             }
@@ -318,7 +322,9 @@ public class RaceHorseHistoryParser implements FileParser {
         } catch (Exception e) {
             Log.write(e, raceProgramHorse.getId());
         } finally {
-            this.raceLinkPage.close();
+            if (this.raceLinkPage != null) {
+                this.raceLinkPage.close();
+            }
         }
         return raceProgramHorse;
     }
@@ -513,7 +519,7 @@ public class RaceHorseHistoryParser implements FileParser {
         return raceProgramHorse;
     }*/
 
-    public static void main(String args []) {
+    public static void main(String[] args) {
 
         //
         // http://heppa.hippos.fi/heppa/horse/RacingHistory,horsesStarts.$DirectLink.sdirect?sp=l8677344796515912522
