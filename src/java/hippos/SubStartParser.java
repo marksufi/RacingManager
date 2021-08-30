@@ -12,14 +12,11 @@ import utils.Log;
 
 import java.io.IOException;
 import java.math.BigDecimal;
-import java.util.Calendar;
-import java.util.Date;
-import java.util.Iterator;
-import java.util.StringTokenizer;
+import java.util.*;
 
 public class SubStartParser extends SubStart {
     StringTokenizer s;
-    Iterator lines;
+    private Iterator lines;
     //Date raceDate;
     static String defaultJockey;
     //private StringBuffer racemode = new StringBuffer();
@@ -61,7 +58,7 @@ public class SubStartParser extends SubStart {
      *  <td>hyv</td>
      *  <td>45,6</td><td class="no_wrap">
      */
-    public Object parse(String line) throws SubStartMissingException, DataObjectException, UnvalidStartException, AbsentException {
+    public Object parse() throws SubStartMissingException, DataObjectException, UnvalidStartException, AbsentException {
         try {
             try {
                 parseJockey();
@@ -76,7 +73,9 @@ public class SubStartParser extends SubStart {
                 parseRating();
                 parseDiff();
             } catch (SubStartMissingException se) {
-                while(lines.hasNext() && (line = (String)lines.next()).contains("</tr>") == false);
+                while(lines.hasNext() && !((String)lines.next()).contains("</tr>")) {
+                    // ei sisällä rivinvaihtoa, eli seuraavalle riville vaan sitten
+                }
 
                 throw se;
 
@@ -99,10 +98,10 @@ public class SubStartParser extends SubStart {
     }
 
     private void parseJockey() throws IOException {
-        String jockey = null;
+        String jockey;
         String line = HTMLParser.readBlock(lines, "td");
         if(line.contains("getDriver")) {
-            jockey = HTMLParser.readBlock(line, "a").strip();
+            jockey = Objects.requireNonNull(HTMLParser.readBlock(line, "a")).strip();
         } else {
             throw new IOException("Could not find jockey: " + line);
         }
@@ -115,9 +114,8 @@ public class SubStartParser extends SubStart {
     /**
      * Sets locality horseProgNumber from the parameter string. An empty locality horseProgNumber is ignored.
      * MANDATORY for success
-     * @param locality f.e. "J "
      */
-    private void parseLocality() throws SubStartMissingException, DataObjectException {
+    private void parseLocality() throws SubStartMissingException {
         String locality = HTMLParser.readBlock(lines, "td").strip();
 
         if (!locality.isEmpty()) {
@@ -132,9 +130,7 @@ public class SubStartParser extends SubStart {
      * Sets date horseProgNumber from the parameter string. The missing year horseProgNumber is substituted with
      * the current year horseProgNumber.
      *
-     * @param s f.e. 7.6.2010
-     *               21.9
-     * @throws DataObjectException if format doesn't match
+     * @throws AbsentException jos poissa
      */
     private void parseDate() throws AbsentException {
         try {
@@ -151,13 +147,13 @@ public class SubStartParser extends SubStart {
             StringTokenizer st = new StringTokenizer(s, ". ");
 
             if (st.countTokens() >= 2) {
-                day = new Integer(st.nextToken());
-                month = new Integer(st.nextToken());
+                day = Integer.valueOf(st.nextToken());
+                month = Integer.valueOf(st.nextToken());
             }
             if (st.hasMoreTokens()) {
-                year = new Integer(st.nextToken());
+                year = Integer.valueOf(st.nextToken());
             } else {
-                year = new Integer(raceProgramYear);
+                year = Integer.valueOf(raceProgramYear);
             }
 
             Calendar c = Calendar.getInstance();
@@ -182,7 +178,6 @@ public class SubStartParser extends SubStart {
 
     /**
      * Sets raceLength and raceTrack from the input string
-     * @param s f.e. "1600/ 6"
      * @throws DataObjectException if format doesn't match
      */
     public void parseLength() throws DataObjectException {
@@ -216,20 +211,16 @@ public class SubStartParser extends SubStart {
             }
         }
 
-        setRaceMode(new RaceMode(getRaceLiteral(), raceTime, getRaceLength(), getStartNumber()));
+        setRaceMode(new RaceMode(getRaceLiteral(), null, raceTime, getRaceLength(), getStartNumber()));
 
         raceTime.setAlpha(getRaceMode().toString());
         setSubTime(raceTime);
-
-        //setRaceTrackRow(HorsesHelper.evalTrackRow(locality.toString(), length.getBigDecimal(), track, originalTime.alpha));
-        //setRaceTrackRow(evalTrackRow());
     }
 
  /**
      * Sets the myRanking horseProgNumber from the input string. Only digits are countered
      *
-     * @param s f.e. "11             "
-     */
+  */
     private void parseRanking() {
         String s = HTMLParser.readBlock(lines, "td");
         AlphaNumber rawString = new AlphaNumber(s);
@@ -245,14 +236,11 @@ public class SubStartParser extends SubStart {
     /**
      * Set the rating horseProgNumber from the given input parameter. Only digital values are noticed
      *
-     * @param s f.e. "*30 "
-     *          53,0
-     * @throws DataObjectException
      */
-    private void parseRating() throws DataObjectException {
+    private void parseRating() {
         //System.out.println("SubStartParser.parseRating: " + line);
         String line = HTMLParser.readBlock(lines, "td");
-        if(line.indexOf("\t") >= 0) {
+        if(line.contains("\t")) {
             // Joku ylipääräinen kenttä tullut jossain vaiheessa
             line = HTMLParser.readBlock(lines, "td");
         }
@@ -265,9 +253,8 @@ public class SubStartParser extends SubStart {
     /**
      * Set the difference to winner.
      *
-     * @param s f.e. <td>4,4</td><td class="no_wrap">
      */
-    private void parseDiff() throws DataObjectException {
+    private void parseDiff() {
         while (lines.hasNext()) {
             String line = (String) lines.next();
             if (line.contains("</tr>")) {

@@ -2,6 +2,7 @@ package hippos;
 
 import hippos.exception.UnvalidStartException;
 import hippos.utils.HorsesHelper;
+import utils.Log;
 
 import java.math.BigDecimal;
 import java.util.ArrayList;
@@ -11,48 +12,54 @@ import java.util.List;
 public class RaceMode {
     private String racemode;
 
-    public RaceMode(String horseRace, SubTime raceTime, BigDecimal raceLength, BigDecimal startNumber) throws UnvalidStartException {
-        //try {
-            StringBuffer sb = new StringBuffer();
+    public RaceMode(String horseRace, String raceType, SubTime raceTime, BigDecimal raceLength, BigDecimal startNumber) throws UnvalidStartException {
+        try {
+            StringBuilder sb = new StringBuilder();
 
+            // rodun tunnus L tai K
             sb.append(horseRace);
-            if(raceTime.getAlpha() != null) {
+
+            // Monte,  jos 'm' löytyy ajasta
+            if (raceTime.getAlpha() != null) {
                 if (raceTime.getAlpha().indexOf('m') >= 0) {
                     // Montelähtö
                     sb.append("m");
                 }
-                if (raceTime.getAlpha().indexOf('a') >= 0 || raceTime.getAlpha().indexOf('L') >= 0) {
-                    // linjalähdöt muuttetaan ajolähdöiksi
+            }
+
+            // Ryhmäajon tunnus 'a'
+            if (raceType != null) {
+                // Historiatiedoista ajolähdön tunnus luetaan raceType parametrista
+                if(raceType.contains("R")) {
+                    sb.append("a");
+                }
+            } else {
+                // Lähtölistasta tunnus luetaan ajasta
+                if (raceTime.getAlpha() != null && raceTime.getAlpha().contains("a")) {
                     sb.append("a");
                 }
             }
-            if(startNumber.intValue() < 20) {
+
+            // Matkan tai koelähdön tunnus
+            if (startNumber.intValue() < 20) {
                 sb.append(HorsesHelper.raceLengthId(raceLength));
-            } else if(startNumber.intValue() < 25) {
+            } else if (startNumber.intValue() < 25) {
                 sb.append("kl");
-            } else if(startNumber.intValue() >= 50) {
+            } else if (startNumber.intValue() >= 50) {
                 // nuoret
                 sb.append("kl");
             } else {
                 // Opetuslähtö
-                //System.out.println("RaceMode.RaceMode Opetuslähtö?: " + startNumber.intValue());
                 throw new UnvalidStartException("Opetuslähtö");
             }
 
             this.racemode = sb.toString();
+        } catch (UnvalidStartException e) {
+            throw e;
+        } catch (Exception e) {
+            Log.write(e);
+        }
 
-            /** etsii myös pienet kirjaimet, outoa??
-             *
-            if(racemode.lastIndexOf('L') > 0 || racemode.lastIndexOf('K') > 0) {
-                //Rodun kirjaimen pitää olla alussa
-                Log.write("Incorrect racemode '" + racemode + "'");
-            }
-             */
-
-            //System.out.println("RaceMode.RaceMode: " +  raceTime.getNumber() + "" + racemode);
-        //} catch(Exception e) {
-        //    Log.write("Failed to construct RaceMode(" + horseRace + ", " + raceTime + ", " + raceLength + ")");
-        //}
     }
 
     public RaceMode(String racemode) {
