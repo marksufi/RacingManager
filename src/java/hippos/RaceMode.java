@@ -69,9 +69,4 @@ public class RaceMode {
     public String toString() {
         return racemode;
     }
-
-    public List toList() {
-
-        return Collections.singletonList(racemode);
-    }
 }

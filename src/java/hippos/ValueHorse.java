@@ -184,10 +184,17 @@ public class ValueHorse implements Comparable {
             e.printStackTrace();
         }
     }
+
+    public void setValues() {
+        maxValue.add(regY);
+        minValue.add(regY);
+
+        value = maxValue;
+    }
     /**
      * Hits:   26.90%
      * Profit: -4924.6/46087 = -0.11€/startti
-     */
+     *
     public void setValues() {
 
         // 1372 seconds
@@ -322,27 +329,10 @@ public class ValueHorse implements Comparable {
             //maxValue = siirräAlisuoritetut(maxValue, minValue);
 
             value = maxValue;
-            /*
-            value = new SubValueList();
-            if(!maxValue.isEmpty())
-                value.add(maxValue.getSubValueSet().first());
-            if(!minValue.isEmpty())
-                value.add(minValue.getSubValueSet().first());
-            */
-            /*
-            BigDecimal coachAwardRate = raceProgramHorse.getCoach().getForm().awardRate(null);
-            if(coachAwardRate != null) {
-                // Valmentajan luokka
-                value.add(coachAwardRate);
-            }
-            BigDecimal jockeyAwardRate = raceProgramHorse.getRaceProgramDriver().getForm().awardRate(null);
-            if(jockeyAwardRate != null) {
-                value.add(jockeyAwardRate);
-            }*/
         } catch (Exception e) {
             e.printStackTrace();
         }
-    }
+    }*/
 
     private SubValueList siirräAlisuoritetut(SubValueList maxValue, SubValueList minValue) {
         BigDecimal minAverage = minValue.average(2);

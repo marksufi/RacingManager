@@ -364,7 +364,11 @@ select yht_s, yht_1, yht_2, yht_3, yht_r, kcode, xcode from programhorse where n
 select count(*), sum(S_1), sum(S_2), sum(S_3), sum(palkinto), sum(KCODE), count(XCODE), count(KCODE) from SUBRESULT where NIMI='Eräsmies';
 select count(*), sum(S_1), sum(S_2), sum(S_3), sum(palkinto), sum(KCODE), sum(X), min(AIKA) Aika, min(PVM), TYYPPI, LAHTOTYYPPI from SUBRESULT where NIMI='Koivikon Kalle' and laji='K' group by TYYPPI, LAHTOTYYPPI, KCODE, X;
 select count(*), sum(S_1), sum(S_2), sum(S_3), sum(palkinto), sum(KCODE), sum(X), min(AIKA) Aika, min(PVM), TYYPPI, LAHTOTYYPPI from SUBRESULT where NIMI='Uljas Suomalainen' and laji='K' group by TYYPPI, LAHTOTYYPPI, KCODE, X;
-select S_1, S_2, S_3, palkinto, KCODE, XCODE from SUBRESULT where NIMI='Alma Cotter';
+select PVM, TYYPPI, LAHTOTYYPPI, AIKA, SIJOITUS as SIJA, X, XCODE, PALKINTO from SUBRESULT where NIMI='Pappan Paras' order by PVM desc;
+
+select count(*), sum(S_1), sum(S_2), sum(S_3), MAX( SIJOITUS ) KEEP ( DENSE_RANK LAST ORDER BY PVM ) AS lastResult, sum(palkinto), sum(KCODE), sum(X), min(AIKA) Aika, TYYPPI, LAHTOTYYPPI from SUBRESULT where NIMI='Uljas Suomalainen' and laji='K' group by TYYPPI, LAHTOTYYPPI, KCODE;
+
+MAX( SIJOITUS ) KEEP ( DENSE_RANK LAST ORDER BY PVM ) AS lastResult
 
 SELECT pvm, lahto, numero, nimi, sijoitus from resulthorse
 select avg(palkinto) from SUBRESULT where nimi = 'Tuviker' and xcode is null;

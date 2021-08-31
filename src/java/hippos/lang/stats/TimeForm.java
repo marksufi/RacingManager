@@ -11,6 +11,7 @@ import java.util.*;
 public class TimeForm extends Form {
     private String raceMode;
     private Form kForm = new Form("->");
+    private Form xForm = new Form("-x");
 
     //private AlphaNumber recordTime;
     private SortedSet<AlphaNumber> recordTimes = new TreeSet<>();
@@ -110,7 +111,10 @@ public class TimeForm extends Form {
     }
 
     public void add(TimeForm form) {
-        if(form.getKcode().intValue() > 0) {
+        if(form.getXcode().intValue() > 0) {
+            // Laukkatilastot omaan
+            xForm.add(form);
+        } else if(form.getKcode().intValue() > 0) {
             // Paalutilastot omaan
             kForm.add(form);
         } else {

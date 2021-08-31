@@ -64,7 +64,7 @@ public class Statements {
 
         try {
             StringBuffer stmt = new StringBuffer();
-            stmt.append("select count(*), sum(S_1), sum(S_2), sum(S_3), sum(palkinto), sum(KCODE), count(XCODE), min(AIKA) Aika, TYYPPI, LAHTOTYYPPI ");
+            stmt.append("select count(*), sum(S_1), sum(S_2), sum(S_3), sum(palkinto), sum(KCODE), sum(X), min(AIKA) Aika, TYYPPI, LAHTOTYYPPI ");
             stmt.append("from SUBRESULT ");
             stmt.append("where NIMI=? and laji=? and PVM < ? ");
             if(startDate != null) {
@@ -72,7 +72,7 @@ public class Statements {
             }
             //stmt.append("and KERROIN is not null");
             //stmt.append("group by TYYPPI, LAHTOTYYPPI");
-            stmt.append("group by TYYPPI, LAHTOTYYPPI, KCODE");
+            stmt.append("group by TYYPPI, LAHTOTYYPPI, KCODE, X");
 
             statement = conn.prepareStatement(stmt.toString());
 

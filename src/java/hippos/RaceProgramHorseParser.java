@@ -173,16 +173,7 @@ public class RaceProgramHorseParser implements FileParser {
     }
 
     /**
-     * @param line
-     *
-     * 		<a href="/heppa/racing/RaceProgramOneRace,getHorse.$DirectLink.sdirect;jsessionid=p6+QtwpVje2pJ3mNO95X1Q**.app3?sp=l3465426026070201393&amp;sp=X" onclick="return setStatusAndEnsure(selectText, this);" class="horse_normal">
-     *           Taikahippuli
-     *       </a>
-     *
-     *       <a href="/heppa/racing/RaceProgramOneRace,getHorse.$DirectLink.sdirect;jsessionid=uYEnfYEbMk8RVz0vXpkLTA**.app3?sp=l1480482254062633010&amp;sp=X" onclick="return setStatusAndEnsure(selectText, this);" class="horse_normal">
-     *           Paper Moon* (SE)
-     *       </a>
-     *
+     *  Parsii nimen
      */
     private void parseNameLine() throws OutOfHorsesException, DataObjectException {
         //System.out.println("RaceProgramHorseParser.parseNameLine(" + line + ")");
@@ -391,7 +382,7 @@ public class RaceProgramHorseParser implements FileParser {
         try {
             if(HarnessApp.useHorseRaceHistoryLink == false || HarnessApp.debugMode == true) {
                 SubStartParser subStartParser = new SubStartParser(lines, raceDate, raceProgramHorse);
-                SubStart subStart = (SubStart)subStartParser.parse(line);
+                SubStart subStart = (SubStart)subStartParser.parse();
 
                 System.out.println("RaceProgramHorseParser.parseSubStart: " + subStart.toString());
                 if(HarnessApp.useHorseRaceHistoryLink == false) {
