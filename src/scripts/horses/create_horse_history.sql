@@ -1,7 +1,7 @@
 DROP TABLE SUBRESULT;
 DROP INDEX subresult_kuljettaja_idx;
 DROP INDEX subresult_valmentaja_idx;
-DROP INDEX subresult_tyyppi_idx;
+DROP INDEX subresult_lahtotyyppi_idx;
 
 CREATE TABLE SUBRESULT (
     NIMI NVARCHAR2 ( 30 ) NOT NULL,
@@ -30,6 +30,6 @@ CREATE TABLE SUBRESULT (
 	);
 CREATE INDEX subresult_kuljettaja_idx on subresult(kuljettaja, pvm);
 CREATE INDEX subresult_valmentaja_idx on subresult(valmentaja, nimi, pvm);
-CREATE INDEX subresult_tyyppi_idx on subresult(tyyppi, lahtotyyppi, kcode, x);
+CREATE INDEX subresult_lahtotyyppi_idx on subresult(lahtotyyppi, kcode, x);
 
 commit;

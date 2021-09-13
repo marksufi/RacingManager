@@ -2,12 +2,10 @@ package hippos.lang.stats;
 
 import hippos.RaceProgramHorse;
 import hippos.database.Statements;
-import hippos.math.AlphaNumber;
 import hippos.util.Mapper;
 import hippos.utils.DateUtils;
 import utils.Log;
 
-import java.math.BigDecimal;
 import java.sql.*;
 import java.sql.Date;
 import java.util.*;
@@ -19,9 +17,7 @@ public class FullStatistics extends TimeForm {
     private String name;
     private String race;
 
-    private Mapper<TimeForm> forms = new Mapper<>();
-    //private Mapper<Form> featuredStats = new Mapper<>();
-
+    private List<SubForm> subForms = new ArrayList<>();
 
     public FullStatistics(String label, RaceProgramHorse raceProgramHorse) {
         super(label);
@@ -32,6 +28,7 @@ public class FullStatistics extends TimeForm {
         this.timeStatistics = new TimeStatistics(raceProgramHorse);
     }
 
+    /*
     public void fetchForm(Connection conn) {
         PreparedStatement statement = null;
         ResultSet set = null;
@@ -43,16 +40,45 @@ public class FullStatistics extends TimeForm {
             while(set.next()) {
                 TimeForm form = new TimeForm(set);
 
-                List keyList = new ArrayList();
-                keyList.add(form.getLabel());
+                subForms.add()
+                //List keyList = new ArrayList();
+                //keyList.add(form.getLabel());
 
-                forms.getOrCreate(Collections.singletonList(form.getLabel()), new TimeForm(form.getLabel())).add(form);
+                try{
+
+                    subForms.get(form.getLabel()).add(form);
+                } catch (Exception e) {
+                    subForms.put(form.getLabel(), form);
+                }
 
                 super.add(form);
-
             }
 
             //fetchFeaturedStats(conn);
+
+        } catch (Exception e) {
+            Log.write(e);
+        } finally {
+            try { set.close(); } catch (Exception e) { }
+            try { statement.close();} catch (Exception e) { }
+        }
+    }*/
+
+    public void fetchSubForms(Connection conn) {
+        PreparedStatement statement = null;
+        ResultSet set = null;
+
+        try {
+            statement = Statements.getTimeFormStatement(conn, name, race, DateUtils.toSQLDate(endDate));
+
+            set = statement.executeQuery();
+            while(set.next()) {
+                SubForm subForm = new SubForm(set);
+
+                subForms.add(subForm);
+
+                super.add(subForm);
+            }
 
         } catch (Exception e) {
             Log.write(e);
@@ -67,8 +93,8 @@ public class FullStatistics extends TimeForm {
 
         str.append(super.toString());
 
-        for(TimeForm timeForm : forms.getValues()) {
-            str.append("\n\t" + timeForm);
+        for(SubForm subForm : subForms) {
+            str.append("\n\t" + subForm);
         }
 
         return str.toString();
@@ -144,36 +170,22 @@ public class FullStatistics extends TimeForm {
         return sb.toString();
     }
 
-    public String getAsString(List keys) {
-        StringBuffer sb = new StringBuffer();
-
-        try {
-            TimeForm form = forms.get(keys);
-            sb.append(form.getAsString());
-
-        } catch (NullPointerException e) {
-            // Etsittyä formia ei ole
-        } catch (Exception e) {
-            e.printStackTrace();
-        }
-
-        return sb.toString();
-    }
-
     public void init(String label, String str) {
+        /* Ei talleteta enään kantaan, jos reaaliaikainen lasku on riittävän nopea
         try {
             System.out.println("FullStatistics.init: " + str);
 
             TimeForm timeForm = new TimeForm(label);
             timeForm.init(str);
 
-            forms.put(Collections.singletonList(label), timeForm);
+            subForms.put(Collections.singletonList(label), timeForm);
 
         } catch (NullPointerException e) {
 
         } catch (Exception e) {
             Log.write(e);
         }
+         */
     }
 
     public void init(String str) {
@@ -187,15 +199,17 @@ public class FullStatistics extends TimeForm {
         }
     }
 
-    public Form get(List y) {
-        return forms.get(y);
-    }
-
     public Form getForm() {
         return this;
     }
 
+    public List<SubForm> getSubForms() {
+        return subForms;
+    }
 
+    public String getName() {
+        return name;
+    }
 }
 
 

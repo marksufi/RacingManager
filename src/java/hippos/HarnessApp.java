@@ -11,6 +11,7 @@ import hippos.lang.toto.TotoEngine;
 import hippos.lang.toto.Voittajapeli;
 import hippos.math.betting.GameFactory;
 import hippos.math.regression.HipposUpdatingRegression;
+import hippos.util.Mapper;
 import hippos.utils.DateUtils;
 import hippos.utils.HipposProperties;
 import hippos.web.ProgramListener;
@@ -99,6 +100,8 @@ public class HarnessApp {
     //public static TreeMap<String, Form> driverFullYearFormPool = new TreeMap();
     public static TreeMap<String, Form> driverRaceTypePool = new TreeMap();
 
+    public static Mapper<HipposUpdatingRegression> regMap = new Mapper<>();
+
     public static HarnessApp getInstance() throws FileNotFoundException {
         if(instance == null) {
             instance = new HarnessApp();
@@ -149,9 +152,9 @@ public class HarnessApp {
                         totoEngine.check(raceResultStart);
                         System.out.println(totoEngine.toString());
 
-                        raceResultStart.updateStatistics();
+                        raceResultStart.updateTrackStats();
 
-                        raceProgramStart.learn();
+                        raceProgramStart.learn2();
                 }
 
         } catch (Exception e) {

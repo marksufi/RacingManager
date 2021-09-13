@@ -38,7 +38,6 @@ public class HipposUpdatingRegression extends MillerUpdatingRegression {
     }
 
     public double get(double[] x) throws ModelSpecificationException {
-        double Y = Double.NaN;
 
         try {
             double B[] = regress().getParameterEstimates();
@@ -49,20 +48,20 @@ public class HipposUpdatingRegression extends MillerUpdatingRegression {
                 b += itc ? x[i] * B[i+1] : x[i] * B[i];
             }
 
-            Y = b;
-
             /*
             System.out.println();
             System.out.println("getDiagonalOfHatMatrix: " + this.getDiagonalOfHatMatrix(x));
             System.out.println("getPartialCorrelations(0): " + Arrays.toString(this.getPartialCorrelations(0)));
             System.out.println("getPartialCorrelations(1): " + Arrays.toString(this.getPartialCorrelations(1)));
             */
+
+            return b;
         } catch (ModelSpecificationException me) {
             throw me;
         } catch (Exception e) {
             e.printStackTrace();
+            throw e;
         }
-        return Y;
     }
 
     public double get(double x) throws ModelSpecificationException {

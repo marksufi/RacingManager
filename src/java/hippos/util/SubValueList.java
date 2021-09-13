@@ -8,23 +8,23 @@ import java.math.BigDecimal;
 import java.util.*;
 
 public class SubValueList extends Value {
-    private ArrayList <SubValue> subValueList = new ArrayList();
-    private TreeSet<SubValue> subValueSet = new TreeSet();
-    private int laukattomat = 0;
+    private ArrayList <Value> subValueList = new ArrayList();
+    private TreeSet<Value> subValueSet = new TreeSet();
 
     public Value getValue() {
         return this;
     }
 
-    public void add(SubValue subValue) {
-        super.add(subValue.getValue().average(2, null));
-        subValueList.add(subValue);
-        subValueSet.add(subValue);
-
-        if(subValue.onLaukaton()) {
-            laukattomat++;
+    public void add(Value subValue) {
+        try {
+            if (!subValue.isEmpty()) {
+                super.add(subValue.average(2, null));
+                subValueList.add(subValue);
+                subValueSet.add(subValue);
+            }
+        } catch (Exception e) {
+            e.printStackTrace();
         }
-
     }
 
     /*
@@ -57,8 +57,8 @@ public class SubValueList extends Value {
             BigDecimal avg = getAvg(2);
             Value dev = new Value();
 
-            for (SubValue subValue : subValueList) {
-                BigDecimal sub = subValue.getValue().average(2).subtract(avg);
+            for (Value subValue : subValueList) {
+                BigDecimal sub = subValue.average(2).subtract(avg);
                 dev.add(Math.abs(sub.doubleValue()));
             }
 
@@ -68,10 +68,6 @@ public class SubValueList extends Value {
         }
 
         return null;
-    }
-
-    public int getLaukattomat() {
-        return laukattomat;
     }
 
     /**
@@ -85,11 +81,11 @@ public class SubValueList extends Value {
     }
 
 
-    public ArrayList<SubValue> getSubValueList() {
+    public ArrayList<Value> getSubValueList() {
         return subValueList;
     }
 
-    public TreeSet<SubValue> getSubValueSet() {
+    public TreeSet<Value> getSubValueSet() {
         return subValueSet;
     }
 

@@ -4,7 +4,7 @@ import hippos.RaceProgramHorse;
 import hippos.SubStart;
 import hippos.SubTime;
 import hippos.math.SumReg;
-import hippos.math.regression.RegressionModelException;
+import hippos.exception.RegressionModelException;
 
 import java.math.BigDecimal;
 import java.util.ArrayList;

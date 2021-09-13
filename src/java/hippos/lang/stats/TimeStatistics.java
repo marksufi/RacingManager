@@ -2,13 +2,8 @@ package hippos.lang.stats;
 
 import hippos.*;
 import hippos.math.*;
-import hippos.math.racing.FinalTime;
 import hippos.math.racing.QuarterTime;
-import hippos.math.regression.RegressionModelException;
-import hippos.util.Mapper;
 import hippos.util.QuarterTimes;
-import hippos.utils.DateUtils;
-import hippos.utils.HorsesHelper;
 import utils.Log;
 
 import java.math.BigDecimal;

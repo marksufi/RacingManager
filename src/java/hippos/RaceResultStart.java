@@ -382,7 +382,7 @@ public class RaceResultStart extends RaceStart {
     /**
      * Päivittää ratakohtaisia väliaikatilastoja
      */
-    public void updateStatistics() {
+    public void updateTrackStats() {
         for(RaceResultHorse raceResultHorse : getRaceResultHorseList()) {
             List id = Collections.singletonList(raceResultHorse.getTrackId());
             BigDecimal va_1 = raceResultHorse.getVA_1();

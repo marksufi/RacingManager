@@ -62,7 +62,7 @@ public class QuarterTime extends StatisticalValue implements Comparable {
     }
 
     public BigDecimal getPropabiltyProcents() {
-        return propbabilty.divide(BigDecimal.valueOf(100.00), 2, RoundingMode.HALF_UP);
+        return propbabilty != null ? propbabilty.divide(BigDecimal.valueOf(100.00), 2, RoundingMode.HALF_UP) : BigDecimal.ZERO;
     }
 
     public int compareTo(Object o) {

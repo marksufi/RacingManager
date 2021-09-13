@@ -1,4 +1,4 @@
-package hippos.math.regression;
+package hippos.exception;
 
 public class RegressionModelException extends Exception {
 }

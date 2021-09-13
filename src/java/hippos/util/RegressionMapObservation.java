@@ -1,6 +1,6 @@
 package hippos.util;
 
-import hippos.math.regression.RegressionModelException;
+import hippos.exception.RegressionModelException;
 
 import java.util.List;
 

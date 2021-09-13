@@ -1,7 +1,11 @@
 package hippos.lang.stats;
 
-import hippos.exception.Missing;
+import hippos.RaceProgramStart;
+import hippos.exception.RegressionModelException;
 import hippos.math.AlphaNumber;
+import hippos.math.regression.HipposUpdatingRegression;
+import hippos.util.QuarterTimes;
+import org.apache.commons.math3.stat.regression.ModelSpecificationException;
 import utils.Log;
 
 import java.math.BigDecimal;
@@ -10,8 +14,10 @@ import java.util.*;
 
 public class TimeForm extends Form {
     private String raceMode;
-    private Form kForm = new Form("->");
-    private Form xForm = new Form("-x");
+    private BigDecimal lastRanking;
+    private Form cForm = new Form("C"); // Puhtaat juoksut
+    private Form kForm = new Form("->"); // Keulapaikkajuoksut
+    //private Form xForm = new Form("-x"); // Laukkajuoksut
 
     //private AlphaNumber recordTime;
     private SortedSet<AlphaNumber> recordTimes = new TreeSet<>();
@@ -37,8 +43,11 @@ public class TimeForm extends Form {
      */
     public TimeForm(ResultSet set) throws SQLException {
         super(set);
-        setLabel(set.getString("TYYPPI"));
+        //setLabel(set.getString("TYYPPI"));
         this.raceMode = set.getString("LAHTOTYYPPI");
+        setLabel(this.raceMode);
+
+        this.lastRanking = set.getBigDecimal("VSIJOITUS");
         addRecordTime(set.getBigDecimal("AIKA"));
     }
 
@@ -110,37 +119,38 @@ public class TimeForm extends Form {
         this.kForm = kForm;
     }
 
-    public void add(TimeForm form) {
-        if(form.getXcode().intValue() > 0) {
-            // Laukkatilastot omaan
-            xForm.add(form);
-        } else if(form.getKcode().intValue() > 0) {
-            // Paalutilastot omaan
-            kForm.add(form);
-        } else {
-            super.add(form);
-        }
+    public void add(SubForm form) {
+        try {
+            /*
+                TODO: aktivoi kun kannasta laukka-arvot on korjattu
+             *
+            if(form.getXcode().intValue() > 0) {
+                // Laukkatilastot omaan
+                xForm.add(form);
+            } */
+            if(form.getKcode().intValue() > 0) {
+                // Paalutilastot omaan
+                kForm.add(form);
+            } else {
+                cForm.add(form);
+            }
 
-        try { recordTimes.addAll(form.recordTimes);  } catch (NullPointerException e) {}
-        try { aRecordTimes.addAll(form.aRecordTimes);  } catch (NullPointerException e) {}
-        try { tRecordTimes.addAll(form.tRecordTimes);  } catch (NullPointerException e) {}
+            super.add(form);
+
+            addRecordTime(form.getRaceModeTime());
+        } catch (Exception e) {
+            e.printStackTrace();
+        }
     }
 
     public String toString() {
         StringBuffer sb = new StringBuffer();
-        sb.append(getLabel() + ": " + getStarts() + " " + getFirsts() + "-" + getSeconds() + "-" + getThirds() + "-" + getXcode() + " (" + getAwardRate() + "€/s) " );
+        //sb.append(getLabel() + ": " + getStarts() + " " + getFirsts() + "-" + getSeconds() + "-" + getThirds() + " (" + getAwardRate() + "€/s) " );
+        //sb.append("{" + getProbability() + "%} ");
 
-        //sb.append(kForm.getLabel() + kForm.getStarts() + " " + kForm.getFirsts() + "-" + kForm.getSeconds() + "-" + kForm.getThirds()+ "-" + kForm.getXcode() + " (" + kForm.getAwardRate() + "€/s) " );
-        sb.append("->> " + kForm.getStarts() + " " + kForm.getFirsts() + "-" + kForm.getSeconds() + "-" + kForm.getThirds()+ "-" + kForm.getXcode() + " (" + kForm.getAwardRate() + "€/s) " );
-
-        sb.append("{" + kForm.getProbability() + "%} ");
-        /*
-        for(TimeForm timeForm : forms) {
-            sb.append(timeForm.toString());
-        }*/
-
-        while (sb.length() < 50)
-            sb.append(" ");
+        sb.append(cForm.toString());
+        sb.append(kForm.toString());
+        //sb.append(xForm.toString());
 
         sb.append(recordTimes);
 
@@ -182,4 +192,102 @@ public class TimeForm extends Form {
 
     }
 
+    public void learn(BigDecimal raceResultPrize, FullStatistics fullStatistics) throws RegressionModelException {
+
+        if(raceResultPrize != null) {
+            double[] x = new double[0];
+            try {
+                x = getRegX(fullStatistics);
+
+                RaceProgramStart.featuredReg.get(getLabel()).add(x, raceResultPrize.doubleValue());
+            } catch (NullPointerException e) {
+                HipposUpdatingRegression newHipposUpdatingRegression = new HipposUpdatingRegression(x.length);
+                newHipposUpdatingRegression.add(x, raceResultPrize.doubleValue());
+
+                RaceProgramStart.featuredReg.put(getLabel(), newHipposUpdatingRegression);
+            } catch (RegressionModelException e) {
+                throw e;
+            } catch (Exception e) {
+                e.printStackTrace();
+            }
+        }
+    }
+
+    private double[] getRegX(FullStatistics fullStatistics) throws RegressionModelException {
+        try {
+
+            List<BigDecimal> xList = new ArrayList();
+
+            QuarterTimes qt2 = fullStatistics.getTimeStatistics().getSecondQuarter();
+
+            //BigDecimal kp = qt2.getPropabiltyProcents();
+            BigDecimal kp = BigDecimal.ONE;
+            BigDecimal xp = BigDecimal.ONE;
+            BigDecimal cp = BigDecimal.ONE;
+
+            xList.add(cForm.getStarts().multiply(cp));
+            xList.add(cForm.getFirsts().multiply(cp));
+            xList.add(cForm.getSeconds().multiply(cp));
+            xList.add(cForm.getThirds().multiply(cp));
+            xList.add(cForm.getAwards().multiply(cp));
+
+            /*
+            xList.add(xForm.getStarts().multiply(xp));
+            xList.add(xForm.getFirsts().multiply(xp));
+            xList.add(xForm.getSeconds().multiply(xp));
+            xList.add(xForm.getThirds().multiply(xp));
+            xList.add(xForm.getAwards().multiply(xp));
+            */
+
+            xList.add(kForm.getStarts().multiply(kp));
+            xList.add(kForm.getFirsts().multiply(kp));
+            xList.add(kForm.getSeconds().multiply(kp));
+            xList.add(kForm.getThirds().multiply(kp));
+            xList.add(kForm.getAwards().multiply(kp));
+
+            xList.add(recordTimes.first().getBigDecimal());
+
+            double[] x = new double[xList.size()];
+
+            int xi = 0;
+            for (BigDecimal b : xList) {
+                x[xi++] = b.doubleValue();
+            }
+
+            //System.out.println(Arrays.toString(x) + " => " + RaceProgramStart.featuredReg.get(getLabel()).get(x));
+
+            return x;
+        } catch (NoSuchElementException e) {
+            throw new RegressionModelException();
+        } catch (Exception e) {
+            e.printStackTrace();
+        }
+
+        return null;
+
+    }
+
+    public BigDecimal getRegY(FullStatistics fullStatistics)throws RegressionModelException {
+
+        try {
+            double[] regX = getRegX(fullStatistics);
+
+            double regY = RaceProgramStart.featuredReg.get(getLabel()).get(regX);
+
+            return BigDecimal.valueOf(regY);
+        } catch (NullPointerException e) {
+            // ei riittävästi tietoa
+        } catch (RegressionModelException e) {
+            throw e;
+        } catch (ModelSpecificationException e) {
+            // Regulla vielä liian vähän tietoa
+            throw new RegressionModelException();
+        } catch (NumberFormatException e) {
+            throw new RegressionModelException();
+        } catch (Exception e) {
+            e.printStackTrace();
+        }
+
+        return null;
+    }
 }

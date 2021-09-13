@@ -12,9 +12,7 @@ import hippos.utils.StringUtils;
 import utils.Log;
 
 import java.math.BigDecimal;
-import java.math.RoundingMode;
 import java.sql.Connection;
-import java.sql.Date;
 import java.sql.PreparedStatement;
 import java.sql.ResultSet;
 import java.sql.SQLException;
@@ -99,7 +97,7 @@ public class RaceProgramHorse extends Horse {
 
             //fullStatistics = new FullStatistics("Yht", raceSet, this);
 
-            fullStatistics = new FullStatistics("Y", this);
+            //fullStatistics = new FullStatistics("Y", this);
             //fullStatistics.fetchForm(conn);
 
             initSubStart(raceSet.getString("SUBSTART_1"));
@@ -113,13 +111,16 @@ public class RaceProgramHorse extends Horse {
 
             //fullStatistics = new FullStatistics("Y", this);
 
-            fullStatistics.init(raceSet.getString("Y_STATS"));
-            fullStatistics.init("R", raceSet.getString("R_STATS"));
-            fullStatistics.init("T", raceSet.getString("T_STATS"));
+            //fullStatistics.init(raceSet.getString("Y_STATS"));
+            //fullStatistics.init("R", raceSet.getString("R_STATS"));
+            //fullStatistics.init("T", raceSet.getString("T_STATS"));
 
             addWeeksKey();
 
             fetchQuarterTimes(conn);
+
+            fetchRaceModeStats();
+
         } catch (Exception e) {
             e.printStackTrace();
         }
@@ -259,8 +260,8 @@ public class RaceProgramHorse extends Horse {
         subStartList.add(subStart);
         subStartSet.add(subStart);
 
-        fullStatistics.getTimeStatistics().add(subStart.getSubTime());
-        fullStatistics.getTimeStatistics().add(subStart.getSubRank());
+        //fullStatistics.getTimeStatistics().add(subStart.getSubTime());
+        //fullStatistics.getTimeStatistics().add(subStart.getSubRank());
     }
 
     public void init() {
@@ -440,12 +441,7 @@ public class RaceProgramHorse extends Horse {
                     stmt.setString( i++, sb.toString());
                 }
 
-                stmt.setString(i++, fullStatistics.getAsString());
-                stmt.setString(i++, fullStatistics.getAsString(Collections.singletonList("R")));
-                stmt.setString(i++, fullStatistics.getAsString(Collections.singletonList("T")));
-
                 stmt.executeUpdate();
-                //conn.commit();
                 stmt.close();
 
             //}
@@ -488,8 +484,49 @@ public class RaceProgramHorse extends Horse {
 
             Connection conn = Database.getConnection();
 
-            fullStatistics = new FullStatistics("Y", this);
-            fullStatistics.fetchForm(conn);
+            fullStatistics = new FullStatistics("Yht", this);
+            fullStatistics.fetchSubForms(conn);
+
+            if(raceResultHorse != null) {
+                Driver raceResultdriver = raceResultHorse.getRaceResultDriver();
+                raceResultdriver.fetchRaceTypeForm(conn, getRaceDate(), getRaceMode());
+
+                raceProgramDriver.setName(raceResultdriver.getName());
+                raceProgramDriver.setForm(raceResultdriver.getForm());
+
+            } else {
+                raceProgramDriver.fetchRaceTypeForm(conn, this.getRaceDate(), this.getRaceMode());
+            }
+
+            coach.fetchForm(conn, this.getRaceHorseName(), this.getRaceDate());
+
+            fetchSubStarts(conn, 8);
+
+        } catch (Exception throwables) {
+            throwables.printStackTrace();
+        }
+    }
+
+    /**
+     * Tämä vie aikaa
+     */
+    public void fetchRaceModeStats() {
+        try {
+
+            Connection conn = Database.getConnection();
+
+            fullStatistics = new FullStatistics("Yht", this);
+            fullStatistics.fetchSubForms(conn);
+
+        } catch (Exception throwables) {
+            throwables.printStackTrace();
+        }
+    }
+
+    public void fetchDriverStats() {
+        try {
+
+            Connection conn = Database.getConnection();
 
             if(raceResultHorse != null) {
                 Driver raceResultdriver = raceResultHorse.getRaceResultDriver();
@@ -767,7 +804,7 @@ public class RaceProgramHorse extends Horse {
             xList.add(form0.getThirds());
             xList.add(form0.getAwards());
 
-            QuarterTimes qt1 = getFullStatistics().getTimeStatistics().getFirstQuarter();
+            QuarterTimes qt1 = getFullStatistics().getTimeStatistics().getSecondQuarter();
             BigDecimal p1 = qt1.getPropabiltyProcents();
 
             xList.add(form1.getStarts().multiply(p1));

@@ -3,7 +3,7 @@ package hippos.util;
 import hippos.database.Database;
 import hippos.math.Value;
 import hippos.math.regression.HipposUpdatingRegression;
-import hippos.math.regression.RegressionModelException;
+import hippos.exception.RegressionModelException;
 import org.apache.commons.math3.stat.regression.ModelSpecificationException;
 
 import java.math.BigDecimal;

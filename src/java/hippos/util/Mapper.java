@@ -1,6 +1,9 @@
 package hippos.util;
 
+import hippos.RaceProgramHorse;
+import hippos.exception.KeyNotFoundException;
 import hippos.math.Value;
+import hippos.math.regression.HipposUpdatingRegression;
 
 import java.math.BigDecimal;
 import java.util.*;
@@ -56,6 +59,10 @@ public class Mapper<T> {
         return get(initMap, keys.iterator(), null);
     }
 
+    public T get(Object key)  {
+        return get(initMap, Collections.singletonList(key).iterator(), null);
+    }
+
     /**
      * Hakee avainlistalla tallennettua arvoa
      *
@@ -65,16 +72,22 @@ public class Mapper<T> {
      * @return  Tannettu arvo, jos löytyy, muuten uusi newT tietue
      */
     public T getOrCreate(List keys, T newT) {
+
         return get(initMap, keys.iterator(), newT);
+    }
+
+    public T getOrCreate(Object key, T newT) {
+
+        return get(initMap, Collections.singletonList(key).iterator(), newT);
     }
 
     private T get(MapperCell map, Iterator keyItr, T newT) {
         try {
-            if(keyItr.hasNext())
-               iKey = keyItr.next();
-
-            if(!keyItr.hasNext())
+            if(keyItr.hasNext()) {
+                iKey = keyItr.next();
+            } else {
                 return (T) map.getValue(iKey, newT);
+            }
 
             return get((MapperCell)map.next(iKey), keyItr, newT);
         } catch (NullPointerException e) {
@@ -94,61 +107,18 @@ public class Mapper<T> {
         add(initMap, keys.iterator(), value);
     }
 
-    private void add(MapperCell keyMap, Iterator keyItr, T value) {
-        if(keyItr.hasNext())
-            iKey = keyItr.next();
+    public void put(Object key, T value) {
+        add(initMap, Collections.singletonList(key).iterator(), value);
+    }
 
-        if(!keyItr.hasNext()) {
+    private void add(MapperCell keyMap, Iterator keyItr, T value) {
+        if(keyItr.hasNext()) {
+            iKey = keyItr.next();
+        } else  {
             keyMap.put(iKey, value);
             return;
         }
         add((MapperCell)keyMap.next(iKey), keyItr, value);
-    }
-
-    public static void main(String args []) {
-        List keyList = new ArrayList();
-        keyList.add(new BigDecimal(1));
-
-        Mapper <Value> mapper = new Mapper();
-
-        Value value = mapper.get(keyList);
-        System.out.println("Mapper.main " + keyList + " => " + value);
-
-        mapper.put(keyList, new Value(1.0));
-        value = mapper.get(keyList);
-        System.out.println("Mapper.main " + keyList + " => " + value);
-
-        keyList.add(new BigDecimal(2));
-        mapper.put(keyList, new Value(2.0));
-        value = (Value) mapper.get(keyList);
-
-        System.out.println("Mapper.main " + keyList + " => " + value);
-
-        keyList.add(new BigDecimal(3));
-        mapper.put(keyList, new Value(3.0));
-        value = (Value) mapper.get(keyList);
-
-        System.out.println("Mapper.main " + keyList + " => " + value);
-
-        mapper.get(keyList).add(4);
-        value = (Value) mapper.get(keyList);
-        System.out.println("Mapper.main " + keyList + " => " + value);
-
-        Mapper <String> esimerkki = new Mapper();
-        List avainlista = Arrays.asList("eka", "toka", "kolmas");
-        esimerkki.put(avainlista, "kolme avainta");
-        String arvo = esimerkki.get(avainlista);
-        System.out.println("Mapper.main " + avainlista + " => " + arvo);
-
-        esimerkki.put(avainlista, null);
-        arvo = esimerkki.get(avainlista);
-        System.out.println("Mapper.main " + avainlista + " => " + arvo);
-
-        avainlista = Arrays.asList("eka", null, "kolmas");
-        esimerkki.put(avainlista, null);
-        arvo = esimerkki.get(avainlista);
-        System.out.println("Mapper.main " + avainlista + " => " + arvo);
-
     }
 
     public Collection<T> getValues() {
@@ -176,7 +146,62 @@ public class Mapper<T> {
         }
 
         public void put(Object iKey, T value) {
-            valuemap.put(iKey, value);
+            try {
+                valuemap.put(iKey, value);
+            } catch (Exception e) {
+                e.printStackTrace();
+            }
+        }
+
+        public T get(Object key)  {
+            try {
+                return valuemap.get(key);
+            } catch (NullPointerException e) {
+                // Avainta ei löyvy
+            } catch (Exception e) {
+                e.printStackTrace();
+            }
+            return null;
         }
     }
+
+    public static void main(String args []) {
+        List keyList = new ArrayList();
+
+        Mapper <Value> mapper = new Mapper();
+
+        // tyhjä
+        System.out.println("Mapper.main " + keyList + " => " + mapper.get(keyList));
+
+        //
+        //mapper.put(BigDecimal.ZERO, new Value(0));
+        //System.out.println("Mapper.main " + BigDecimal.ZERO + " => " + mapper.get(BigDecimal.ZERO));
+        System.out.println("Mapper.main " + BigDecimal.ZERO + " => " + mapper.getOrCreate(BigDecimal.ZERO, new Value(100)));
+
+        keyList.add(new BigDecimal(1));
+        mapper.put(keyList, new Value(1.0));
+        System.out.println("Mapper.main " + keyList + " => " + mapper.get(keyList));
+
+        System.out.println("Mapper.main " + BigDecimal.valueOf(1) + " => " + mapper.get(BigDecimal.valueOf(1)));
+        System.out.println("Mapper.main " + BigDecimal.valueOf(1) + " => " + mapper.getOrCreate(BigDecimal.valueOf(1), new Value(101)));
+        System.out.println("Mapper.main " + BigDecimal.valueOf(2) + " => " + mapper.getOrCreate(BigDecimal.valueOf(2), new Value(102)));
+
+        keyList.add("toka");
+        mapper.put(keyList, new Value(2.0));
+        System.out.println("Mapper.main " + keyList + " => " + mapper.get(keyList));
+
+        keyList.add(new BigDecimal(3));
+        mapper.put(keyList, new Value(3.0));
+        System.out.println("Mapper.main " + keyList + " => " + mapper.get(keyList));
+
+        mapper.get(keyList).add(4);
+        System.out.println("Mapper.main " + keyList + " => " + mapper.get(keyList));
+
+        keyList.add("neljäs");
+        mapper.getOrCreate(keyList, new Value()).add(4);
+        System.out.println("Mapper.main " + keyList + " => " + mapper.get(keyList));
+
+
+    }
+
 }

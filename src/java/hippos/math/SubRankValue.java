@@ -1,7 +1,7 @@
 package hippos.math;
 
 import hippos.SubRank;
-import hippos.math.regression.RegressionModelException;
+import hippos.exception.RegressionModelException;
 import utils.Log;
 
 import java.util.Arrays;

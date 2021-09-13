@@ -3,7 +3,7 @@ package hippos.lang.stats;
 import hippos.*;
 import hippos.math.AlphaNumber;
 import hippos.util.*;
-import hippos.math.regression.RegressionModelException;
+import hippos.exception.RegressionModelException;
 import hippos.utils.HorsesHelper;
 import utils.Log;
 

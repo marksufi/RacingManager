@@ -2,14 +2,13 @@ package hippos;
 
 import hippos.lang.stats.SubRaceTime;
 import hippos.math.*;
-import hippos.math.regression.RegressionModelException;
+import hippos.exception.RegressionModelException;
 import hippos.util.RegressionMapObservation;
 import hippos.util.RegressionMapper;
 import hippos.utils.DateUtils;
 import utils.Log;
 
 import java.math.BigDecimal;
-import java.math.RoundingMode;
 import java.util.ArrayList;
 import java.util.Date;
 import java.util.List;

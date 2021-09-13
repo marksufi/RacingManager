@@ -1,14 +1,16 @@
 package hippos;
 
 import hippos.database.Statements;
+import hippos.exception.RegressionModelException;
 import hippos.io.RaceProgramFile;
-import hippos.lang.stats.Form;
+import hippos.lang.stats.FullStatistics;
+import hippos.lang.stats.SubForm;
+import hippos.lang.stats.TimeForm;
 import hippos.math.AlphaNumber;
 import hippos.util.Mapper;
 import hippos.math.racing.QuarterTime;
 import hippos.math.regression.HipposUpdatingRegression;
 import hippos.math.regression.LogisticRegression;
-import hippos.util.QuarterTimes;
 import org.apache.commons.math3.stat.regression.ModelSpecificationException;
 import utils.Log;
 
@@ -37,7 +39,7 @@ public class RaceProgramStart extends RaceStart {
 
     private Mapper<SortedSet<QuarterTime>> quarterMap = new Mapper<>();
 
-    public static HipposUpdatingRegression featuredReg;
+    public static TreeMap <String, HipposUpdatingRegression> featuredReg = new TreeMap<>();
 
     public RaceProgramStart(RaceProgramFile raceProgramFile) {
         this.raceProgramFile = raceProgramFile;
@@ -330,8 +332,7 @@ public class RaceProgramStart extends RaceStart {
         }
 
         try {
-            newValueHorse.setStatValues();
-            newValueHorse.setValues();
+            newValueHorse.setRegValues();
 
         } catch (ModelSpecificationException me) {
             // Regressiolla liian vähän dataa
@@ -425,21 +426,27 @@ public class RaceProgramStart extends RaceStart {
         return quarterMap.get(Collections.singletonList(BigDecimal.valueOf(qt)));
     }
 
-    public void learn() {
+    public void learn2() {
 
         for(RaceProgramHorse raceProgramHorse : raceProgramHorses) {
             try {
                 RaceResultHorse raceResultHorse = raceProgramHorse.getRaceResultHorse();
-                BigDecimal y = raceResultHorse.getRaceResultPrize();
+                BigDecimal raceResultPrize = raceResultHorse.getRaceResultPrize();
 
-                if (raceResultHorse != null && y != null) {
-                    double[] x = raceProgramHorse.getRegX();
+                if (raceResultHorse != null && raceResultPrize != null) {
 
-                    if (featuredReg == null) {
-                        featuredReg = new HipposUpdatingRegression(x.length, true);
+                    FullStatistics fullStatistics = raceProgramHorse.getFullStatistics();
+
+                    for(SubForm subForm : fullStatistics.getSubForms()) {
+                        try {
+                            subForm.learn(raceResultPrize, fullStatistics);
+
+                        } catch (RegressionModelException e) {
+
+                        } catch (Exception e) {
+                            e.printStackTrace();
+                        }
                     }
-
-                    featuredReg.add(x, y.doubleValue());
 
                     //System.out.println(Arrays.toString(x) + " => " + featuredReg.get(x));
                 }
@@ -448,4 +455,5 @@ public class RaceProgramStart extends RaceStart {
             }
         }
     }
+
 }
