@@ -30,6 +30,7 @@ import static hippos.math.Progress.getWeeksKey;
 public class RaceProgramHorse extends Horse {
     public static Mapper<Progress> progressMap = new Mapper<>();
     private FullStatistics fullStatistics;
+    private TimeStatistics timeStatistics;
 
     protected RaceProgramStart raceProgramStart;
     protected RaceResultHorse raceResultHorse;
@@ -63,6 +64,8 @@ public class RaceProgramHorse extends Horse {
     public RaceProgramHorse(RaceProgramStart raceProgramStart) {
         super(raceProgramStart);
         this.raceProgramStart = raceProgramStart;
+
+        this.timeStatistics = new TimeStatistics(this);
     }
 
 
@@ -76,6 +79,8 @@ public class RaceProgramHorse extends Horse {
      */
     public RaceProgramHorse(ResultSet raceSet, Connection conn, RaceProgramStart raceProgramStart) throws SQLException {
         super(raceProgramStart);
+
+        this.raceProgramStart = raceProgramStart;
 
         try {
             setRaceProgramStart(raceProgramStart);
@@ -109,6 +114,8 @@ public class RaceProgramHorse extends Horse {
             initSubStart(raceSet.getString("SUBSTART_7"));
             initSubStart(raceSet.getString("SUBSTART_8"));
 
+            this.timeStatistics = new TimeStatistics(this);
+
             //fullStatistics = new FullStatistics("Y", this);
 
             //fullStatistics.init(raceSet.getString("Y_STATS"));
@@ -119,7 +126,7 @@ public class RaceProgramHorse extends Horse {
 
             fetchQuarterTimes(conn);
 
-            fetchRaceModeStats();
+            initFullStatistics(conn);
 
         } catch (Exception e) {
             e.printStackTrace();
@@ -135,10 +142,10 @@ public class RaceProgramHorse extends Horse {
             setTrackFirstQuarterPropability(trackIdL);
             setTrackSecondQuarterPropability(trackIdL);
 
-            fullStatistics.getTimeStatistics().fetchQuarterTimesStatistics(conn);
+            timeStatistics.fetchQuarterTimesStatistics(conn);
 
             try {
-                QuarterTime quarterTime = fullStatistics.getTimeStatistics().getFirstQuarter().getQuarterTime();
+                QuarterTime quarterTime = timeStatistics.getFirstQuarter().getQuarterTime();
                 quarterTime.addTrackPropability(getTrackFirstQuarterPropability());
 
                 raceProgramStart.addQuarterTime(1, quarterTime);
@@ -148,7 +155,7 @@ public class RaceProgramHorse extends Horse {
             }
 
             try {
-                QuarterTime quarterTime = fullStatistics.getTimeStatistics().getSecondQuarter().getQuarterTime();
+                QuarterTime quarterTime = timeStatistics.getSecondQuarter().getQuarterTime();
                 quarterTime.addTrackPropability(getTrackSecondQuarterPropability());
 
                 raceProgramStart.addQuarterTime(2, quarterTime);
@@ -160,7 +167,7 @@ public class RaceProgramHorse extends Horse {
             }
 
             try {
-                QuarterTime quarterTime = fullStatistics.getTimeStatistics().getLastQuarter().getQuarterTime();
+                QuarterTime quarterTime = timeStatistics.getLastQuarter().getQuarterTime();
                 raceProgramStart.addQuarterTime(3, quarterTime);
 
             } catch (NoSuchElementException e) {
@@ -169,7 +176,7 @@ public class RaceProgramHorse extends Horse {
             }
 
             try {
-                QuarterTime quarterTime = fullStatistics.getTimeStatistics().getFinalTimes().getQuarterTime();
+                QuarterTime quarterTime = timeStatistics.getFinalTimes().getQuarterTime();
                 raceProgramStart.addQuarterTime(4, quarterTime);
 
             } catch (NoSuchElementException e) {
@@ -268,7 +275,7 @@ public class RaceProgramHorse extends Horse {
         subStartList = new ArrayList();
         subStartSet = new TreeSet();
 
-        fullStatistics.getTimeStatistics().init();
+        timeStatistics.init();
     }
 
     private void fetchSubStarts(Connection conn, int count) {
@@ -484,8 +491,7 @@ public class RaceProgramHorse extends Horse {
 
             Connection conn = Database.getConnection();
 
-            fullStatistics = new FullStatistics("Yht", this);
-            fullStatistics.fetchSubForms(conn);
+            initFullStatistics(conn);
 
             if(raceResultHorse != null) {
                 Driver raceResultdriver = raceResultHorse.getRaceResultDriver();
@@ -510,10 +516,8 @@ public class RaceProgramHorse extends Horse {
     /**
      * Tämä vie aikaa
      */
-    public void fetchRaceModeStats() {
+    public void initFullStatistics(Connection conn) {
         try {
-
-            Connection conn = Database.getConnection();
 
             fullStatistics = new FullStatistics("Yht", this);
             fullStatistics.fetchSubForms(conn);
@@ -730,13 +734,13 @@ public class RaceProgramHorse extends Horse {
 
             if(fullStatistics != null) {
                 str.append("\n[" + trackFirstQuarterPropability + "%]");
-                str.append("\t500m:  " + fullStatistics.getTimeStatistics().getFirstQuarter().toString());
+                str.append("\t500m:  " + timeStatistics.getFirstQuarter().toString());
 
                 str.append("\n[" + trackSecondQuarterPropability + "%]");
-                str.append("\t1000m: " + fullStatistics.getTimeStatistics().getSecondQuarter().toString());
+                str.append("\t1000m: " + timeStatistics.getSecondQuarter().toString());
 
                 str.append("\n");
-                str.append("\tV500m: " + fullStatistics.getTimeStatistics().getLastQuarter().toString());
+                str.append("\tV500m: " + timeStatistics.getLastQuarter().toString());
             }
 
             str.append("\n\t" + coach.getForm());
@@ -804,7 +808,7 @@ public class RaceProgramHorse extends Horse {
             xList.add(form0.getThirds());
             xList.add(form0.getAwards());
 
-            QuarterTimes qt1 = getFullStatistics().getTimeStatistics().getSecondQuarter();
+            QuarterTimes qt1 = timeStatistics.getSecondQuarter();
             BigDecimal p1 = qt1.getPropabiltyProcents();
 
             xList.add(form1.getStarts().multiply(p1));

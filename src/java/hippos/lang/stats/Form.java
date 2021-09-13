@@ -279,6 +279,20 @@ public class Form {
         return xcode;
     }
 
+    public BigDecimal getXcodeProcents(BigDecimal ifZero) {
+        try {
+            BigDecimal xcoderate = this.xcode.multiply(BigDecimal.valueOf(100.00));
+            xcoderate = xcoderate.divide(starts, 0, RoundingMode.HALF_UP);
+
+            return xcoderate;
+        } catch (ArithmeticException e) {
+            // starts is zero
+        } catch (Exception e) {
+            e.printStackTrace();
+        }
+        return ifZero;
+    }
+
     public void setXcode(BigDecimal xcode) {
         if(xcode != null) {
             this.xcode = xcode;

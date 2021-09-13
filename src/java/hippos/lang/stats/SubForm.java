@@ -18,6 +18,8 @@ public class SubForm extends Form {
     private final BigDecimal lastRanking;
     private final BigDecimal recordTime;
 
+    private double y = Double.NaN;
+
     public SubForm(ResultSet set) throws SQLException {
         super(set);
         this.raceMode = set.getString("LAHTOTYYPPI");
@@ -64,7 +66,7 @@ public class SubForm extends Form {
         try {
             double[] x = getRegX(fullStatistics);
 
-            double y = HarnessApp.regMap.get(getLabel()).get(x);
+            y = HarnessApp.regMap.get(getLabel()).get(x);
 
             System.out.println("SubForm.getRegY: "  + fullStatistics.getName() + " " + getLabel() + ": " + Arrays.toString(x) + " ==> " + y);
 
@@ -118,6 +120,7 @@ public class SubForm extends Form {
         sb.append(" " + recordTime + getLabel());
         sb.append(" " + lastRanking);
 
+        sb.append(" ==> " + y);
         return sb.toString();
 
     }

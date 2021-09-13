@@ -24,7 +24,7 @@ public class TimeForm extends Form {
     private SortedSet<AlphaNumber> aRecordTimes = new TreeSet<>();
     private SortedSet<AlphaNumber> tRecordTimes = new TreeSet<>();
 
-    private List <TimeForm> forms = new ArrayList();
+    private List<TimeForm> forms = new ArrayList();
 
     public TimeForm(String label) {
         super(label);
@@ -38,7 +38,7 @@ public class TimeForm extends Form {
     /**
      * Parseri kutsuu tätä
      *
-     * @param set   Tilastotiedot kannasta
+     * @param set Tilastotiedot kannasta
      * @throws SQLException
      */
     public TimeForm(ResultSet set) throws SQLException {
@@ -90,9 +90,9 @@ public class TimeForm extends Form {
     }
 
     public void addRecordTime(BigDecimal recordTime) {
-        if(recordTime != null) {
+        if (recordTime != null) {
             recordTimes.add(new AlphaNumber(recordTime, this.raceMode));
-            if(this.raceMode.contains("a")) {
+            if (this.raceMode.contains("a")) {
                 aRecordTimes.add(new AlphaNumber(recordTime, this.raceMode));
             } else {
                 tRecordTimes.add(new AlphaNumber(recordTime, this.raceMode));
@@ -101,9 +101,9 @@ public class TimeForm extends Form {
     }
 
     public void addRecordTime(AlphaNumber recordTime) {
-        if(recordTime != null && recordTime.getNumber() != null) {
+        if (recordTime != null && recordTime.getNumber() != null) {
             recordTimes.add(recordTime);
-            if(recordTime.getAlpha().contains("a")) {
+            if (recordTime.getAlpha().contains("a")) {
                 aRecordTimes.add(recordTime);
             } else {
                 tRecordTimes.add(recordTime);
@@ -128,7 +128,7 @@ public class TimeForm extends Form {
                 // Laukkatilastot omaan
                 xForm.add(form);
             } */
-            if(form.getKcode().intValue() > 0) {
+            if (form.getKcode().intValue() > 0) {
                 // Paalutilastot omaan
                 kForm.add(form);
             } else {
@@ -145,14 +145,18 @@ public class TimeForm extends Form {
 
     public String toString() {
         StringBuffer sb = new StringBuffer();
-        //sb.append(getLabel() + ": " + getStarts() + " " + getFirsts() + "-" + getSeconds() + "-" + getThirds() + " (" + getAwardRate() + "€/s) " );
+        sb.append(getLabel() + ": " + getStarts() + " " + getFirsts() + "-" + getSeconds() + "-" + getThirds() + " (" + getAwardRate() + "€/s) " );
+        sb.append("-> " + getKcode() + "(" + getKcodeProcents(BigDecimal.ZERO) + "%)");
+        sb.append(" - " + getXcode() + "x(" + getXcodeProcents(BigDecimal.ZERO) + "%)");
         //sb.append("{" + getProbability() + "%} ");
 
-        sb.append(cForm.toString());
-        sb.append(kForm.toString());
+        sb.append(" " + recordTimes);
+
+        sb.append("\n\t" + cForm.toString());
+        sb.append("\n\t" + kForm.toString());
         //sb.append(xForm.toString());
 
-        sb.append(recordTimes);
+
 
         return sb.toString();
     }
@@ -192,33 +196,12 @@ public class TimeForm extends Form {
 
     }
 
-    public void learn(BigDecimal raceResultPrize, FullStatistics fullStatistics) throws RegressionModelException {
-
-        if(raceResultPrize != null) {
-            double[] x = new double[0];
-            try {
-                x = getRegX(fullStatistics);
-
-                RaceProgramStart.featuredReg.get(getLabel()).add(x, raceResultPrize.doubleValue());
-            } catch (NullPointerException e) {
-                HipposUpdatingRegression newHipposUpdatingRegression = new HipposUpdatingRegression(x.length);
-                newHipposUpdatingRegression.add(x, raceResultPrize.doubleValue());
-
-                RaceProgramStart.featuredReg.put(getLabel(), newHipposUpdatingRegression);
-            } catch (RegressionModelException e) {
-                throw e;
-            } catch (Exception e) {
-                e.printStackTrace();
-            }
-        }
-    }
-
-    private double[] getRegX(FullStatistics fullStatistics) throws RegressionModelException {
+    private double[] getRegX(TimeStatistics timeStatistics) throws RegressionModelException {
         try {
 
             List<BigDecimal> xList = new ArrayList();
 
-            QuarterTimes qt2 = fullStatistics.getTimeStatistics().getSecondQuarter();
+            QuarterTimes qt2 = timeStatistics.getSecondQuarter();
 
             //BigDecimal kp = qt2.getPropabiltyProcents();
             BigDecimal kp = BigDecimal.ONE;
@@ -265,29 +248,5 @@ public class TimeForm extends Form {
 
         return null;
 
-    }
-
-    public BigDecimal getRegY(FullStatistics fullStatistics)throws RegressionModelException {
-
-        try {
-            double[] regX = getRegX(fullStatistics);
-
-            double regY = RaceProgramStart.featuredReg.get(getLabel()).get(regX);
-
-            return BigDecimal.valueOf(regY);
-        } catch (NullPointerException e) {
-            // ei riittävästi tietoa
-        } catch (RegressionModelException e) {
-            throw e;
-        } catch (ModelSpecificationException e) {
-            // Regulla vielä liian vähän tietoa
-            throw new RegressionModelException();
-        } catch (NumberFormatException e) {
-            throw new RegressionModelException();
-        } catch (Exception e) {
-            e.printStackTrace();
-        }
-
-        return null;
     }
 }

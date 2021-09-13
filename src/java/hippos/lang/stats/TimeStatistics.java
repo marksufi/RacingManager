@@ -163,9 +163,6 @@ public class TimeStatistics {
 
                 tasoitus = raceProgramHorse.getTasoitus();
                 QuarterTime finalTime = new QuarterTime(raceProgramHorse, minAika, raceType, tasoitus, countV500, count, palkinto);
-                if(minAika != null) {
-                    System.out.print("");
-                }
                 finalTimes.add(finalTime);
             }
         } catch (Exception e) {

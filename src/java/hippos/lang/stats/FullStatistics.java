@@ -12,7 +12,6 @@ import java.util.*;
 
 public class FullStatistics extends TimeForm {
     private RaceProgramHorse raceProgramHorse;
-    private TimeStatistics timeStatistics;
     private java.util.Date endDate;
     private String name;
     private String race;
@@ -25,7 +24,6 @@ public class FullStatistics extends TimeForm {
         this.endDate = new Date(raceProgramHorse.getRaceProgramStart().getDate().getTime());
         this.name = raceProgramHorse.getRaceHorseName();
         this.race= raceProgramHorse.getRaceMode().substring(0, 1);
-        this.timeStatistics = new TimeStatistics(raceProgramHorse);
     }
 
     /*
@@ -98,11 +96,6 @@ public class FullStatistics extends TimeForm {
         }
 
         return str.toString();
-    }
-
-
-    public TimeStatistics getTimeStatistics() {
-        return timeStatistics;
     }
 
     /*
