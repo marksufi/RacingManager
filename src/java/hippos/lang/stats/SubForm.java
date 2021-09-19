@@ -1,6 +1,7 @@
 package hippos.lang.stats;
 
 import hippos.HarnessApp;
+import hippos.RaceProgramHorse;
 import hippos.exception.RegressionModelException;
 import hippos.math.AlphaNumber;
 import hippos.math.regression.HipposUpdatingRegression;
@@ -31,8 +32,13 @@ public class SubForm extends Form {
 
     private double[] getRegX(FullStatistics fullStatistics) throws RegressionModelException {
         try {
+            RaceProgramHorse raceProgramHorse = fullStatistics.getRaceProgramHorse();
+            BigDecimal tasoitus = raceProgramHorse.getTasoitus();
 
             List<BigDecimal> xList = new ArrayList();
+
+            // tasoitus ekana
+            xList.add(tasoitus);
 
             xList.add(getStarts());
             xList.add(getFirsts());

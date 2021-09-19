@@ -203,6 +203,10 @@ public class FullStatistics extends TimeForm {
     public String getName() {
         return name;
     }
+
+    public RaceProgramHorse getRaceProgramHorse() {
+        return raceProgramHorse;
+    }
 }
 
 

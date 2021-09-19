@@ -17,7 +17,7 @@ public class TimeForm extends Form {
     private BigDecimal lastRanking;
     private Form cForm = new Form("C"); // Puhtaat juoksut
     private Form kForm = new Form("->"); // Keulapaikkajuoksut
-    //private Form xForm = new Form("-x"); // Laukkajuoksut
+    private Form xForm = new Form("-x"); // Laukkajuoksut
 
     //private AlphaNumber recordTime;
     private SortedSet<AlphaNumber> recordTimes = new TreeSet<>();
@@ -121,14 +121,10 @@ public class TimeForm extends Form {
 
     public void add(SubForm form) {
         try {
-            /*
-                TODO: aktivoi kun kannasta laukka-arvot on korjattu
-             *
             if(form.getXcode().intValue() > 0) {
                 // Laukkatilastot omaan
                 xForm.add(form);
-            } */
-            if (form.getKcode().intValue() > 0) {
+            } else if (form.getKcode().intValue() > 0) {
                 // Paalutilastot omaan
                 kForm.add(form);
             } else {
@@ -154,7 +150,7 @@ public class TimeForm extends Form {
 
         sb.append("\n\t" + cForm.toString());
         sb.append("\n\t" + kForm.toString());
-        //sb.append(xForm.toString());
+        sb.append(xForm.toString());
 
 
 
@@ -196,6 +192,7 @@ public class TimeForm extends Form {
 
     }
 
+    /*
     private double[] getRegX(TimeStatistics timeStatistics) throws RegressionModelException {
         try {
 
@@ -214,13 +211,11 @@ public class TimeForm extends Form {
             xList.add(cForm.getThirds().multiply(cp));
             xList.add(cForm.getAwards().multiply(cp));
 
-            /*
             xList.add(xForm.getStarts().multiply(xp));
             xList.add(xForm.getFirsts().multiply(xp));
             xList.add(xForm.getSeconds().multiply(xp));
             xList.add(xForm.getThirds().multiply(xp));
             xList.add(xForm.getAwards().multiply(xp));
-            */
 
             xList.add(kForm.getStarts().multiply(kp));
             xList.add(kForm.getFirsts().multiply(kp));
@@ -248,5 +243,5 @@ public class TimeForm extends Form {
 
         return null;
 
-    }
+    }*/
 }
