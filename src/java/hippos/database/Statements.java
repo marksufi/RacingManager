@@ -17,9 +17,9 @@ public class Statements {
         String horseRace = raceProgramHorse.getRaceMode().substring(0, 1);
 
         try {
-            StringBuffer stmt = new StringBuffer();
+            StringBuilder stmt = new StringBuilder();
 
-            if(Database.useMySql == false) {
+            if(!Database.useMySql) {
                 /* Oracle */
                 stmt.append("select * from (");
             }
@@ -63,8 +63,8 @@ public class Statements {
         PreparedStatement statement = null;
 
         try {
-            StringBuffer stmt = new StringBuffer();
-            stmt.append("select count(*), sum(S_1), sum(S_2), sum(S_3), sum(palkinto), sum(KCODE), count(XCODE), min(AIKA) Aika, LAHTOTYYPPI, MAX( SIJOITUS ) KEEP ( DENSE_RANK LAST ORDER BY PVM ) AS VSIJOITUS ");
+            StringBuilder stmt = new StringBuilder();
+            stmt.append("select count(*), sum(S_1), sum(S_2), sum(S_3), sum(palkinto), sum(KCODE), sum(X), min(AIKA) Aika, LAHTOTYYPPI, MAX( SIJOITUS ) KEEP ( DENSE_RANK LAST ORDER BY PVM ) AS VSIJOITUS ");
             stmt.append("from SUBRESULT ");
             stmt.append("where NIMI=? and laji=? and PVM < ? ");
             if(startDate != null) {
@@ -72,7 +72,7 @@ public class Statements {
             }
             //stmt.append("and KERROIN is not null");
             //stmt.append("group by TYYPPI, LAHTOTYYPPI");
-            stmt.append("group by LAHTOTYYPPI, KCODE");
+            stmt.append("group by LAHTOTYYPPI, KCODE, X");
 
             statement = conn.prepareStatement(stmt.toString());
 
@@ -91,13 +91,11 @@ public class Statements {
 
     public static PreparedStatement getInsertRaceProgramHorseStamement(Connection conn) {
         try {
-            StringBuffer sb = new StringBuffer();
+            StringBuilder sb = new StringBuilder();
 
             sb.append("insert into PROGRAMHORSE(");
             sb.append("LID, TRACKID, NUMERO, NIMI, KULJETTAJA, VALMENTAJA, ");
             sb.append("MATKA, RATA, TASOITUS, ");
-            //sb.append("YHT_S, XCODE, KCODE, YHT_1, YHT_2, YHT_3, YHT_R, ");
-            sb.append("V_S, V_1, V_2, V_3, V_R, ");
             sb.append("K_S, K_1, K_2, K_3, K_R, K_PAALU, K_X, ");
             sb.append("SUBSTART_1, ");
             sb.append("SUBSTART_2, ");
@@ -106,23 +104,14 @@ public class Statements {
             sb.append("SUBSTART_5, ");
             sb.append("SUBSTART_6, ");
             sb.append("SUBSTART_7, ");
-            sb.append("SUBSTART_8, ");
-            sb.append("Y_STATS, ");
-            sb.append("R_STATS, ");
-            sb.append("T_STATS) ");
+            sb.append("SUBSTART_8) ");
 
             sb.append("values(?, ?, ?, ?, ?, ?, ");
             sb.append("?, ?, ?, ");
-            //sb.append("?, ?, ?, ?, ?, ?, ?, ");
-            sb.append("?, ?, ?, ?, ?, ");
             sb.append("?, ?, ?, ?, ?, ?, ?, ");
-            sb.append("?, ?, ?, ?, ?, ?, ?, ?, ");
+            sb.append("?, ?, ?, ?, ?, ?, ?, ?)");
 
-            sb.append("?, ?, ?)");
-
-            PreparedStatement stmt = conn.prepareStatement(sb.toString());
-
-            return stmt;
+            return conn.prepareStatement(sb.toString());
 
         } catch (Exception e) {
             Log.write(e);
@@ -139,12 +128,9 @@ public class Statements {
 
             sb.append("select TRACKID, NUMERO, NIMI, KULJETTAJA, VALMENTAJA, ");
             sb.append("MATKA, RATA, TASOITUS, ");
-            //sb.append("YHT_S, XCODE, KCODE, YHT_1, YHT_2, YHT_3, YHT_R, ");
-            sb.append("V_S, V_1, V_2, V_3, V_R, ");
             sb.append("K_S, K_1, K_2, K_3, K_R, K_PAALU, K_X, ");
             sb.append("SUBSTART_1, SUBSTART_2, SUBSTART_3, SUBSTART_4, ");
-            sb.append("SUBSTART_5, SUBSTART_6, SUBSTART_7, SUBSTART_8, ");
-            sb.append("Y_STATS, R_STATS, T_STATS ");
+            sb.append("SUBSTART_5, SUBSTART_6, SUBSTART_7, SUBSTART_8 ");
             sb.append("from PROGRAMHORSE ");
             sb.append("where LID = ? ");
             sb.append("order by NUMERO");

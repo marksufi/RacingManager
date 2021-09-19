@@ -150,7 +150,7 @@ public class TimeForm extends Form {
 
         sb.append("\n\t" + cForm.toString());
         sb.append("\n\t" + kForm.toString());
-        sb.append(xForm.toString());
+        sb.append("\n\t" + xForm.toString());
 
 
 

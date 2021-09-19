@@ -16,11 +16,13 @@ public class QuarterTimes extends QuarterTime {
     private Mapper <QuarterTime> raceTypedMap = new Mapper<>();
 
     public QuarterTimes(String id, RaceProgramHorse raceProgramHorse) {
-        this(id, raceProgramHorse, raceProgramHorse.getRaceLength().intValue());
+        super(raceProgramHorse);
+        //this(id, raceProgramHorse, raceProgramHorse.getRaceLength().intValue());
     }
 
     public QuarterTimes(String id, RaceProgramHorse raceProgramHorse, int qtLenght) {
-        this(id, raceProgramHorse, raceProgramHorse.getRaceLength().intValue(), null);
+        //this(id, raceProgramHorse, raceProgramHorse.getRaceLength().intValue(), null);
+        this(id, raceProgramHorse, qtLenght, null);
     }
 
     public QuarterTimes(String id, RaceProgramHorse raceProgramHorse, int qtLenght, BigDecimal trackPolePosProb) {

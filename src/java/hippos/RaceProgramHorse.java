@@ -96,14 +96,9 @@ public class RaceProgramHorse extends Horse {
             setTasoitus(raceSet.getBigDecimal("TASOITUS"));
             setName(raceSet.getString("NIMI"));
             setRaceProgramDriver(new RaceProgramDriver(raceSet));
-            setCoach(new Coach(raceSet));
+            setCoach(new Coach(raceSet.getString("VALMENTAJA")));
 
             setRaceResultHorse(raceProgramStart.getRaceResultStart());
-
-            //fullStatistics = new FullStatistics("Yht", raceSet, this);
-
-            //fullStatistics = new FullStatistics("Y", this);
-            //fullStatistics.fetchForm(conn);
 
             initSubStart(raceSet.getString("SUBSTART_1"));
             initSubStart(raceSet.getString("SUBSTART_2"));
@@ -116,12 +111,6 @@ public class RaceProgramHorse extends Horse {
 
             this.timeStatistics = new TimeStatistics(this);
 
-            //fullStatistics = new FullStatistics("Y", this);
-
-            //fullStatistics.init(raceSet.getString("Y_STATS"));
-            //fullStatistics.init("R", raceSet.getString("R_STATS"));
-            //fullStatistics.init("T", raceSet.getString("T_STATS"));
-
             addWeeksKey();
 
             fetchQuarterTimes(conn);
@@ -130,6 +119,90 @@ public class RaceProgramHorse extends Horse {
 
         } catch (Exception e) {
             e.printStackTrace();
+        }
+    }
+
+    public void insert(Connection conn) throws SQLException {
+        PreparedStatement stmt = null;
+        try {
+            //if(getRaceHorseName().equals("Muiston Viljo"))
+            //    System.out.print("");
+
+            //if(!existsInDatabase(conn)) {
+            int i = 1;
+            stmt = Statements.getInsertRaceProgramHorseStamement(conn);
+
+            //stmt.setString( i++, getId());
+            stmt.setString( i++, getLid());
+            stmt.setString( i++, getTrackId());
+            stmt.setBigDecimal( i++, getHorseProgNumber());
+            stmt.setString( i++, getRaceHorseName().toString());
+            stmt.setString( i++, getRaceProgramDriver().toString());
+            stmt.setString( i++, coach.toString());
+            stmt.setBigDecimal( i++, getRaceLength());
+            stmt.setBigDecimal( i++, getRaceTrack());
+            stmt.setBigDecimal( i++, getTasoitus());
+
+            Form driverStats = getRaceProgramDriver().getForm();
+            stmt.setBigDecimal( i++, driverStats.getStarts());
+            stmt.setBigDecimal( i++, driverStats.getFirsts());
+            stmt.setBigDecimal( i++, driverStats.getSeconds());
+            stmt.setBigDecimal( i++, driverStats.getThirds());
+            stmt.setBigDecimal( i++, driverStats.getAwards());
+            stmt.setBigDecimal( i++, driverStats.getKcode());
+            stmt.setBigDecimal( i++, driverStats.getXcode());
+
+            for(int is = 0; is < 8; is++) {
+                StringBuffer sb = new StringBuffer();
+
+                if(is < subStartList.size()) {
+                    try {
+                        SubStart subStart = (SubStart) subStartList.get(is);
+
+                        if (subStart.getSubTime() != null && subStart.getSubTime().getAlpha() != null && subStart.getSubTime().getAlpha().contains("x")) {
+                            System.out.println("RaceProgramHorse.insert: +  tietokantaan ei saa yhdistää aikaa ja xcodea");
+                        }
+                        sb.append(subStart.getTrackId() + ";");
+                        sb.append(subStart.getWeather() + ";");
+
+                        sb.append(subStart.getSubTime());
+
+                        sb.append(";");
+                        sb.append(subStart.getSubRank());
+
+                        sb.append(";");
+                        sb.append(subStart.getxCode());
+
+                        sb.append(";");
+                        int dateDiff = DateUtils.getDayDiff(this.getRaceDate(), subStart.getDate());
+                        sb.append(dateDiff);
+
+                        sb.append(";");
+                        sb.append(subStart.getAward());
+
+                        sb.append(";");
+                        sb.append(subStart.getkCode());
+
+                        sb.append(";");
+                        BigDecimal subDriverFirstRate = subStart.getSubDriver().getForm().firstRate();
+                        sb.append(subDriverFirstRate);
+
+                    } catch (Exception e) {
+                        e.printStackTrace();
+                        sb = new StringBuffer();
+                    }
+                }
+                stmt.setString( i++, sb.toString());
+            }
+
+            stmt.executeUpdate();
+            stmt.close();
+
+            //}
+        } catch (Exception e) {
+            Log.write(e, this.getId());
+        } finally {
+            try{ stmt.close(); } catch (Exception e) {}
         }
     }
 
@@ -357,108 +430,6 @@ public class RaceProgramHorse extends Horse {
         return subStartSet;
     }
 
-    public void insert(Connection conn) throws SQLException {
-        PreparedStatement stmt = null;
-        try {
-            //if(getRaceHorseName().equals("Muiston Viljo"))
-            //    System.out.print("");
-
-            //if(!existsInDatabase(conn)) {
-                int i = 1;
-                stmt = Statements.getInsertRaceProgramHorseStamement(conn);
-
-                //stmt.setString( i++, getId());
-                stmt.setString( i++, getLid());
-                stmt.setString( i++, getTrackId());
-                stmt.setBigDecimal( i++, getHorseProgNumber());
-                stmt.setString( i++, getRaceHorseName().toString());
-                stmt.setString( i++, getRaceProgramDriver().toString());
-                stmt.setString( i++, coach.toString());
-                stmt.setBigDecimal( i++, getRaceLength());
-                stmt.setBigDecimal( i++, getRaceTrack());
-                stmt.setBigDecimal( i++, getTasoitus());
-
-                /*
-                stmt.setBigDecimal( i++, fullStatistics.getStarts());
-                stmt.setBigDecimal( i++, fullStatistics.getXcode());
-                stmt.setBigDecimal( i++, fullStatistics.getKcode());
-                stmt.setBigDecimal( i++, fullStatistics.getFirsts());
-                stmt.setBigDecimal( i++, fullStatistics.getSeconds());
-                stmt.setBigDecimal( i++, fullStatistics.getThirds());
-                stmt.setBigDecimal( i++, fullStatistics.getAwards());
-                */
-
-                Form coachStats = coach.fetchForm(conn, getRaceHorseName(), getRaceDate());
-                stmt.setBigDecimal( i++, coachStats.getStarts());
-                stmt.setBigDecimal( i++, coachStats.getFirsts());
-                stmt.setBigDecimal( i++, coachStats.getSeconds());
-                stmt.setBigDecimal( i++, coachStats.getThirds());
-                stmt.setBigDecimal( i++, coachStats.getAwards());
-
-                //Form driverStats = getRaceProgramDriver().getFullYearForm();
-                Form driverStats = getRaceProgramDriver().getForm();
-                stmt.setBigDecimal( i++, driverStats.getStarts());
-                stmt.setBigDecimal( i++, driverStats.getFirsts());
-                stmt.setBigDecimal( i++, driverStats.getSeconds());
-                stmt.setBigDecimal( i++, driverStats.getThirds());
-                stmt.setBigDecimal( i++, driverStats.getAwards());
-                stmt.setBigDecimal( i++, driverStats.getKcode());
-                stmt.setBigDecimal( i++, driverStats.getXcode());
-
-                for(int is = 0; is < 8; is++) {
-                    StringBuffer sb = new StringBuffer();
-
-                    if(is < subStartList.size()) {
-                        try {
-                            SubStart subStart = (SubStart) subStartList.get(is);
-
-                            if (subStart.getSubTime() != null && subStart.getSubTime().getAlpha() != null && subStart.getSubTime().getAlpha().contains("x")) {
-                                System.out.println("RaceProgramHorse.insert: +  tietokantaan ei saa yhdistää aikaa ja xcodea");
-                            }
-                            sb.append(subStart.getTrackId() + ";");
-                            sb.append(subStart.getWeather() + ";");
-
-                            sb.append(subStart.getSubTime());
-
-                            sb.append(";");
-                            sb.append(subStart.getSubRank());
-
-                            sb.append(";");
-                            sb.append(subStart.getxCode());
-
-                            sb.append(";");
-                            int dateDiff = DateUtils.getDayDiff(this.getRaceDate(), subStart.getDate());
-                            sb.append(dateDiff);
-
-                            sb.append(";");
-                            sb.append(subStart.getAward());
-
-                            sb.append(";");
-                            sb.append(subStart.getkCode());
-
-                            sb.append(";");
-                            BigDecimal subDriverFirstRate = subStart.getSubDriver().getForm().firstRate();
-                            sb.append(subDriverFirstRate);
-
-                        } catch (Exception e) {
-                            e.printStackTrace();
-                            sb = new StringBuffer();
-                        }
-                    }
-                    stmt.setString( i++, sb.toString());
-                }
-
-                stmt.executeUpdate();
-                stmt.close();
-
-            //}
-        } catch (Exception e) {
-            Log.write(e, this.getId());
-        } finally {
-            try{ stmt.close(); } catch (Exception e) {}
-        }
-    }
-
     public boolean existsInDatabase(Connection conn) {
         PreparedStatement statement = null;
         ResultSet set = null;
@@ -504,8 +475,6 @@ public class RaceProgramHorse extends Horse {
                 raceProgramDriver.fetchRaceTypeForm(conn, this.getRaceDate(), this.getRaceMode());
             }
 
-            coach.fetchForm(conn, this.getRaceHorseName(), this.getRaceDate());
-
             fetchSubStarts(conn, 8);
 
         } catch (Exception throwables) {
@@ -542,8 +511,6 @@ public class RaceProgramHorse extends Horse {
             } else {
                 raceProgramDriver.fetchRaceTypeForm(conn, this.getRaceDate(), this.getRaceMode());
             }
-
-            coach.fetchForm(conn, this.getRaceHorseName(), this.getRaceDate());
 
             fetchSubStarts(conn, 8);
 
@@ -743,8 +710,10 @@ public class RaceProgramHorse extends Horse {
                 str.append("\tV500m: " + timeStatistics.getLastQuarter().toString());
             }
 
-            str.append("\n\t" + coach.getForm());
-            str.append("\n\t" + raceProgramDriver.getForm());
+            //str.append("\n\t" + coach);
+            if(this.raceProgramDriver != null) {
+                str.append("\n\t" + raceProgramDriver.getForm());
+            }
             /*
             for (int i = 0; i < 9; i++) {
                 str.append("\n" + toString(i));

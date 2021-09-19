@@ -17,17 +17,17 @@ public class TimeStatistics {
     private RaceProgramHorse raceProgramHorse;
     private Date raceDate;
 
-    private SortedSet <SubTime> aRecordSet = new TreeSet();
-    private SortedSet <SubTime> tRecordSet = new TreeSet();
+    private SortedSet <SubTime> aRecordSet = new TreeSet<>();
+    private SortedSet <SubTime> tRecordSet = new TreeSet<>();
 
-    private SortedSet<SubTime> raceTimeSet = new TreeSet();
-    private List<SubTime> raceTimeList = new ArrayList();
+    private SortedSet<SubTime> raceTimeSet = new TreeSet<>();
+    private List<SubTime> raceTimeList = new ArrayList<>();
 
-    private SortedSet <SubRank> raceRankingSet = new TreeSet();
-    private List <SubRank> raceRankingList = new ArrayList();
+    private SortedSet <SubRank> raceRankingSet = new TreeSet<>();
+    private List <SubRank> raceRankingList = new ArrayList<>();
 
-    private SortedSet <SubValue> raceTimeValueSet = new TreeSet();
-    private SortedSet <SubValue> raceRankValueSet = new TreeSet();
+    private SortedSet <SubValue> raceTimeValueSet = new TreeSet<>();
+    private SortedSet <SubValue> raceRankValueSet = new TreeSet<>();
 
     private QuarterTimes firstQuarter;
     private QuarterTimes secondQuarter;
@@ -40,24 +40,25 @@ public class TimeStatistics {
         this.firstQuarter = new QuarterTimes("500m  ", raceProgramHorse, 500);
         this.secondQuarter = new QuarterTimes("1000m ", raceProgramHorse, 1000);
         this.lastQuarter = new QuarterTimes("V500  ", raceProgramHorse, 500);
-        this.finalTimes = new QuarterTimes("final ", raceProgramHorse, raceProgramHorse.getRaceLength().intValue());
+        //this.finalTimes = new QuarterTimes("final ", raceProgramHorse, raceProgramHorse.getRaceLength().intValue());
+        this.finalTimes = new QuarterTimes("final ", raceProgramHorse);
     }
 
     public void init() {
-        aRecordSet = new TreeSet();
-        tRecordSet = new TreeSet();
+        aRecordSet = new TreeSet<>();
+        tRecordSet = new TreeSet<>();
 
-        raceTimeSet = new TreeSet();
-        raceTimeList = new ArrayList();
+        raceTimeSet = new TreeSet<>();
+        raceTimeList = new ArrayList<>();
 
-        raceRankingSet = new TreeSet();
-        raceRankingList = new ArrayList();
+        raceRankingSet = new TreeSet<>();
+        raceRankingList = new ArrayList<>();
 
     }
 
     public SubTime getaRecord() {
         if (!aRecordSet.isEmpty()) {
-            return (SubTime) aRecordSet.first();
+            return aRecordSet.first();
         }
         //return new SubTime("    ");
         return null;
@@ -65,7 +66,7 @@ public class TimeStatistics {
 
     public SubTime gettRecord() {
         if (!tRecordSet.isEmpty()) {
-            return (SubTime) tRecordSet.first();
+            return tRecordSet.first();
         }
         //return new SubTime("    ");
         return null;
@@ -73,7 +74,7 @@ public class TimeStatistics {
 
     public SubTime getRecord() {
         if (!raceTimeSet.isEmpty()) {
-            return (SubTime) raceTimeSet.first();
+            return raceTimeSet.first();
         }
         //return new SubTime("    ");
         return null;
@@ -105,7 +106,7 @@ public class TimeStatistics {
     /**
      * Lisää hevosen sijoituksen settiin ja listaan
      *
-     * @param raceRanking   Lisättävä sijoitus
+     * @param raceRank   Lisättävä sijoitus
      */
     public void add(SubRank raceRank) {
         try {
@@ -124,7 +125,7 @@ public class TimeStatistics {
         ResultSet set = null;
 
         try {
-            StringBuffer sb = new StringBuffer();
+            StringBuilder sb = new StringBuilder();
             sb.append("select lahtotyyppi, tasoitus, min(VA_1), count(va_1), min(VA_2), count(VA_2), min(V500), count(V500), min(aika), count(*), avg(PALKINTO) ");
             sb.append("from RESULTHORSE ");
             sb.append("where NIMI=? and PVM<? ");
@@ -146,7 +147,7 @@ public class TimeStatistics {
                 BigDecimal countV500 = set.getBigDecimal(i++);
                 BigDecimal minAika = set.getBigDecimal(i++);
                 BigDecimal count = set.getBigDecimal(i++);
-                BigDecimal palkinto = set.getBigDecimal(i++);
+                BigDecimal palkinto = set.getBigDecimal(i);
 
                 if(minVA_1 != null)
                     System.out.print("");
