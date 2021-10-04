@@ -2,6 +2,7 @@ package hippos;
 
 import hippos.database.Database;
 import hippos.database.Statements;
+import hippos.exception.RegressionModelException;
 import hippos.lang.stats.*;
 import hippos.util.Mapper;
 import hippos.math.Progress;
@@ -302,6 +303,7 @@ public class RaceProgramHorse extends Horse {
                 SubStart newSubStart = new SubStart(subStartStr, this);
 
                 addObservations(newSubStart);
+
                 add(newSubStart);
             }
         } catch (Exception e) {
@@ -799,5 +801,24 @@ public class RaceProgramHorse extends Horse {
         }
 
         return null;
+    }
+
+    public void addObservations() {
+        try {
+            BigDecimal raceResultPrize = raceResultHorse.getRaceResultPrize();
+
+            for (SubForm subForm : fullStatistics.getSubForms()) {
+                try {
+                    subForm.addObservations(raceResultPrize, fullStatistics);
+
+                } catch (RegressionModelException e) {
+
+                } catch (Exception e) {
+                    e.printStackTrace();
+                }
+            }
+        } catch (Exception e) {
+            e.printStackTrace();
+        }
     }
 }

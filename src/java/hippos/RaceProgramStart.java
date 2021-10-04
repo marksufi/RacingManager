@@ -5,7 +5,6 @@ import hippos.exception.RegressionModelException;
 import hippos.io.RaceProgramFile;
 import hippos.lang.stats.FullStatistics;
 import hippos.lang.stats.SubForm;
-import hippos.lang.stats.TimeForm;
 import hippos.math.AlphaNumber;
 import hippos.util.Mapper;
 import hippos.math.racing.QuarterTime;
@@ -426,30 +425,12 @@ public class RaceProgramStart extends RaceStart {
         return quarterMap.get(Collections.singletonList(BigDecimal.valueOf(qt)));
     }
 
-    public void learn2() {
+    public void addObservations() {
 
         for(RaceProgramHorse raceProgramHorse : raceProgramHorses) {
             try {
-                RaceResultHorse raceResultHorse = raceProgramHorse.getRaceResultHorse();
-                BigDecimal raceResultPrize = raceResultHorse.getRaceResultPrize();
+                raceProgramHorse.addObservations();
 
-                if (raceResultHorse != null && raceResultPrize != null) {
-
-                    FullStatistics fullStatistics = raceProgramHorse.getFullStatistics();
-
-                    for(SubForm subForm : fullStatistics.getSubForms()) {
-                        try {
-                            subForm.learn(raceResultPrize, fullStatistics);
-
-                        } catch (RegressionModelException e) {
-
-                        } catch (Exception e) {
-                            e.printStackTrace();
-                        }
-                    }
-
-                    //System.out.println(Arrays.toString(x) + " => " + featuredReg.get(x));
-                }
             } catch (Exception e) {
                 e.printStackTrace();
             }

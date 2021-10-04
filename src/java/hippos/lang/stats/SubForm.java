@@ -90,7 +90,7 @@ public class SubForm extends Form {
         }
     }
 
-    public void learn(BigDecimal raceResultPrize, FullStatistics fullStatistics) throws RegressionModelException {
+    public void addObservations(BigDecimal raceResultPrize, FullStatistics fullStatistics) throws RegressionModelException {
 
         try {
             double[] x = getRegX(fullStatistics);

@@ -154,7 +154,7 @@ public class HarnessApp {
 
                         raceResultStart.updateTrackStats();
 
-                        raceProgramStart.learn2();
+                        raceProgramStart.addObservations();
                 }
 
         } catch (Exception e) {

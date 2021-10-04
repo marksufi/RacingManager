@@ -50,7 +50,6 @@ public class HipposUpdatingRegression extends MillerUpdatingRegression {
 
             /*
             System.out.println();
-            System.out.println("getDiagonalOfHatMatrix: " + this.getDiagonalOfHatMatrix(x));
             System.out.println("getPartialCorrelations(0): " + Arrays.toString(this.getPartialCorrelations(0)));
             System.out.println("getPartialCorrelations(1): " + Arrays.toString(this.getPartialCorrelations(1)));
             */
