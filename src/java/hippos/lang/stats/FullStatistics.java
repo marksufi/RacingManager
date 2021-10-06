@@ -196,16 +196,16 @@ public class FullStatistics extends TimeForm {
         return this;
     }
 
-    public List<SubForm> getSubForms() {
-        return subForms;
-    }
-
     public String getName() {
         return name;
     }
 
     public RaceProgramHorse getRaceProgramHorse() {
         return raceProgramHorse;
+    }
+
+    public List<SubForm> getSubForms() {
+        return subForms;
     }
 }
 

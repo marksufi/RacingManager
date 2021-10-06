@@ -16,17 +16,26 @@ import java.util.*;
 public class SubForm extends Form {
 
     private final String raceMode;
-    private final BigDecimal lastRanking;
-    private final BigDecimal recordTime;
+    private final BigDecimal lastAward;
+    private BigDecimal recordTime;
 
     private double y = Double.NaN;
 
     public SubForm(ResultSet set) throws SQLException {
         super(set);
         this.raceMode = set.getString("LAHTOTYYPPI");
-        setLabel(this.raceMode);
 
-        this.lastRanking = set.getBigDecimal("VSIJOITUS");
+        StringBuilder label = new StringBuilder(this.raceMode);
+        if(getXcode().intValue() > 0) {
+            label.append("x");
+        }
+        if(getKcode().intValue() > 0) {
+            label.append("->");
+        }
+
+        setLabel(label.toString());
+
+        this.lastAward = set.getBigDecimal("VPALKINTO");
         this.recordTime = set.getBigDecimal("AIKA");
     }
 
@@ -38,17 +47,15 @@ public class SubForm extends Form {
             List<BigDecimal> xList = new ArrayList();
 
             // tasoitus ekana
-            xList.add(tasoitus);
+            //xList.add(tasoitus);
 
             xList.add(getStarts());
-            xList.add(getFirsts());
-            xList.add(getSeconds());
-            xList.add(getThirds());
-            xList.add(getAwards());
-            //xList.add(getXcode());
-            xList.add(getKcode());
+            xList.add(firstRate());
+            xList.add(sijaRate());
+            xList.add(awardRate());
+            //xList.add(getKcodeRate());
             xList.add(recordTime);
-            xList.add(lastRanking);
+            xList.add(lastAward);
 
             double[] x = new double[xList.size()];
 
@@ -72,7 +79,10 @@ public class SubForm extends Form {
         try {
             double[] x = getRegX(fullStatistics);
 
-            y = HarnessApp.regMap.get(getLabel()).get(x);
+            List keys = getRegKey(fullStatistics);
+
+            //y = HarnessApp.regMap.get(getLabel()).get(x);
+            y = HarnessApp.regMap.get(keys).get(x);
 
             System.out.println("SubForm.getRegY: "  + fullStatistics.getName() + " " + getLabel() + ": " + Arrays.toString(x) + " ==> " + y);
 
@@ -90,12 +100,23 @@ public class SubForm extends Form {
         }
     }
 
+    private List getRegKey(FullStatistics fullStatistics) {
+        List keys = new ArrayList();
+
+        keys.add(fullStatistics.getRaceProgramHorse().getTrackId());
+        keys.add(getLabel());
+
+        return keys;
+    }
+
     public void addObservations(BigDecimal raceResultPrize, FullStatistics fullStatistics) throws RegressionModelException {
 
         try {
             double[] x = getRegX(fullStatistics);
 
-            HarnessApp.regMap.getOrCreate(getLabel(), new HipposUpdatingRegression(x.length)).add(x, raceResultPrize.doubleValue());
+            List keys = getRegKey(fullStatistics);
+
+            HarnessApp.regMap.getOrCreate(keys, new HipposUpdatingRegression(x.length)).add(x, raceResultPrize.doubleValue());
 
         } catch (NullPointerException e) {
             throw new RegressionModelException();
@@ -116,7 +137,13 @@ public class SubForm extends Form {
     }
 
     public AlphaNumber getRaceModeTime() {
-        return new AlphaNumber(recordTime, raceMode);
+        try {
+            return new AlphaNumber(recordTime, raceMode);
+        } catch (Exception e) {
+            e.printStackTrace();
+        }
+
+        return null;
     }
 
     public String toString() {
@@ -124,7 +151,7 @@ public class SubForm extends Form {
 
         sb.append(super.toString());
         sb.append(" " + recordTime + getLabel());
-        sb.append(" " + lastRanking);
+        sb.append(" " + lastAward);
 
         sb.append(" ==> " + y);
         return sb.toString();

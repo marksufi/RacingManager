@@ -111,9 +111,15 @@ public class TimeForm extends Form {
         }
     }
 
+    public Form getcForm() {
+        return cForm;
+    }
+
     public Form getkForm() {
         return kForm;
     }
+
+
 
     public void setkForm(Form kForm) {
         this.kForm = kForm;

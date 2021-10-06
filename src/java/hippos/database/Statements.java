@@ -64,7 +64,7 @@ public class Statements {
 
         try {
             StringBuilder stmt = new StringBuilder();
-            stmt.append("select count(*), sum(S_1), sum(S_2), sum(S_3), sum(palkinto), sum(KCODE), sum(X), min(AIKA) Aika, LAHTOTYYPPI, MAX( SIJOITUS ) KEEP ( DENSE_RANK LAST ORDER BY PVM ) AS VSIJOITUS ");
+            stmt.append("select count(*), sum(S_1), sum(S_2), sum(S_3), sum(palkinto), sum(KCODE), sum(X), min(AIKA) Aika, LAHTOTYYPPI, MAX( PALKINTO ) KEEP ( DENSE_RANK LAST ORDER BY PVM ) AS VPALKINTO ");
             stmt.append("from SUBRESULT ");
             stmt.append("where NIMI=? and laji=? and PVM < ? ");
             if(startDate != null) {

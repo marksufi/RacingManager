@@ -635,13 +635,15 @@ public class SubStart implements Comparable {
             //p.append(StringUtils.parse(gapString != null ? gapString : "", ' ', 4, StringUtils.ALIGN_LEFT));
             //p.append(StringUtils.parse(startNumber != null ? startNumber.toString() : "", ' ', 3, StringUtils.ALIGN_LEFT));
             //p.append(StringUtils.parse((raceLength != null ? raceLength : "") + "/" + raceTrack, ' ', 8, StringUtils.ALIGN_LEFT));
-            p.append(StringUtils.toColumn(subTime.getSubValue() != null ? subTime.getSubValue().toString() : new String(), 50));
-            p.append(StringUtils.toColumn(subRank.getSubValue() != null ? subRank.getSubValue().toString() : new String(), 50));
+            //p.append(StringUtils.toColumn(subTime.getSubValue() != null ? subTime.getSubValue().toString() : new String(), 50));
+            p.append(StringUtils.toColumn(subTime, 20));
+            //p.append(StringUtils.toColumn(subRank.getSubValue() != null ? subRank.getSubValue().toString() : new String(), 50));
+            p.append(StringUtils.toColumn(subRank, 5));
             p.append(getkCode() != null && getkCode().intValue() == 1 ? "-> " : "   ");
-            p.append(StringUtils.toColumn(xCode != null ? xCode.toString() : new String(), 5));
+            p.append(StringUtils.toColumn(xCode != null ? xCode.toString() : new String(), 10));
             //p.append(StringUtils.toColumnString(rating != null ? rating.toString() : new String(), 5));
             p.append(award != null ? award.toString() + " €" : new String());
-            p.append("\t" + weeksKeyList);
+            //p.append("\t" + weeksKeyList);
 
         } catch(Exception e) {
             e.printStackTrace();

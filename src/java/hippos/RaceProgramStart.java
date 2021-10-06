@@ -340,12 +340,13 @@ public class RaceProgramStart extends RaceStart {
             e.printStackTrace();
         }
 
+        /*
         if(raceResultHorse != null) {
             for(SubStart subStart : newValueHorse.getRaceProgramHorse().getSubStartList()) {
                 subStart.getSubTime().addObservation(newValueHorse.getRaceProgramHorse(), newValueHorse.getRaceResultHorse());
                 subStart.getSubRank().addObservation(newValueHorse.getRaceProgramHorse(), newValueHorse.getRaceResultHorse());
             }
-        }
+        }*/
 
         valueHorseArrayList.add(newValueHorse);
     }

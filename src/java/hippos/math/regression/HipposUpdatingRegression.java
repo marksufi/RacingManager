@@ -50,8 +50,28 @@ public class HipposUpdatingRegression extends MillerUpdatingRegression {
 
             /*
             System.out.println();
+            System.out.println("getPartialCorrelations(X): " + Arrays.toString(x));
+            System.out.println("getPartialCorrelations(B): " + Arrays.toString(B));
             System.out.println("getPartialCorrelations(0): " + Arrays.toString(this.getPartialCorrelations(0)));
             System.out.println("getPartialCorrelations(1): " + Arrays.toString(this.getPartialCorrelations(1)));
+            System.out.println("getPartialCorrelations(2): " + Arrays.toString(this.getPartialCorrelations(2)));
+            System.out.println("getPartialCorrelations(3): " + Arrays.toString(this.getPartialCorrelations(3)));
+            System.out.println("getDiagonalOfHatMatrix(x): " + this.getDiagonalOfHatMatrix(x));
+            System.out.println("getOrderOfRegressors(): " + Arrays.toString(this.getOrderOfRegressors()));
+            System.out.println("getParameterEstimates(): " + Arrays.toString(regress().getParameterEstimates()));
+
+            System.out.println("getCovarianceOfParameters(1, 0): " + regress().getCovarianceOfParameters(1, 0));
+            System.out.println("getCovarianceOfParameters(0, 1): " + regress().getCovarianceOfParameters(0, 1));
+            System.out.println("getCovarianceOfParameters(0, 2): " + regress().getCovarianceOfParameters(0, 2));
+            System.out.println("getCovarianceOfParameters(0, 3): " + regress().getCovarianceOfParameters(0, 3));
+            System.out.println("getCovarianceOfParameters(1, 2): " + regress().getCovarianceOfParameters(1, 2));
+            System.out.println("getCovarianceOfParameters(1, 3): " + regress().getCovarianceOfParameters(1, 3));
+            System.out.println("getCovarianceOfParameters(2, 3): " + regress().getCovarianceOfParameters(2, 3));
+
+
+            double c = x[3] / x[0];
+
+            System.out.println("B <> C = " + b + " <> " + c);
             */
 
             return b;

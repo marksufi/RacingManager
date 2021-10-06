@@ -2,6 +2,7 @@ package hippos.util;
 
 import hippos.RaceProgramHorse;
 import hippos.exception.KeyNotFoundException;
+import hippos.lang.stats.SubForm;
 import hippos.math.Value;
 import hippos.math.regression.HipposUpdatingRegression;
 
@@ -123,6 +124,10 @@ public class Mapper<T> {
 
     public Collection<T> getValues() {
         return initMap.valuemap.values();
+    }
+
+    public Collection getKeys() {
+        return initMap.cellMap.keySet();
     }
 
     private class MapperCell<T> {

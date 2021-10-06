@@ -108,12 +108,21 @@ public class Form {
     }
 
     public BigDecimal sijaRate() {
-        BigDecimal sijat = new BigDecimal(0);
-        sijat = sijat.add(firsts);
-        sijat = sijat.add(seconds);
-        sijat = sijat.add(thirds);
-        BigDecimal erotus = starts.subtract(sijat);
-        return erotus;
+        try {
+            BigDecimal sijat = BigDecimal.ZERO;
+            sijat = sijat.add(firsts);
+            sijat = sijat.add(seconds);
+            sijat = sijat.add(thirds);
+
+            return sijat.divide(starts, 2, RoundingMode.HALF_UP);
+
+        } catch (ArithmeticException e) {
+            // ei startteja
+        } catch (Exception e) {
+            e.printStackTrace();
+        }
+
+        return BigDecimal.ZERO;
     }
 
     public void add(Form hv) {
@@ -253,6 +262,17 @@ public class Form {
 
     public BigDecimal getKcode() {
         return kcode;
+    }
+
+    public BigDecimal getKcodeRate() {
+        try {
+            return kcode.divide(starts, 2, RoundingMode.HALF_UP);
+        } catch (ArithmeticException e) {
+            // starts is zero
+        } catch (Exception e) {
+            e.printStackTrace();
+        }
+        return BigDecimal.ZERO;
     }
 
     public BigDecimal getKcodeProcents(BigDecimal ifZero) {

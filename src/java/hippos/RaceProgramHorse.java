@@ -4,12 +4,14 @@ import hippos.database.Database;
 import hippos.database.Statements;
 import hippos.exception.RegressionModelException;
 import hippos.lang.stats.*;
+import hippos.math.regression.HipposUpdatingRegression;
 import hippos.util.Mapper;
 import hippos.math.Progress;
 import hippos.math.racing.QuarterTime;
 import hippos.util.QuarterTimes;
 import hippos.utils.DateUtils;
 import hippos.utils.StringUtils;
+import org.apache.commons.math3.stat.regression.ModelSpecificationException;
 import utils.Log;
 
 import java.math.BigDecimal;
@@ -36,6 +38,8 @@ public class RaceProgramHorse extends Horse {
     protected RaceProgramStart raceProgramStart;
     protected RaceResultHorse raceResultHorse;
 
+    private static final int regressionSize = 9;
+    private static HipposUpdatingRegression regressionMap = new HipposUpdatingRegression(regressionSize, false);
 
     BigDecimal age;
     String color = "";
@@ -302,7 +306,7 @@ public class RaceProgramHorse extends Horse {
             if (subStartStr != null && !subStartStr.isEmpty()) {
                 SubStart newSubStart = new SubStart(subStartStr, this);
 
-                addObservations(newSubStart);
+               //addObservations(newSubStart);
 
                 add(newSubStart);
             }
@@ -770,15 +774,26 @@ public class RaceProgramHorse extends Horse {
 
             List<BigDecimal> xList = new ArrayList();
 
-            Form form0 = fullStatistics.getForm();
+            Form form0 = fullStatistics.getcForm();
             Form form1 = fullStatistics.getkForm();
 
             xList.add(form0.getStarts());
-            xList.add(form0.getFirsts());
-            xList.add(form0.getSeconds());
-            xList.add(form0.getThirds());
-            xList.add(form0.getAwards());
+            //xList.add(form0.getFirsts());
+            xList.add(form0.firstRate());
+            xList.add(form0.sijaRate());
+            //xList.add(form0.getSeconds());
+            //xList.add(form0.getThirds());
+            //xList.add(form0.getAwards());
+            xList.add(form0.getAwardRate());
 
+            xList.add(form1.getKcode());
+            xList.add(form1.firstRate());
+            xList.add(form1.sijaRate());
+            xList.add(form1.getAwardRate());
+
+            xList.add(getTasoitus());
+
+            /*
             QuarterTimes qt1 = timeStatistics.getSecondQuarter();
             BigDecimal p1 = qt1.getPropabiltyProcents();
 
@@ -788,7 +803,9 @@ public class RaceProgramHorse extends Horse {
             xList.add(form1.getThirds().multiply(p1));
             xList.add(form1.getAwards().multiply(p1));
 
-            double[] x = new double[xList.size()];
+             */
+
+            double[] x = new double[regressionSize];
 
             int xi = 0;
             for (BigDecimal b : xList) {
@@ -807,6 +824,12 @@ public class RaceProgramHorse extends Horse {
         try {
             BigDecimal raceResultPrize = raceResultHorse.getRaceResultPrize();
 
+            /*
+            double x[] = getRegX();
+
+            regressionMap.add(x, raceResultPrize.doubleValue());
+            */
+
             for (SubForm subForm : fullStatistics.getSubForms()) {
                 try {
                     subForm.addObservations(raceResultPrize, fullStatistics);
@@ -817,8 +840,26 @@ public class RaceProgramHorse extends Horse {
                     e.printStackTrace();
                 }
             }
+        } catch (NullPointerException e) {
+            //
         } catch (Exception e) {
             e.printStackTrace();
+        }
+    }
+
+    public double getObservation() throws ModelSpecificationException {
+        try {
+            double x[] = getRegX();
+
+            return regressionMap.get(x);
+
+        } catch (ModelSpecificationException e) {
+            throw e;
+
+        } catch (Exception e) {
+            e.printStackTrace();
+
+            throw e;
         }
     }
 }

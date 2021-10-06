@@ -10,6 +10,7 @@ import hippos.util.SubValueList;
 import hippos.utils.ValueComparator;
 import org.apache.commons.math3.distribution.NormalDistribution;
 import org.apache.commons.math3.exception.NotStrictlyPositiveException;
+import org.apache.commons.math3.stat.regression.ModelSpecificationException;
 import utils.Log;
 
 import java.math.BigDecimal;
@@ -166,6 +167,13 @@ public class ValueHorse implements Comparable {
 
     public void setRegValues() {
         try {
+
+            /*
+            double regY = raceProgramHorse.getObservation();
+
+            maxValue.add(new Value(regY));
+            */
+
             FullStatistics fullStatistics = raceProgramHorse.getFullStatistics();
 
             for(SubForm subForm : fullStatistics.getSubForms()) {
@@ -183,6 +191,8 @@ public class ValueHorse implements Comparable {
             minValue = maxValue;
             value = maxValue;
 
+        } catch (ModelSpecificationException e) {
+            //
         } catch (Exception e) {
             e.printStackTrace();
         }
