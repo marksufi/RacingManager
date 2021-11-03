@@ -431,4 +431,64 @@ public class Form {
         return str.toString();
     }
 
+    public BigDecimal getKcode(BigDecimal propability) {
+        try {
+            BigDecimal kCode = getKcode().multiply(propability);
+
+            return kCode;
+
+        } catch (Exception e) {
+            e.printStackTrace();
+        }
+
+        return BigDecimal.ZERO;
+    }
+
+    public BigDecimal firstRate(BigDecimal propability) {
+        try {
+            BigDecimal firstRate = firstRate();
+
+            BigDecimal prop = firstRate.multiply(propability);
+
+            return prop;
+
+        } catch (Exception e) {
+            e.printStackTrace();
+        }
+
+        return BigDecimal.ZERO;
+    }
+
+    public BigDecimal sijaRate(BigDecimal propability) {
+
+        try {
+            BigDecimal sijaRate = sijaRate();
+
+            BigDecimal prop = sijaRate.multiply(propability);
+
+            return prop;
+
+        } catch (Exception e) {
+            e.printStackTrace();
+        }
+
+        return BigDecimal.ZERO;
+
+    }
+
+    public BigDecimal getAwardRate(BigDecimal propability) {
+        try {
+            BigDecimal awardRate = getAwardRate();
+
+            BigDecimal prop = awardRate.multiply(propability);
+
+            return prop;
+
+        } catch (Exception e) {
+            e.printStackTrace();
+        }
+
+        return BigDecimal.ZERO;
+
+    }
 }

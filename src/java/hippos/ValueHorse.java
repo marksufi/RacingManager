@@ -4,6 +4,7 @@ import hippos.exception.RegressionModelException;
 import hippos.lang.stats.FullStatistics;
 import hippos.lang.stats.SubForm;
 import hippos.lang.stats.TimeForm;
+import hippos.lang.stats.YearStatistics;
 import hippos.math.*;
 import hippos.math.regression.HipposRegressionResults;
 import hippos.util.SubValueList;
@@ -168,19 +169,31 @@ public class ValueHorse implements Comparable {
     public void setRegValues() {
         try {
 
-            /*
             double regY = raceProgramHorse.getObservation();
 
             maxValue.add(new Value(regY));
-            */
 
             FullStatistics fullStatistics = raceProgramHorse.getFullStatistics();
 
             for(SubForm subForm : fullStatistics.getSubForms()) {
                 try {
-                    double regY = subForm.getRegY(fullStatistics);
+                    regY = subForm.getRegY(fullStatistics);
 
-                    maxValue.add(new Value(regY));
+                    //maxValue.add(new Value(regY));
+                } catch (RegressionModelException e) {
+                    // Ei onnistunut
+                } catch (Exception e) {
+                    e.printStackTrace();
+                }
+            }
+
+            YearStatistics yearStatistics = raceProgramHorse.getYearStatistics();
+
+            for(SubForm subForm : yearStatistics.getSubForms()) {
+                try {
+                    regY = subForm.getRegY(yearStatistics);
+
+                    //maxValue.add(new Value(regY));
                 } catch (RegressionModelException e) {
                     // Ei onnistunut
                 } catch (Exception e) {
@@ -193,6 +206,10 @@ public class ValueHorse implements Comparable {
 
         } catch (ModelSpecificationException e) {
             //
+
+        } catch (NullPointerException e) {
+            // regressionMap does not exist
+
         } catch (Exception e) {
             e.printStackTrace();
         }
@@ -204,6 +221,7 @@ public class ValueHorse implements Comparable {
         sb.append("\n\n");
         sb.append(raceProgramHorse.toString());
 
+        sb.append("\n\t    Reg: " + raceProgramHorse.getxList());
         sb.append("\n\t    Max: " + maxValue);
         sb.append("\n\t    Min: " + minValue);
         //sb.append("\n\t    Val: " + value);

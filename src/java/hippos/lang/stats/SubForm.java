@@ -39,9 +39,9 @@ public class SubForm extends Form {
         this.recordTime = set.getBigDecimal("AIKA");
     }
 
-    private double[] getRegX(FullStatistics fullStatistics) throws RegressionModelException {
+    private double[] getRegX(Statistics statistics) throws RegressionModelException {
         try {
-            RaceProgramHorse raceProgramHorse = fullStatistics.getRaceProgramHorse();
+            RaceProgramHorse raceProgramHorse = statistics.getRaceProgramHorse();
             BigDecimal tasoitus = raceProgramHorse.getTasoitus();
 
             List<BigDecimal> xList = new ArrayList();
@@ -49,13 +49,15 @@ public class SubForm extends Form {
             // tasoitus ekana
             //xList.add(tasoitus);
 
+            /*
             xList.add(getStarts());
             xList.add(firstRate());
             xList.add(sijaRate());
             xList.add(awardRate());
             //xList.add(getKcodeRate());
+             */
             xList.add(recordTime);
-            xList.add(lastAward);
+            //xList.add(lastAward);
 
             double[] x = new double[xList.size()];
 
@@ -75,16 +77,16 @@ public class SubForm extends Form {
         }
     }
 
-    public double getRegY(FullStatistics fullStatistics) throws RegressionModelException {
+    public double getRegY(Statistics statistics) throws RegressionModelException {
         try {
-            double[] x = getRegX(fullStatistics);
+            double[] x = getRegX(statistics);
 
-            List keys = getRegKey(fullStatistics);
+            List keys = getRegKey(statistics);
 
             //y = HarnessApp.regMap.get(getLabel()).get(x);
             y = HarnessApp.regMap.get(keys).get(x);
 
-            System.out.println("SubForm.getRegY: "  + fullStatistics.getName() + " " + getLabel() + ": " + Arrays.toString(x) + " ==> " + y);
+            //System.out.println("SubForm.getRegY: "  + statistics.getName() + " " + getLabel() + ": " + Arrays.toString(x) + " ==> " + y);
 
             return y;
         } catch (RegressionModelException e) {
@@ -100,21 +102,21 @@ public class SubForm extends Form {
         }
     }
 
-    private List getRegKey(FullStatistics fullStatistics) {
+    private List getRegKey(Statistics statistics) {
         List keys = new ArrayList();
 
-        keys.add(fullStatistics.getRaceProgramHorse().getTrackId());
+        //keys.add(fullStatistics.getRaceProgramHorse().getTrackId());
         keys.add(getLabel());
 
         return keys;
     }
 
-    public void addObservations(BigDecimal raceResultPrize, FullStatistics fullStatistics) throws RegressionModelException {
+    public void addObservations(BigDecimal raceResultPrize, Statistics statistics) throws RegressionModelException {
 
         try {
-            double[] x = getRegX(fullStatistics);
+            double[] x = getRegX(statistics);
 
-            List keys = getRegKey(fullStatistics);
+            List keys = getRegKey(statistics);
 
             HarnessApp.regMap.getOrCreate(keys, new HipposUpdatingRegression(x.length)).add(x, raceResultPrize.doubleValue());
 

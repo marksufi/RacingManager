@@ -34,12 +34,15 @@ public class RaceProgramHorse extends Horse {
     public static Mapper<Progress> progressMap = new Mapper<>();
     private FullStatistics fullStatistics;
     private TimeStatistics timeStatistics;
+    private YearStatistics yearStatistics;
 
     protected RaceProgramStart raceProgramStart;
     protected RaceResultHorse raceResultHorse;
 
-    private static final int regressionSize = 9;
-    private static HipposUpdatingRegression regressionMap = new HipposUpdatingRegression(regressionSize, false);
+    //private static final int regressionSize = 9;
+    //private static HipposUpdatingRegression regressionMap = new HipposUpdatingRegression(regressionSize, false);
+    private static HipposUpdatingRegression regressionMap;
+    private List<BigDecimal> xList = new ArrayList();
 
     BigDecimal age;
     String color = "";
@@ -121,6 +124,7 @@ public class RaceProgramHorse extends Horse {
             fetchQuarterTimes(conn);
 
             initFullStatistics(conn);
+            initYearStatistics(conn);
 
         } catch (Exception e) {
             e.printStackTrace();
@@ -420,6 +424,10 @@ public class RaceProgramHorse extends Horse {
         return fullStatistics;
     }
 
+    public YearStatistics getYearStatistics() {
+        return yearStatistics;
+    }
+
     public RaceProgramStart getRaceProgramStart() {
         return raceProgramStart;
     }
@@ -496,6 +504,17 @@ public class RaceProgramHorse extends Horse {
 
             fullStatistics = new FullStatistics("Yht", this);
             fullStatistics.fetchSubForms(conn);
+
+        } catch (Exception throwables) {
+            throwables.printStackTrace();
+        }
+    }
+
+    public void initYearStatistics(Connection conn) {
+        try {
+
+            yearStatistics = new YearStatistics("Year", this);
+            yearStatistics.fetchSubForms(conn);
 
         } catch (Exception throwables) {
             throwables.printStackTrace();
@@ -686,52 +705,6 @@ public class RaceProgramHorse extends Horse {
         }
     }*/
 
-    public String toString() {
-        try {
-            StringBuffer str = new StringBuffer();
-
-            str.append(getHorseProgNumber());
-            str.append("(" + getTrackId() + ")");
-            str.append("\t" + getRaceHorseName() + " (" + getRaceProgramDriver() + ")");
-            if (raceResultHorse != null) {
-                str.append(" => " + raceResultHorse.toString());
-            }
-
-            str.append("\n");
-
-            str.append("\t" + fullStatistics);
-            //str.append("\t" + fullStatistics != null ? fullStatistics.getTimeStatistics().getFinalTimes().toString() : "");
-
-            //str.append("\n\t" + fullStatistics.getFeaturedStats().get(Collections.singletonList(BigDecimal.ZERO)));
-            //str.append("\n\t" + fullStatistics.getFeaturedStats().get(Collections.singletonList(BigDecimal.ONE)));
-
-            if(fullStatistics != null) {
-                str.append("\n[" + trackFirstQuarterPropability + "%]");
-                str.append("\t500m:  " + timeStatistics.getFirstQuarter().toString());
-
-                str.append("\n[" + trackSecondQuarterPropability + "%]");
-                str.append("\t1000m: " + timeStatistics.getSecondQuarter().toString());
-
-                str.append("\n");
-                str.append("\tV500m: " + timeStatistics.getLastQuarter().toString());
-            }
-
-            //str.append("\n\t" + coach);
-            if(this.raceProgramDriver != null) {
-                str.append("\n\t" + raceProgramDriver.getForm());
-            }
-            /*
-            for (int i = 0; i < 9; i++) {
-                str.append("\n" + toString(i));
-            }*/
-
-            return str.toString();
-        } catch (Exception e) {
-            e.printStackTrace();
-        }
-        return "";
-    }
-
     private String toString(int line) {
         final int LEN = 30;
         StringBuilder str = new StringBuilder();
@@ -772,7 +745,7 @@ public class RaceProgramHorse extends Horse {
     public double[] getRegX() {
         try {
 
-            List<BigDecimal> xList = new ArrayList();
+            xList = new ArrayList();
 
             Form form0 = fullStatistics.getcForm();
             Form form1 = fullStatistics.getkForm();
@@ -781,31 +754,51 @@ public class RaceProgramHorse extends Horse {
             //xList.add(form0.getFirsts());
             xList.add(form0.firstRate());
             xList.add(form0.sijaRate());
-            //xList.add(form0.getSeconds());
-            //xList.add(form0.getThirds());
-            //xList.add(form0.getAwards());
             xList.add(form0.getAwardRate());
 
-            xList.add(form1.getKcode());
-            xList.add(form1.firstRate());
-            xList.add(form1.sijaRate());
-            xList.add(form1.getAwardRate());
-
-            xList.add(getTasoitus());
-
-            /*
             QuarterTimes qt1 = timeStatistics.getSecondQuarter();
             BigDecimal p1 = qt1.getPropabiltyProcents();
 
+            xList.add(form1.getKcode(p1));
+            xList.add(form1.firstRate(p1));
+            xList.add(form1.sijaRate(p1));
+            xList.add(form1.getAwardRate(p1));
+
+            xList.add(getTasoitus());
+
+            BigDecimal driverFirstRate = getRaceProgramDriver().getForm().firstRate();
+
+            xList.add(driverFirstRate);
+
+            double bestTime = 0.0;
+            for(SubForm subForm : yearStatistics.getSubForms()) {
+                try {
+                    double regY = subForm.getRegY(yearStatistics);
+
+                    if(regY > bestTime) {
+                        bestTime = regY;
+                    }
+
+                    //maxValue.add(new Value(regY));
+                } catch (RegressionModelException e) {
+                    // Ei onnistunut
+                } catch (Exception e) {
+                    e.printStackTrace();
+                }
+            }
+
+            xList.add(BigDecimal.valueOf(bestTime));
+
+
+            /*
             xList.add(form1.getStarts().multiply(p1));
             xList.add(form1.getFirsts().multiply(p1));
             xList.add(form1.getSeconds().multiply(p1));
             xList.add(form1.getThirds().multiply(p1));
             xList.add(form1.getAwards().multiply(p1));
+            */
 
-             */
-
-            double[] x = new double[regressionSize];
+            double[] x = new double[xList.size()];
 
             int xi = 0;
             for (BigDecimal b : xList) {
@@ -824,11 +817,13 @@ public class RaceProgramHorse extends Horse {
         try {
             BigDecimal raceResultPrize = raceResultHorse.getRaceResultPrize();
 
-            /*
+
             double x[] = getRegX();
 
+            if(regressionMap == null)
+                regressionMap = new HipposUpdatingRegression(x.length, false);
+
             regressionMap.add(x, raceResultPrize.doubleValue());
-            */
 
             for (SubForm subForm : fullStatistics.getSubForms()) {
                 try {
@@ -840,6 +835,18 @@ public class RaceProgramHorse extends Horse {
                     e.printStackTrace();
                 }
             }
+
+            for (SubForm subForm : yearStatistics.getSubForms()) {
+                try {
+                    subForm.addObservations(raceResultPrize, yearStatistics);
+
+                } catch (RegressionModelException e) {
+
+                } catch (Exception e) {
+                    e.printStackTrace();
+                }
+            }
+
         } catch (NullPointerException e) {
             //
         } catch (Exception e) {
@@ -847,7 +854,7 @@ public class RaceProgramHorse extends Horse {
         }
     }
 
-    public double getObservation() throws ModelSpecificationException {
+    public double getObservation() throws ModelSpecificationException, NullPointerException {
         try {
             double x[] = getRegX();
 
@@ -856,10 +863,69 @@ public class RaceProgramHorse extends Horse {
         } catch (ModelSpecificationException e) {
             throw e;
 
+        } catch (NullPointerException e) {
+            // regressionMap does not exist yet
+
+            throw e;
+
         } catch (Exception e) {
             e.printStackTrace();
 
             throw e;
         }
     }
+
+    public List<BigDecimal> getxList() {
+        return xList;
+    }
+
+    public String toString() {
+        try {
+            StringBuffer str = new StringBuffer();
+
+            str.append(getHorseProgNumber());
+            str.append("(" + getTrackId() + ")");
+            str.append("\t" + getRaceHorseName() + " (" + getRaceProgramDriver() + ")");
+            if (raceResultHorse != null) {
+                str.append(" => " + raceResultHorse.toString());
+            }
+
+            str.append("\n");
+
+            //str.append("\t" + fullStatistics);
+            //str.append("\n");
+            str.append("\t" + yearStatistics);
+            str.append("\n");
+            //str.append("\t" + fullStatistics != null ? fullStatistics.getTimeStatistics().getFinalTimes().toString() : "");
+
+            //str.append("\n\t" + fullStatistics.getFeaturedStats().get(Collections.singletonList(BigDecimal.ZERO)));
+            //str.append("\n\t" + fullStatistics.getFeaturedStats().get(Collections.singletonList(BigDecimal.ONE)));
+
+            if(fullStatistics != null) {
+                str.append("\n[" + trackFirstQuarterPropability + "%]");
+                str.append("\t500m:  " + timeStatistics.getFirstQuarter().toString());
+
+                str.append("\n[" + trackSecondQuarterPropability + "%]");
+                str.append("\t1000m: " + timeStatistics.getSecondQuarter().toString());
+
+                str.append("\n");
+                str.append("\tV500m: " + timeStatistics.getLastQuarter().toString());
+            }
+
+            //str.append("\n\t" + coach);
+            if(this.raceProgramDriver != null) {
+                str.append("\n\t" + raceProgramDriver.getForm());
+            }
+            /*
+            for (int i = 0; i < 9; i++) {
+                str.append("\n" + toString(i));
+            }*/
+
+            return str.toString();
+        } catch (Exception e) {
+            e.printStackTrace();
+        }
+        return "";
+    }
+
 }

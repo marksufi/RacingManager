@@ -2,6 +2,7 @@ package hippos.lang.stats;
 
 import hippos.RaceProgramHorse;
 import hippos.database.Database;
+import hippos.database.Statements;
 import hippos.utils.DateUtils;
 import utils.Log;
 
@@ -10,27 +11,20 @@ import java.sql.Connection;
 import java.sql.PreparedStatement;
 import java.sql.ResultSet;
 import java.sql.SQLException;
+import java.util.ArrayList;
 import java.util.Date;
+import java.util.List;
 
-public class YearStatistics extends Form {
-    private RaceProgramHorse raceProgramHorse;
-    private TimeStatistics timeStatistics;
+public class YearStatistics extends Statistics {
+
     private Date startDate;
-    private Date endDate;
-    private String name;
-    private String race;
 
     public YearStatistics(String label, RaceProgramHorse raceProgramHorse) {
-        super(label);
-        this.raceProgramHorse = raceProgramHorse;
-        this.endDate = raceProgramHorse.getRaceProgramStart().getDate();
+        super(label, raceProgramHorse);
         this.startDate = DateUtils.rollYears(this.endDate, -1);
-        this.name = raceProgramHorse.getRaceHorseName();
-        this.race= raceProgramHorse.getRaceMode().substring(0, 1);
-        this.timeStatistics = new TimeStatistics(raceProgramHorse);
-
     }
 
+    /*
     public YearStatistics(String label, ResultSet raceSet, RaceProgramHorse raceProgramHorse) {
         super(label);
         this.raceProgramHorse = raceProgramHorse;
@@ -52,28 +46,11 @@ public class YearStatistics extends Form {
         } catch (SQLException e) {
             Log.write(e);
         }
+    }*/
+
+    protected PreparedStatement getStatement(Connection conn) {
+        return Statements.getTimeFormStatement(conn, name, race, DateUtils.toSQLDate(startDate), DateUtils.toSQLDate(endDate));
     }
 
-    public TimeStatistics getTimeStatistics() {
-        return timeStatistics;
-    }
 
-    public void fetchForm(Connection conn) {
-        PreparedStatement statement = null;
-        ResultSet set = null;
-
-        try {
-
-            statement = super.getStatement(conn, name, race, DateUtils.toSQLDate(startDate), DateUtils.toSQLDate(endDate));
-
-            set = statement.executeQuery();
-
-            super.init(set);
-        } catch (Exception e) {
-            Log.write(e, "GeneralRaceProgramHorseDatabaseForm.select");
-        } finally {
-            try { set.close(); } catch (Exception e) { }
-            try { statement.close();} catch (Exception e) { }
-        }
-    }
 }
