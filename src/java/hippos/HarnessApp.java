@@ -9,6 +9,7 @@ import hippos.lang.Pointer;
 import hippos.lang.stats.Form;
 import hippos.lang.toto.TotoEngine;
 import hippos.lang.toto.Voittajapeli;
+import hippos.math.TimeSet;
 import hippos.math.betting.GameFactory;
 import hippos.math.regression.HipposUpdatingRegression;
 import hippos.util.Mapper;
@@ -101,6 +102,7 @@ public class HarnessApp {
     public static TreeMap<String, Form> driverRaceTypePool = new TreeMap();
 
     public static Mapper<HipposUpdatingRegression> regMap = new Mapper<>();
+    //public static Mapper<TimeSet> timeSetMapper = new Mapper<>();
 
     public static HarnessApp getInstance() throws FileNotFoundException {
         if(instance == null) {
@@ -367,7 +369,7 @@ public class HarnessApp {
     /**
      * Hakee Hippoksen sivuilta uudet käsiohjelma- ja tulostiedostot
      *
-     * @param raceCalendarEarlierYearUrl
+     * @param raceCalendarUrl
      *      Linkki luettavaan Hippoksen kantaan
      *
      * @param conn

@@ -4,6 +4,7 @@ import hippos.HarnessApp;
 import hippos.RaceProgramHorse;
 import hippos.exception.RegressionModelException;
 import hippos.math.AlphaNumber;
+import hippos.math.TimeSet;
 import hippos.math.regression.HipposUpdatingRegression;
 import hippos.util.Mapper;
 import org.apache.commons.math3.stat.regression.ModelSpecificationException;
@@ -119,6 +120,7 @@ public class SubForm extends Form {
             List keys = getRegKey(statistics);
 
             HarnessApp.regMap.getOrCreate(keys, new HipposUpdatingRegression(x.length)).add(x, raceResultPrize.doubleValue());
+            //HarnessApp.timeSetMapper.getOrCreate(keys, new TimeSet()).add(recordTime);
 
         } catch (NullPointerException e) {
             throw new RegressionModelException();

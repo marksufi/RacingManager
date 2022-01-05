@@ -750,11 +750,11 @@ public class RaceProgramHorse extends Horse {
             Form form0 = fullStatistics.getcForm();
             Form form1 = fullStatistics.getkForm();
 
-            xList.add(form0.getStarts());
+            xList.add(fullStatistics.getStarts());
             //xList.add(form0.getFirsts());
-            xList.add(form0.firstRate());
-            xList.add(form0.sijaRate());
-            xList.add(form0.getAwardRate());
+            xList.add(fullStatistics.firstRate());
+            xList.add(fullStatistics.sijaRate());
+            xList.add(fullStatistics.getAwardRate());
 
             QuarterTimes qt1 = timeStatistics.getSecondQuarter();
             BigDecimal p1 = qt1.getPropabiltyProcents();
