@@ -20,7 +20,7 @@ import java.util.StringTokenizer;
  * Time: 8:09:01 PM
  * To change this template use Options | File Templates.
  */
-public class Driver extends Person {
+public class Driver extends Person implements Comparable {
 
     protected String jockeyClass;
     //protected Form fullYearForm = new Form("1 year");
@@ -29,7 +29,7 @@ public class Driver extends Person {
     /**
      * Alustaa kuljettajan
      *
-     * @param value
+     * @param name
      *  R Tupamäki
      *  P J Korhonen
      *  Mario De la Cruz
@@ -44,7 +44,8 @@ public class Driver extends Person {
 
         try {
             java.sql.Date sqlEndDate = DateUtils.toSQLDate(date);
-            StringBuffer sb = new StringBuffer();
+            StringBuilder sb = new StringBuilder();
+
             sb.append(raceTypeForm.getSelect() + " ");
             sb.append("from SUBRESULT ");
             sb.append("where kuljettaja like ? ");
@@ -70,10 +71,12 @@ public class Driver extends Person {
             try {
                 stmt.close();
             } catch (Exception e) {
+                e.printStackTrace();
             }
             try {
                 rs.close();
             } catch (Exception e) {
+                e.printStackTrace();
             }
         }
         return raceTypeForm;
@@ -112,5 +115,55 @@ public class Driver extends Person {
     public static void main(String args []) {
         RaceProgramDriver driver = new RaceProgramDriver("Orlando");
         System.out.println(driver);
+    }
+
+    @Override
+    public int compareTo(Object o) {
+
+        try {
+            Driver aDriver = (Driver) o;
+
+            if(this.hashCode() == o.hashCode())
+                return 0;
+
+            if(raceTypeForm.firstRate().equals(aDriver.getForm().firstRate())) {
+                // Voittoprosentti yhtä suuri, palauttaa sijoitusten vertailun
+
+                if (raceTypeForm.sijaRate().compareTo(aDriver.raceTypeForm.sijaRate()) == 0) {
+                    // Myös sijaprosentti yhtä suuri, kokeilee startteja
+
+                    if (raceTypeForm.getStarts().compareTo(aDriver.raceTypeForm.getStarts()) == 0) {
+                        // ja myös startteja yhtä paljon, palauttaa vain nimivertailun
+                        return getName().compareTo(aDriver.getName());
+                    }
+
+                    return aDriver.raceTypeForm.getStarts().compareTo(raceTypeForm.getStarts());
+                }
+
+                aDriver.raceTypeForm.sijaRate().compareTo(raceTypeForm.sijaRate());
+            }
+
+            return aDriver.raceTypeForm.firstRate().compareTo(raceTypeForm.firstRate());
+
+        } catch (Exception e) {
+            e.printStackTrace();
+        }
+
+        return -1;
+    }
+
+    public String toString() {
+        StringBuilder sb = new StringBuilder();
+
+        try {
+            sb.append(getName());
+            sb.append("(" + raceTypeForm.firstRateProcents(2) + "%)");
+
+        } catch (Exception e) {
+            e.printStackTrace();
+        }
+
+        return sb.toString();
+
     }
 }

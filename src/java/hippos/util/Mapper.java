@@ -168,6 +168,20 @@ public class Mapper<T> {
             }
             return null;
         }
+
+        public String toString() {
+            return valuemap.values().toString();
+        }
+    }
+
+    public String toString() {
+        StringBuilder sb = new StringBuilder();
+
+        for(Object key : initMap.cellMap.keySet()) {
+            sb.append(key.toString()  + ":" + initMap.cellMap.get(key) + "\n");
+        }
+
+        return sb.toString();
     }
 
     public static void main(String args []) {

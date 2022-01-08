@@ -1,11 +1,9 @@
 package hippos;
 
 import hippos.database.Statements;
-import hippos.exception.RegressionModelException;
 import hippos.io.RaceProgramFile;
-import hippos.lang.stats.FullStatistics;
-import hippos.lang.stats.SubForm;
 import hippos.math.AlphaNumber;
+import hippos.util.HObservable;
 import hippos.util.Mapper;
 import hippos.math.racing.QuarterTime;
 import hippos.math.regression.HipposUpdatingRegression;
@@ -37,6 +35,7 @@ public class RaceProgramStart extends RaceStart {
     private HashMap<String, ValueHorse> valueHorseHashMap = new HashMap<>();
 
     private Mapper<SortedSet<QuarterTime>> quarterMap = new Mapper<>();
+    private Mapper<SortedSet<Comparable>> observerMap = new Mapper<>();
 
     public static TreeMap <String, HipposUpdatingRegression> featuredReg = new TreeMap<>();
 
@@ -391,6 +390,9 @@ public class RaceProgramStart extends RaceStart {
         str.append("\n final: ");
         str.append(getQuarterString(4));
 
+        str.append("\n\n observables:");
+        observerMap.toString();
+
         //str.append("\n\n");
 
         return str.toString();
@@ -436,6 +438,16 @@ public class RaceProgramStart extends RaceStart {
                 e.printStackTrace();
             }
         }
+
+        System.out.println(observerMap);
+
     }
 
+    public void addObservable(String key, Comparable comparable, RaceResultHorse raceResultHorse) {
+
+        HObservable hobservable = new HObservable(comparable, raceResultHorse);
+
+        observerMap.getOrCreate(key, new TreeSet<>()).add(hobservable);
+
+    }
 }

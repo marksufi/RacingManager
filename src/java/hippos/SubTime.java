@@ -281,7 +281,19 @@ public class SubTime extends AlphaNumber implements Comparable, RegressionMapObs
     public int compareTo(Object o) {
         SubTime aSubTime = (SubTime) o;
 
-        return subValue.compareTo(aSubTime.getSubValue());
+        if(this.hashCode() == o.hashCode())
+            return 0;
+
+        if (this.getNumber() == null)
+            return 1;
+
+        if(aSubTime.getNumber() == null)
+            return -1;
+
+        return getNumber().compareTo(aSubTime.getNumber());
+
+        // Miksi oli näin?
+        //return subValue.compareTo(aSubTime.getSubValue());
     }
 
     public BigDecimal getK() {

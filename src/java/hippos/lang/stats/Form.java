@@ -57,33 +57,29 @@ public class Form {
         }
     }
 
-    /*
-    public Form(String raceLiteral) {
-        this();
-        this.raceLiteral = raceLiteral;
-    }
-
-    public String getRaceLiteral() {
-        return raceLiteral;
-    }*/
-
     public BigDecimal firstRate() {
         if(starts != null && starts.intValue() != 0) {
-            return firsts.divide(starts, 2, RoundingMode.HALF_UP);
+            return firsts.divide(starts, 4, RoundingMode.HALF_UP);
         }
+
         return new BigDecimal(0);
+    }
+
+    public BigDecimal firstRateProcents(int scale) {
+
+        return firstRate().multiply(BigDecimal.valueOf(100.00)).setScale(scale);
     }
 
     public BigDecimal secondRate() {
         if(starts != null && starts.intValue() != 0) {
-            return seconds.divide(starts, 2, RoundingMode.HALF_UP);
+            return seconds.divide(starts, 4, RoundingMode.HALF_UP);
         }
         return new BigDecimal(0);
     }
 
     public BigDecimal thirdRate() {
         if(starts != null && starts.intValue() != 0) {
-            return thirds.divide(starts, 2, BigDecimal.ROUND_HALF_UP);
+            return thirds.divide(starts, 4, RoundingMode.HALF_UP);
         }
         return new BigDecimal(0);
     }
@@ -114,7 +110,7 @@ public class Form {
             sijat = sijat.add(seconds);
             sijat = sijat.add(thirds);
 
-            return sijat.divide(starts, 2, RoundingMode.HALF_UP);
+            return sijat.divide(starts, 4, RoundingMode.HALF_UP);
 
         } catch (ArithmeticException e) {
             // ei startteja
@@ -133,32 +129,6 @@ public class Form {
         try { awards = awards.add(hv.awards); } catch (NullPointerException e) {}
         try { kcode = kcode.add(hv.kcode); } catch (NullPointerException e) {}
         try { xcode = xcode.add(hv.xcode); } catch (NullPointerException e) {}
-    }
-
-    public BigDecimal getRankRate() {
-        BigDecimal rankRate = firsts.add(seconds.multiply(BigDecimal.valueOf(0.50))).add(thirds.multiply(BigDecimal.valueOf(0.33)));
-
-        rankRate = starts.intValue() > 0 ? rankRate.divide(starts, 2, BigDecimal.ROUND_HALF_UP) : BigDecimal.ZERO;
-
-        return rankRate;
-    }
-
-    public BigDecimal getRankRate(BigDecimal ifZero) {
-        if(starts.intValue() > 0) {
-            BigDecimal rankRate = firsts;
-            rankRate = rankRate.add(seconds.multiply(BigDecimal.valueOf(0.50)));
-            rankRate = rankRate.add(thirds.multiply(BigDecimal.valueOf(0.33)));
-
-            rankRate = rankRate.multiply(BigDecimal.valueOf(100.00));
-            rankRate = rankRate.divide(starts, 2, RoundingMode.HALF_UP);
-
-            //rankRate.setScale(2, RoundingMode.HALF_UP);
-
-            return rankRate;
-
-        }
-
-        return ifZero;
     }
 
     public String getLabel() {

@@ -847,6 +847,26 @@ public class RaceProgramHorse extends Horse {
                 }
             }
 
+            BigDecimal ranking = raceResultHorse.getRaceRanking();
+
+            int i = 0;
+            for (SubStart subStart :  subStartSet) {
+                SubTime subTime = subStart.getSubTime();
+                StringBuilder key = new StringBuilder();
+                key.append("S");
+                key.append(i++);
+
+                raceProgramStart.addObservable(key.toString(), subTime, raceResultHorse);
+
+            }
+
+            BigDecimal driverVP = getRaceProgramDriver().getForm().firstRate();
+            String key = "DWP";
+
+            raceProgramStart.addObservable(key, getRaceProgramDriver(), raceResultHorse);
+
+
+
         } catch (NullPointerException e) {
             //
         } catch (Exception e) {
