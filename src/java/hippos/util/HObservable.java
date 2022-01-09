@@ -1,17 +1,18 @@
 package hippos.util;
 
+import hippos.RaceProgramHorse;
 import hippos.RaceResultHorse;
 
 public class HObservable implements Comparable {
     private Comparable element;
-    private RaceResultHorse raceResultHorse;
+    private Object content;
+    private RaceProgramHorse raceProgramHorse;
 
-    public HObservable () { }
-
-    public HObservable(Comparable element, RaceResultHorse raceResultHorse) {
+    public HObservable(Comparable element, Object content, RaceProgramHorse raceProgramHorse) {
 
         this.element = element;
-        this.raceResultHorse = raceResultHorse;
+        this.content = content;
+        this.raceProgramHorse = raceProgramHorse;
     }
 
     @Override
@@ -26,8 +27,16 @@ public class HObservable implements Comparable {
         StringBuilder sb = new StringBuilder();
 
         sb.append(element);
+        sb.append("[");
+        sb.append(content);
+        sb.append("]");
         sb.append(("/"));
-        sb.append(raceResultHorse.getRaceHorseName());
+        sb.append(raceProgramHorse.getRaceHorseName());
+
+        if(raceProgramHorse.getRaceResultHorse() != null) {
+            sb.append("=>");
+            sb.append(raceProgramHorse.getRaceResultHorse().getRaceRanking());
+        }
 
         return sb.toString();
     }

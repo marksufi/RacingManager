@@ -440,11 +440,11 @@ public class RaceResultHorse extends Horse implements Comparable {
             stmt = conn.prepareStatement(sb.toString());
 
             stmt.setString(i++, getRaceResultDriver().getName());
-            stmt.setBigDecimal(i++, getRaceResultDriver().getForm().getStarts());
-            stmt.setBigDecimal(i++, getRaceResultDriver().getForm().getFirsts());
-            stmt.setBigDecimal(i++, getRaceResultDriver().getForm().getSeconds());
-            stmt.setBigDecimal(i++, getRaceResultDriver().getForm().getThirds());
-            stmt.setBigDecimal(i++, getRaceResultDriver().getForm().getAwards());
+            stmt.setBigDecimal(i++, getRaceResultDriver().getDriverForm().getForm().getStarts());
+            stmt.setBigDecimal(i++, getRaceResultDriver().getDriverForm().getForm().getFirsts());
+            stmt.setBigDecimal(i++, getRaceResultDriver().getDriverForm().getForm().getSeconds());
+            stmt.setBigDecimal(i++, getRaceResultDriver().getDriverForm().getForm().getThirds());
+            stmt.setBigDecimal(i++, getRaceResultDriver().getDriverForm().getForm().getAwards());
 
             stmt.setString(i++, getLid());
             stmt.setBigDecimal(i++, getHorseProgNumber());

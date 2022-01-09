@@ -20,7 +20,10 @@ public class SubRaceTime extends AlphaNumber {
     private static ChangeMapper weatherMapper = new WeatherMapper();
     private double x[] = null;
 
+    private static final int LENGTH = 3;
+
     private SubRank subRank;
+
 
     /**
      * lähtöön ja lähtötapaan suhteutettu aika
@@ -91,12 +94,13 @@ public class SubRaceTime extends AlphaNumber {
 
             //double raceTypeChange = raceTypeMapper.get(raceModeKey).getChange().doubleValue();
             double raceTypeChange = raceTypeMapper.getChange(subStart, raceProgramHorse);
-            double weatherChange = weatherMapper.getChange(subStart, raceProgramHorse);
+            //double weatherChange = weatherMapper.getChange(subStart, raceProgramHorse);
 
-            double[] x = new double[3];
+            double[] x = new double[LENGTH];
 
             x[0] = subStart.getSubTime().getNumber().doubleValue();
             x[1] = raceTypeChange;
+            // Tasoitus lisätään myöhemmin
             //x[2] = weatherChange;
             //x[3] = newSubTime.getDriverDiff(raceProgramHorse.getRaceProgramDriver()).doubleValue();
 

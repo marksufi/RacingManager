@@ -260,7 +260,7 @@ public class RaceResultStart extends RaceStart {
                     raceResultHorse.insert(conn);
 
                     // Päivittää käsiohjelmahevoselle kuljettajan tiedot
-                    raceResultHorse.getRaceResultDriver().fetchRaceTypeForm(conn, getDate(), getRaceMode());
+                    raceResultHorse.getRaceResultDriver().getDriverForm().fetchRaceTypeForm(conn, getDate(), getRaceMode());
                     raceResultHorse.updateRaceProgramDriver(conn);
                 } else {
                     raceResultHorse.deleteRaceProgramHorse(conn);

@@ -1,29 +1,27 @@
 package hippos;
 
-import hippos.lang.stats.Form;
-import hippos.utils.DateUtils;
-
 import java.math.BigDecimal;
 import java.math.RoundingMode;
-import java.sql.Connection;
-import java.sql.PreparedStatement;
 import java.sql.ResultSet;
 import java.sql.SQLException;
-import java.util.Date;
 
-public class RaceProgramDriver extends Driver {
-    public RaceProgramDriver(String value) {
+public class RaceProgramDriver extends Person {
+    private DriverForm driverForm;
 
-        super(value);
+    public RaceProgramDriver(String name) {
+
+        super(name);
     }
 
     public RaceProgramDriver(ResultSet raceSet) throws SQLException {
-        super(raceSet);
+        this(raceSet.getString("KULJETTAJA"));
+
+        driverForm = new DriverForm(getName(), raceSet);
     }
 
     public BigDecimal getDriverDiff(SubStart subStart) {
         try {
-            BigDecimal raceProgramDriverAvg = getForm().awardRate(null);
+            BigDecimal raceProgramDriverAvg = driverForm.getForm().awardRate(null);
 
             //BigDecimal subDriverAvg = this.driverClass;
             BigDecimal subDriverAvg = subStart.getDriverRaceTypeClass();
@@ -47,4 +45,22 @@ public class RaceProgramDriver extends Driver {
         return BigDecimal.ZERO;
     }
 
+    public DriverForm getDriverForm() {
+        return driverForm;
+    }
+
+    public String toString() {
+        StringBuilder sb = new StringBuilder();
+
+        try {
+            sb.append(super.toString());
+            sb.append("(" + driverForm.raceTypeForm.firstRateProcents(2) + "%)");
+
+        } catch (Exception e) {
+            e.printStackTrace();
+        }
+
+        return sb.toString();
+
+    }
 }

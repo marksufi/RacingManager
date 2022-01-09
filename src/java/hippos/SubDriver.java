@@ -1,22 +1,16 @@
 package hippos;
 
-import hippos.lang.stats.Form;
-import hippos.utils.DateUtils;
-
-import java.sql.Connection;
-import java.sql.PreparedStatement;
 import java.sql.ResultSet;
 import java.sql.SQLException;
-import java.util.Date;
 
-public class SubDriver extends Driver {
+public class SubDriver extends DriverForm {
 
-    public SubDriver(String value) {
-        super(value);
+    public SubDriver(String name) {
+        super(name);
     }
 
-    public SubDriver(ResultSet raceSet) throws SQLException {
-        super(raceSet);
+    public SubDriver(String name, ResultSet raceSet) throws SQLException {
+        super(name, raceSet);
     }
 
     /*

@@ -122,8 +122,11 @@ public class RaceTypeMapper implements ChangeMapper {
             key.add(targetRaceMode);
 
             return key;
+        } catch (RegressionModelException e) {
+            throw e;
         } catch (Exception e) {
-            throw new RegressionModelException();
+            e.printStackTrace();
+            throw e;
         }
     }
 

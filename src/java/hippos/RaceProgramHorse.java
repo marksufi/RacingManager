@@ -152,7 +152,7 @@ public class RaceProgramHorse extends Horse {
             stmt.setBigDecimal( i++, getRaceTrack());
             stmt.setBigDecimal( i++, getTasoitus());
 
-            Form driverStats = getRaceProgramDriver().getForm();
+            Form driverStats = getRaceProgramDriver().getDriverForm().raceTypeForm;
             stmt.setBigDecimal( i++, driverStats.getStarts());
             stmt.setBigDecimal( i++, driverStats.getFirsts());
             stmt.setBigDecimal( i++, driverStats.getSeconds());
@@ -479,14 +479,14 @@ public class RaceProgramHorse extends Horse {
             initFullStatistics(conn);
 
             if(raceResultHorse != null) {
-                Driver raceResultdriver = raceResultHorse.getRaceResultDriver();
-                raceResultdriver.fetchRaceTypeForm(conn, getRaceDate(), getRaceMode());
+                DriverForm raceResultdriverForm = raceResultHorse.getRaceResultDriver().getDriverForm();
+                raceResultdriverForm.fetchRaceTypeForm(conn, getRaceDate(), getRaceMode());
 
-                raceProgramDriver.setName(raceResultdriver.getName());
-                raceProgramDriver.setForm(raceResultdriver.getForm());
+                raceProgramDriver.setName(raceResultdriverForm.getName());
+                raceProgramDriver.getDriverForm().setForm(raceResultdriverForm.getForm());
 
             } else {
-                raceProgramDriver.fetchRaceTypeForm(conn, this.getRaceDate(), this.getRaceMode());
+                raceProgramDriver.getDriverForm().fetchRaceTypeForm(conn, this.getRaceDate(), this.getRaceMode());
             }
 
             fetchSubStarts(conn, 8);
@@ -527,14 +527,14 @@ public class RaceProgramHorse extends Horse {
             Connection conn = Database.getConnection();
 
             if(raceResultHorse != null) {
-                Driver raceResultdriver = raceResultHorse.getRaceResultDriver();
-                raceResultdriver.fetchRaceTypeForm(conn, getRaceDate(), getRaceMode());
+                DriverForm raceResultdriverForm = raceResultHorse.getRaceResultDriver().getDriverForm();
+                raceResultdriverForm.fetchRaceTypeForm(conn, getRaceDate(), getRaceMode());
 
-                raceProgramDriver.setName(raceResultdriver.getName());
-                raceProgramDriver.setForm(raceResultdriver.getForm());
+                raceProgramDriver.setName(raceResultdriverForm.getName());
+                raceProgramDriver.getDriverForm().setForm(raceResultdriverForm.getForm());
 
             } else {
-                raceProgramDriver.fetchRaceTypeForm(conn, this.getRaceDate(), this.getRaceMode());
+                raceProgramDriver.getDriverForm().fetchRaceTypeForm(conn, this.getRaceDate(), this.getRaceMode());
             }
 
             fetchSubStarts(conn, 8);
@@ -728,7 +728,7 @@ public class RaceProgramHorse extends Horse {
                 appendSubStart(str, line);
                 break;
             //if (driver.getDriverStats(conn, this).jockeyClass != null) str.append(" (" + driver.getDriverStats(conn, this).jockeyClass + ")"); break;
-            case 6: str.append(StringUtils.toColumn(getRaceProgramDriver().getForm().toString(), 40));
+            case 6: str.append(StringUtils.toColumn(getRaceProgramDriver().getDriverForm().getForm().toString(), 40));
                 appendSubStart(str, line);
                 break;
             case 7: //str.append(driver.getDriverStats().getYearForm().toString());
@@ -766,7 +766,7 @@ public class RaceProgramHorse extends Horse {
 
             xList.add(getTasoitus());
 
-            BigDecimal driverFirstRate = getRaceProgramDriver().getForm().firstRate();
+            BigDecimal driverFirstRate = getRaceProgramDriver().getDriverForm().getForm().firstRate();
 
             xList.add(driverFirstRate);
 
@@ -846,27 +846,6 @@ public class RaceProgramHorse extends Horse {
                     e.printStackTrace();
                 }
             }
-
-            BigDecimal ranking = raceResultHorse.getRaceRanking();
-
-            int i = 0;
-            for (SubStart subStart :  subStartSet) {
-                SubTime subTime = subStart.getSubTime();
-                StringBuilder key = new StringBuilder();
-                key.append("S");
-                key.append(i++);
-
-                raceProgramStart.addObservable(key.toString(), subTime, raceResultHorse);
-
-            }
-
-            BigDecimal driverVP = getRaceProgramDriver().getForm().firstRate();
-            String key = "DWP";
-
-            raceProgramStart.addObservable(key, getRaceProgramDriver(), raceResultHorse);
-
-
-
         } catch (NullPointerException e) {
             //
         } catch (Exception e) {
@@ -934,7 +913,7 @@ public class RaceProgramHorse extends Horse {
 
             //str.append("\n\t" + coach);
             if(this.raceProgramDriver != null) {
-                str.append("\n\t" + raceProgramDriver.getForm());
+                str.append("\n\t" + raceProgramDriver.getDriverForm().getForm());
             }
             /*
             for (int i = 0; i < 9; i++) {

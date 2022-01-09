@@ -41,6 +41,7 @@ public class SubTime extends AlphaNumber implements Comparable, RegressionMapObs
 
     public SubTime(String str, SubStart subStart) {
         super(str);
+
         this.subStart = subStart;
         if (getNumber() == null) {
             if (getAlpha() != null) {
@@ -50,8 +51,8 @@ public class SubTime extends AlphaNumber implements Comparable, RegressionMapObs
         this.subValue = new SubTimeValue(this);
     }
 
-    public SubTime(BigDecimal aika, SubStart subStart) {
-        super(aika);
+    public SubTime(BigDecimal aika, String raceMode, SubStart subStart) {
+        super(aika, raceMode);
         this.subStart = subStart;
         this.subValue = new SubTimeValue(this);
     }
@@ -91,17 +92,6 @@ public class SubTime extends AlphaNumber implements Comparable, RegressionMapObs
         return subRaceTime;
     }
 
-    public String toString() {
-        try {
-            // Ei saa muuttaa, tulostaa programhorsen substart_ tauluihin
-
-            return super.toString();
-        } catch (Exception e) {
-            e.printStackTrace();
-        }
-        return "";
-
-    }
 
     public void setDate(Date raceDate, BigDecimal dateDiff) {
         int daysToStart = dateDiff.intValue();
@@ -111,7 +101,6 @@ public class SubTime extends AlphaNumber implements Comparable, RegressionMapObs
     public Date getDate() {
         return subStart.getDate();
     }
-
 
     public double getSeason() {
         return subStart.getSeason();
@@ -303,4 +292,17 @@ public class SubTime extends AlphaNumber implements Comparable, RegressionMapObs
     public SubStart getSubStart() {
         return subStart;
     }
+
+    public String toString() {
+        try {
+            // Ei saa muuttaa, tulostaa programhorsen substart_ tauluihin
+
+            return super.toString();
+        } catch (Exception e) {
+            e.printStackTrace();
+        }
+        return "";
+
+    }
+
 }

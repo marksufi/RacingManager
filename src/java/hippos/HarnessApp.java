@@ -31,14 +31,6 @@ import java.util.*;
  * PROGRAM_FILE_PATH = C:/Users/Markus/Documents/Filebase/hippos/ohjelma/
  * Raviohjelman pääluokka
  *
- * kuljettajamuutoksen jälkeen:
- * Hits:   21.21%
- * Profit: -13087.4�/56347 = -0.23�/startti
- *
- * Ennen kuljettajamuutosta
- * Hits:   20.84%
- * Profit: -14233.9�/56068 = -0.25�/startti
- *
  */
 public class HarnessApp {
     public static final boolean includeConstant = true;
@@ -142,6 +134,8 @@ public class HarnessApp {
                     ja lähdöt tietokannasta.
                  */
                 raceProgramStart = new RaceProgramStart(conn, lid, date, raceResultStart);
+
+                raceProgramStart.getObservations();
 
                 raceProgramStart.initValueHorses(linregMap);
 

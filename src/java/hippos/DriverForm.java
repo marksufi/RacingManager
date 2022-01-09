@@ -1,17 +1,13 @@
 package hippos;
 
-import hippos.database.Database;
 import hippos.lang.stats.Form;
 import hippos.utils.DateUtils;
-import utils.Log;
 
-import java.math.BigDecimal;
 import java.sql.Connection;
 import java.sql.PreparedStatement;
 import java.sql.ResultSet;
 import java.sql.SQLException;
 import java.util.Date;
-import java.util.StringTokenizer;
 
 /**
  * Created by IntelliJ IDEA.
@@ -20,7 +16,7 @@ import java.util.StringTokenizer;
  * Time: 8:09:01 PM
  * To change this template use Options | File Templates.
  */
-public class Driver extends Person implements Comparable {
+public class DriverForm extends Person implements Comparable {
 
     protected String jockeyClass;
     //protected Form fullYearForm = new Form("1 year");
@@ -34,8 +30,19 @@ public class Driver extends Person implements Comparable {
      *  P J Korhonen
      *  Mario De la Cruz
      */
-    public Driver(String name) {
+    public DriverForm(String name) {
         super(name);
+    }
+
+    public DriverForm(String name, ResultSet raceSet) throws SQLException {
+        this(name);
+        raceTypeForm.setStarts(raceSet.getBigDecimal("K_S"));
+        raceTypeForm.setFirsts(raceSet.getBigDecimal("K_1"));
+        raceTypeForm.setSeconds(raceSet.getBigDecimal("K_2"));
+        raceTypeForm.setThirds(raceSet.getBigDecimal("K_3"));
+        raceTypeForm.setAwards(raceSet.getBigDecimal("K_R"));
+        raceTypeForm.setKcode(raceSet.getBigDecimal("K_PAALU"));
+        raceTypeForm.setXcode(raceSet.getBigDecimal("K_X"));
     }
 
     public Form fetchRaceTypeForm(Connection conn, Date date, String raceType) {
@@ -82,18 +89,6 @@ public class Driver extends Person implements Comparable {
         return raceTypeForm;
     }
 
-
-    public Driver(ResultSet raceSet) throws SQLException {
-        this(raceSet.getString("KULJETTAJA"));
-        raceTypeForm.setStarts(raceSet.getBigDecimal("K_S"));
-        raceTypeForm.setFirsts(raceSet.getBigDecimal("K_1"));
-        raceTypeForm.setSeconds(raceSet.getBigDecimal("K_2"));
-        raceTypeForm.setThirds(raceSet.getBigDecimal("K_3"));
-        raceTypeForm.setAwards(raceSet.getBigDecimal("K_R"));
-        raceTypeForm.setKcode(raceSet.getBigDecimal("K_PAALU"));
-        raceTypeForm.setXcode(raceSet.getBigDecimal("K_X"));
-    }
-
     public String getJockeyClass() {
         return jockeyClass;
     }
@@ -121,7 +116,7 @@ public class Driver extends Person implements Comparable {
     public int compareTo(Object o) {
 
         try {
-            Driver aDriver = (Driver) o;
+            DriverForm aDriver = (DriverForm) o;
 
             if(this.hashCode() == o.hashCode())
                 return 0;
@@ -156,8 +151,10 @@ public class Driver extends Person implements Comparable {
         StringBuilder sb = new StringBuilder();
 
         try {
-            sb.append(getName());
-            sb.append("(" + raceTypeForm.firstRateProcents(2) + "%)");
+            //sb.append(getName());
+            //sb.append("(");
+            sb.append(raceTypeForm.firstRateProcents(2) + "%");
+            //sb.append(")");
 
         } catch (Exception e) {
             e.printStackTrace();

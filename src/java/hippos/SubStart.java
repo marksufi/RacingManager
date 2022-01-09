@@ -91,8 +91,10 @@ public class SubStart implements Comparable {
         raceLength = set.getBigDecimal("MATKA");
         raceTrack = set.getBigDecimal("RATA");
         raceType = set.getString("TYYPPI");
-        subTime = new SubTime(set.getBigDecimal("AIKA"), this);
+
         raceMode = new RaceMode(set.getString("LAHTOTYYPPI"));
+        subTime = new SubTime(set.getBigDecimal("AIKA"), raceMode.toString(), this);
+
         subRank = new SubRank(set.getBigDecimal("SIJOITUS"), this);
 
         xCode = new AlphaNumber(set.getString("XCODE"));
@@ -111,9 +113,9 @@ public class SubStart implements Comparable {
         subTime.setAlpha(raceMode.toString());
     }
 
-    /** Luo taulun lähdön PROGRAMHORSE-taulun SUBSTART rivistä
+    /**
+     * Luo taulun lähdön PROGRAMHORSE-taulun SUBSTART rivistä
      *
-     * @param substart
      */
     public SubStart(String subStart, RaceProgramHorse raceProgramHorse) {
         this.raceProgramHorse = raceProgramHorse;

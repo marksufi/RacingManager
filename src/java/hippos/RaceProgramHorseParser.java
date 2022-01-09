@@ -519,7 +519,7 @@ public class RaceProgramHorseParser implements FileParser {
 
                 if(driverClass != null) {
                     if(driverClass.length() < 4) {
-                        raceProgramDriver.setJockeyClass(driverClass);
+                        raceProgramDriver.getDriverForm().setJockeyClass(driverClass);
                     } else {
                         Log.write("Too long driverClass: " + driverClass + ": " + raceProgramHorse.getId());
                     }
