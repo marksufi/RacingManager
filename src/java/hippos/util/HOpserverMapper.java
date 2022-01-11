@@ -2,6 +2,7 @@ package hippos.util;
 
 import hippos.RaceResultHorse;
 import hippos.lang.toto.TotoGameStats;
+import utils.Log;
 
 import java.math.BigDecimal;
 
@@ -27,7 +28,11 @@ public class HOpserverMapper<T> extends Mapper<T> {
 
             try {
                 sb.append("[" + observerStatistics.get(key).getWinProcents() + "%" + "]");
+            } catch (NullPointerException e) {
+                // Avainta ei löytynyt
+
             } catch (Exception e) {
+                Log.write(e);
                 e.printStackTrace();
             }
 

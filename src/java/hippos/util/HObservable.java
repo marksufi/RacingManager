@@ -31,9 +31,13 @@ public class HObservable implements Comparable {
         StringBuilder sb = new StringBuilder();
 
         sb.append(element);
-        sb.append("[");
-        sb.append(content);
-        sb.append("]");
+
+        if(content != null) {
+            sb.append("[");
+            sb.append(content);
+            sb.append("]");
+        }
+
         sb.append(("/"));
         sb.append(raceProgramHorse.getRaceHorseName());
 

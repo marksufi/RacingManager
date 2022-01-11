@@ -465,7 +465,7 @@ public class RaceProgramStart extends RaceStart {
                         key.append("S");
                         key.append(i);
 
-                        addObservable(key.toString(), subRaceTime, subTime, raceProgramHorse);
+                        addObservable(key.toString(), subRaceTime, null, raceProgramHorse);
                     } catch (RegressionModelException e) {
                         //aika puuttuu
                     } catch (Exception e) {
