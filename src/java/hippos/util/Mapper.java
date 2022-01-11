@@ -195,15 +195,16 @@ public class Mapper<T> {
         //
         //mapper.put(BigDecimal.ZERO, new Value(0));
         //System.out.println("Mapper.main " + BigDecimal.ZERO + " => " + mapper.get(BigDecimal.ZERO));
-        System.out.println("Mapper.main " + BigDecimal.ZERO + " => " + mapper.getOrCreate(BigDecimal.ZERO, new Value(100)));
+        //System.out.println("Mapper.main " + BigDecimal.ZERO + " => " + mapper.getOrCreate(BigDecimal.ZERO, new Value(100)));
 
+        //keyList.add("eka");
         keyList.add(new BigDecimal(1));
         mapper.put(keyList, new Value(1.0));
         System.out.println("Mapper.main " + keyList + " => " + mapper.get(keyList));
 
-        System.out.println("Mapper.main " + BigDecimal.valueOf(1) + " => " + mapper.get(BigDecimal.valueOf(1)));
-        System.out.println("Mapper.main " + BigDecimal.valueOf(1) + " => " + mapper.getOrCreate(BigDecimal.valueOf(1), new Value(101)));
-        System.out.println("Mapper.main " + BigDecimal.valueOf(2) + " => " + mapper.getOrCreate(BigDecimal.valueOf(2), new Value(102)));
+        //System.out.println("Mapper.main " + BigDecimal.valueOf(1) + " => " + mapper.get(BigDecimal.valueOf(1)));
+        //System.out.println("Mapper.main " + BigDecimal.valueOf(1) + " => " + mapper.getOrCreate(BigDecimal.valueOf(1), new Value(101)));
+        //System.out.println("Mapper.main " + BigDecimal.valueOf(2) + " => " + mapper.getOrCreate(BigDecimal.valueOf(2), new Value(102)));
 
         keyList.add("toka");
         mapper.put(keyList, new Value(2.0));

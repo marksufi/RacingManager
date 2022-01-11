@@ -34,12 +34,6 @@ public class Voittajapeli implements Totopeli {
 
         submit(raceProgramStart.getId(), valueHorseSet);
 
-        /*
-        totoHorses = new ArrayList();
-        win = null;
-        if(!valueHorseSet.isEmpty()) {
-            totoHorses.add(((ValueHorse)valueHorseSet.first()).getRaceProgramHorse().getRaceHorseName());
-        }*/
     }
 
     public void update(Connection conn, RaceProgramFile raceProgramFile) {
@@ -68,53 +62,7 @@ public class Voittajapeli implements Totopeli {
         } catch (Exception e) {
             e.printStackTrace();
         }
-        /*
-        totoHorses = new ArrayList();
-
-        if(!totoStartHorses.containsKey(lid))
-            totoStartHorses.put(lid, new ArrayList());
-
-        if(!startHorseSet.isEmpty()) {
-            totoHorses.add(((ValueHorse) startHorseSet.first()).getRaceProgramHorse().getRaceHorseName());
-            ((ArrayList<String>)totoStartHorses.get(lid)).add(((ValueHorse) startHorseSet.first()).getRaceProgramHorse().getRaceHorseName());
-        }*/
     }
-
-    /*
-    private void check(String lid, TreeSet resultHorseSet) {
-        Iterator itr = resultHorseSet.iterator();
-        totoHorses = (ArrayList<String>) totoStartHorses.get(lid);
-
-        if(totoHorses != null) {
-            for (int i = 0; itr.hasNext(); i++) {
-                RaceResultHorse raceResultHorse = (RaceResultHorse) itr.next();
-                BigDecimal rank = raceResultHorse.getRaceResultRanking().getNumber();
-                BigDecimal winOdd = raceResultHorse.getRaceResultWinOdds();
-
-                if (rank != null && winOdd != null) {
-                    if (rank.equals(BigDecimal.ZERO)) {
-                        System.out.print("");
-                    } else if (rank.equals(BigDecimal.ONE) && !totoHorses.isEmpty()) {
-                        //BigDecimal horseProgNumber = raceResultHorse.getHorseProgNumber();
-                        String raceResultHorseName = raceResultHorse.getRaceHorseName();
-                        if (raceResultHorseName != null) {
-                            if (totoHorses.contains(raceResultHorseName)) {
-                                gameStats.add(bet.add(winOdd));
-                                System.out.println(bet.add(winOdd) + "�");
-                            }
-                            gameStats.add(bet);
-                        } else {
-                            System.out.println("Voittajapeli.check: horseProgNumber null");
-                        }
-                    } else {
-                        break;
-                    }
-                } else
-                    break;
-            }
-            totoStartHorses.remove(lid);
-        }
-    }*/
 
     public void check(RaceResultStart raceResultStart) {
         List <RaceResultHorse> voittajaHevoset = raceResultStart.getWinnerHorses();
@@ -136,65 +84,7 @@ public class Voittajapeli implements Totopeli {
             }
             gameStats.add(panos);
         }
-        //check(raceResultStart.getId(), raceResultStart.getRaceResultHorses());
-
-        /*
-        BetRate betRate = (BetRate)raceResultStart.getOddsMap().get(FILEID);
-
-        if(betRate != null) {
-            win = BigDecimal.ONE.negate();
-            List odds = betRate.getOdds();
-            //List horseList = raceResultStart.getHorseList();
-            List horseList = raceResultStart.getRaceResultHorseList();
-
-            Iterator itr = horseList.iterator();
-            for(int i = 0; itr.hasNext() && i < odds.size(); i++) {
-                RaceResultHorse raceResultHorse = (RaceResultHorse)itr.next();
-                SubRanking ranking = raceResultHorse.getRaceResultRanking();
-                BigDecimal rank = ranking.getNumber();
-                String raceResultHorseName = raceResultHorse.getRaceHorseName();
-                if(rank != null && rank.equals(BigDecimal.ONE) && totoHorses.contains(raceResultHorseName)) {
-                    win = win.add((BigDecimal)odds.get(i));
-                }
-            }
-        }*/
     }
-
-    /*
-    private void check(String lid, TreeSet resultHorseSet) {
-        Iterator itr = resultHorseSet.iterator();
-        totoHorses = (ArrayList<String>) totoStartHorses.get(lid);
-
-        if(totoHorses != null) {
-            for (int i = 0; itr.hasNext(); i++) {
-                RaceResultHorse raceResultHorse = (RaceResultHorse) itr.next();
-                BigDecimal rank = raceResultHorse.getRaceResultRanking().getNumber();
-                BigDecimal winOdd = raceResultHorse.getRaceResultWinOdds();
-
-                if (rank != null && winOdd != null) {
-                    if (rank.equals(BigDecimal.ZERO)) {
-                        System.out.print("");
-                    } else if (rank.equals(BigDecimal.ONE) && !totoHorses.isEmpty()) {
-                        //BigDecimal horseProgNumber = raceResultHorse.getHorseProgNumber();
-                        String raceResultHorseName = raceResultHorse.getRaceHorseName();
-                        if (raceResultHorseName != null) {
-                            if (totoHorses.contains(raceResultHorseName)) {
-                                gameStats.add(bet.add(winOdd));
-                                System.out.println(bet.add(winOdd) + "�");
-                            }
-                            gameStats.add(bet);
-                        } else {
-                            System.out.println("Voittajapeli.check: horseProgNumber null");
-                        }
-                    } else {
-                        break;
-                    }
-                } else
-                    break;
-            }
-            totoStartHorses.remove(lid);
-        }
-    }*/
 
     public String toString() {
         return gameStats.toString();

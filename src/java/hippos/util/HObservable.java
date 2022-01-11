@@ -15,6 +15,10 @@ public class HObservable implements Comparable {
         this.raceProgramHorse = raceProgramHorse;
     }
 
+    public RaceProgramHorse getRaceProgramHorse() {
+        return raceProgramHorse;
+    }
+
     @Override
     public int compareTo(Object o) {
         HObservable ho = (HObservable) o;

@@ -33,10 +33,4 @@ public interface Totopeli {
      */
     void update(Connection conn, RaceProgramFile raceProgramFile);
 
-    /*
-    void submit(TreeSet startHorseSet);
-
-    void check(TreeSet resultHorseSet);
-    */
-
 }

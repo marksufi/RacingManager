@@ -391,14 +391,4 @@ public class HarnessApp {
 
     }
 }
-/*
-Hits:   20.85%
-        Profit: -15207.6�/57024 = -0.27�/startti
-*/
-
-/*
-Hits:   20.95%
-Profit: -15946.3�/57101 = -0.28�/startti
-
- */
 

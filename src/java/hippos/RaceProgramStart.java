@@ -4,8 +4,10 @@ import hippos.database.Statements;
 import hippos.exception.RegressionModelException;
 import hippos.io.RaceProgramFile;
 import hippos.lang.stats.SubRaceTime;
+import hippos.lang.toto.TotoGameStats;
 import hippos.math.AlphaNumber;
 import hippos.util.HObservable;
+import hippos.util.HOpserverMapper;
 import hippos.util.Mapper;
 import hippos.math.racing.QuarterTime;
 import hippos.math.regression.HipposUpdatingRegression;
@@ -37,7 +39,7 @@ public class RaceProgramStart extends RaceStart {
     private HashMap<String, ValueHorse> valueHorseHashMap = new HashMap<>();
 
     private Mapper<SortedSet<QuarterTime>> quarterMap = new Mapper<>();
-    private Mapper<SortedSet<Comparable>> observerMap = new Mapper<>();
+    private HOpserverMapper<SortedSet<HObservable>> observerMap = new HOpserverMapper<>();
 
     public static TreeMap <String, HipposUpdatingRegression> featuredReg = new TreeMap<>();
 
@@ -417,14 +419,74 @@ public class RaceProgramStart extends RaceStart {
                 e.printStackTrace();
             }
         }
+
+        for(Object key : observerMap.getKeys()) {
+            HObservable hobservable = observerMap.get(key).first();
+
+            RaceResultHorse raceResultHorse = hobservable.getRaceProgramHorse().getRaceResultHorse();
+
+            BigDecimal ranking = raceResultHorse.getRaceResultRanking().getNumber();
+            BigDecimal winOdds = raceResultHorse.getRaceResultWinOdds();
+
+            if(ranking == null || ranking.intValue() != 1)
+                winOdds = BigDecimal.ZERO;
+
+            observerMap.add(key, winOdds);
+
+        }
+
+
     }
 
-    public void addObservable(String key, Comparable comparable, Object content, RaceProgramHorse raceProgramHorse) {
+    public void addObservable(Object key, Comparable comparable, Object content, RaceProgramHorse raceProgramHorse) {
 
-        HObservable hobservable = new HObservable(comparable, content, raceProgramHorse);
+        try {
+            HObservable hobservable = new HObservable(comparable, content, raceProgramHorse);
 
-        observerMap.getOrCreate(key, new TreeSet<>()).add(hobservable);
+            observerMap.getOrCreate(key, new TreeSet<>()).add(hobservable);
+        } catch (Exception e) {
+            Log.write(e);
+            e.printStackTrace();
+        }
+    }
 
+    public void getObservations() {
+        for(RaceProgramHorse raceProgramHorse : raceProgramHorses) {
+            try {
+                Iterator itr = raceProgramHorse.getSubStartSet().iterator();
+                for (int i = 0; itr.hasNext(); i++) {
+                    try {
+                        SubStart subStart = (SubStart) itr.next();
+                        SubTime subTime = subStart.getSubTime();
+
+                        SubRaceTime subRaceTime = new SubRaceTime(subStart, raceProgramHorse);
+
+                        StringBuilder key = new StringBuilder();
+                        key.append("S");
+                        key.append(i);
+
+                        addObservable(key.toString(), subRaceTime, subTime, raceProgramHorse);
+                    } catch (RegressionModelException e) {
+                        //aika puuttuu
+                    } catch (Exception e) {
+                        e.printStackTrace();
+                    }
+                }
+
+                String key = "DW";
+                addObservable(
+                        key,
+                        raceProgramHorse.getRaceProgramDriver().getDriverForm(),
+                        raceProgramHorse.getRaceProgramDriver().getName(),
+                        raceProgramHorse
+                );
+
+
+            } catch (Exception e) {
+                Log.write(e);
+                e.printStackTrace();
+            }
+        }
     }
 
     public String toString() {
@@ -442,51 +504,11 @@ public class RaceProgramStart extends RaceStart {
         str.append("\n final: ");
         str.append(getQuarterString(4));
 
-        str.append("\n\n observables:\n");
+        str.append("\n\nObservables:\n");
         str.append(observerMap.toString());
 
-        //str.append("\n\n");
+        str.append("\n\n");
 
         return str.toString();
-    }
-
-    public void getObservations() {
-        for(RaceProgramHorse raceProgramHorse : raceProgramHorses) {
-            try {
-                int i = 0;
-                for (SubStart subStart :  raceProgramHorse.getSubStartSet()) {
-                    SubTime subTime = subStart.getSubTime();
-
-                    SubRaceTime subRaceTime = null;
-                    try {
-                        subRaceTime = new SubRaceTime(subStart, raceProgramHorse);
-
-                    } catch (RegressionModelException e) {
-                        // Aika saattaa puuttua
-                        i++;
-                        continue;
-                    }
-
-                    StringBuilder key = new StringBuilder();
-                    key.append("S");
-                    key.append(i++);
-
-                    addObservable(key.toString(), subRaceTime, subTime, raceProgramHorse);
-
-                }
-
-                String key = "DW";
-                addObservable(
-                        key,
-                        raceProgramHorse.getRaceProgramDriver().getDriverForm(),
-                        raceProgramHorse.getRaceProgramDriver().getName(),
-                        raceProgramHorse
-                );
-
-
-            } catch (Exception e) {
-                e.printStackTrace();
-            }
-        }
     }
 }
