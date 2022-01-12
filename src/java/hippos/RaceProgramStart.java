@@ -6,12 +6,14 @@ import hippos.io.RaceProgramFile;
 import hippos.lang.stats.SubRaceTime;
 import hippos.lang.toto.TotoGameStats;
 import hippos.math.AlphaNumber;
+import hippos.util.DissendingComparator;
 import hippos.util.HObservable;
 import hippos.util.HOpserverMapper;
 import hippos.util.Mapper;
 import hippos.math.racing.QuarterTime;
 import hippos.math.regression.HipposUpdatingRegression;
 import hippos.math.regression.LogisticRegression;
+import hippos.utils.HorsesHelper;
 import org.apache.commons.math3.stat.regression.ModelSpecificationException;
 import utils.Log;
 
@@ -421,33 +423,27 @@ public class RaceProgramStart extends RaceStart {
         }
 
         for(Object key : observerMap.getKeys()) {
-            HObservable hobservable = observerMap.get(key).first();
+            try {
+                HObservable hobservable = observerMap.get(key).first();
 
-            RaceResultHorse raceResultHorse = hobservable.getRaceProgramHorse().getRaceResultHorse();
+                RaceResultHorse raceResultHorse = hobservable.getRaceProgramHorse().getRaceResultHorse();
 
-            BigDecimal ranking = raceResultHorse.getRaceResultRanking().getNumber();
-            BigDecimal winOdds = raceResultHorse.getRaceResultWinOdds();
+                BigDecimal ranking = raceResultHorse.getRaceResultRanking().getNumber();
+                BigDecimal winOdds = raceResultHorse.getRaceResultWinOdds();
 
-            if(ranking == null || ranking.intValue() != 1)
-                winOdds = BigDecimal.ZERO;
+                if(ranking == null || ranking.intValue() != 1)
+                    winOdds = BigDecimal.ZERO;
 
-            observerMap.add(key, winOdds);
+                observerMap.add(key, winOdds);
+
+            } catch (Exception e) {
+                Log.write(e);
+                e.printStackTrace();
+            }
 
         }
 
 
-    }
-
-    public void addObservable(Object key, Comparable comparable, Object content, RaceProgramHorse raceProgramHorse) {
-
-        try {
-            HObservable hobservable = new HObservable(comparable, content, raceProgramHorse);
-
-            observerMap.getOrCreate(key, new TreeSet<>()).add(hobservable);
-        } catch (Exception e) {
-            Log.write(e);
-            e.printStackTrace();
-        }
     }
 
     public void getObservations() {
@@ -457,7 +453,6 @@ public class RaceProgramStart extends RaceStart {
                 for (int i = 0; itr.hasNext(); i++) {
                     try {
                         SubStart subStart = (SubStart) itr.next();
-                        SubTime subTime = subStart.getSubTime();
 
                         SubRaceTime subRaceTime = new SubRaceTime(subStart, raceProgramHorse);
 
@@ -465,7 +460,10 @@ public class RaceProgramStart extends RaceStart {
                         key.append("S");
                         key.append(i);
 
-                        addObservable(key.toString(), subRaceTime, null, raceProgramHorse);
+                        HObservable hobservable = new HObservable(subRaceTime,  null, raceProgramHorse);
+
+                        observerMap.getOrCreate(key.toString(), new TreeSet<>()).add(hobservable);
+
                     } catch (RegressionModelException e) {
                         //aika puuttuu
                     } catch (Exception e) {
@@ -474,12 +472,38 @@ public class RaceProgramStart extends RaceStart {
                 }
 
                 String key = "DW";
-                addObservable(
-                        key,
+
+                HObservable hobservable1 = new HObservable(
                         raceProgramHorse.getRaceProgramDriver().getDriverForm(),
                         raceProgramHorse.getRaceProgramDriver().getName(),
-                        raceProgramHorse
-                );
+                        raceProgramHorse);
+
+                observerMap.getOrCreate(key, new TreeSet<>()).add(hobservable1);
+
+                /*
+                    Voittoprosentti
+                 */
+                key = "WP";
+                HObservable hobservable2 = new HObservable(
+                        raceProgramHorse.getYearStatistics().getForm().firstRateProcents(2),
+                        raceProgramHorse.getYearStatistics().getForm().toTinyString(),
+                        raceProgramHorse,
+                        new DissendingComparator());
+
+                observerMap.getOrCreate(key, new TreeSet<>()).add(hobservable2);
+
+                /*
+                    Sijoitusprosentti
+                 */
+                key = "SP";
+                HObservable hobservable3 = new HObservable(
+                        HorsesHelper.toProcents(raceProgramHorse.getYearStatistics().getForm().sijaRate()),
+                        raceProgramHorse.getYearStatistics().getForm().toTinyString(),
+                        raceProgramHorse,
+                        new DissendingComparator());
+
+                observerMap.getOrCreate(key, new TreeSet<>()).add(hobservable3);
+
 
 
             } catch (Exception e) {

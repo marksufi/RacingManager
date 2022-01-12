@@ -1,5 +1,6 @@
 package hippos.lang.stats;
 
+import hippos.DriverForm;
 import hippos.SubStart;
 import hippos.math.AlphaNumber;
 import org.apache.commons.math3.dfp.DfpField;
@@ -367,40 +368,6 @@ public class Form {
         return sb.toString();
     }
 
-    public String toString() {
-        StringBuffer str = new StringBuffer();
-        str.append(label + ": " + starts + " " + firsts + "-" + seconds + "-" + thirds + " (" + getAwardRate()+ "€/s)");
-
-        if(kcode != null) {
-            str.append("->" + kcode + " ");
-            str.append("(");
-            str.append(probability != null ? probability : getKcodeProcents(BigDecimal.ZERO));
-            str.append("%)");
-        }
-
-        str.append("-" + xcode + "x");
-        str.append("(");
-
-        try {
-            // Laukkaprosentti
-            str.append((xcode.divide(starts, 2, RoundingMode.HALF_UP)).multiply(BigDecimal.valueOf(100).setScale(0, RoundingMode.HALF_UP)) + "%");
-        } catch (ArithmeticException e) { /* starts nolla */
-        } catch (Exception e) { e.printStackTrace(); }
-
-        str.append(")");
-
-        /*
-        if(awards != null) {
-            str.append("  " + awards + "€");
-            str.append(" (");
-            str.append(starts.intValue() > 0 ? awards.divide(starts, 0, RoundingMode.HALF_UP) : "0");
-            str.append("€/s)");
-        }
-        */
-
-        return str.toString();
-    }
-
     public BigDecimal getKcode(BigDecimal propability) {
         try {
             BigDecimal kCode = getKcode().multiply(propability);
@@ -461,4 +428,35 @@ public class Form {
         return BigDecimal.ZERO;
 
     }
+
+    public String toTinyString() {
+
+        return (starts + " " + firsts + "-" + seconds + "-" + thirds + " (" + getAwardRate()+ "€/s)");
+    }
+
+    public String toString() {
+        StringBuffer str = new StringBuffer();
+        str.append(label + ": " + starts + " " + firsts + "-" + seconds + "-" + thirds + " (" + getAwardRate()+ "€/s)");
+
+        if(kcode != null) {
+            str.append("->" + kcode + " ");
+            str.append("(");
+            str.append(probability != null ? probability : getKcodeProcents(BigDecimal.ZERO));
+            str.append("%)");
+        }
+
+        str.append("-" + xcode + "x");
+        str.append("(");
+
+        try {
+            // Laukkaprosentti
+            str.append((xcode.divide(starts, 2, RoundingMode.HALF_UP)).multiply(BigDecimal.valueOf(100).setScale(0, RoundingMode.HALF_UP)) + "%");
+        } catch (ArithmeticException e) { /* starts nolla */
+        } catch (Exception e) { e.printStackTrace(); }
+
+        str.append(")");
+
+        return str.toString();
+    }
+
 }

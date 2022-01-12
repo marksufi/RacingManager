@@ -4,6 +4,7 @@ import hippos.RaceResultHorse;
 import hippos.SubStart;
 import hippos.ValueHorse;
 import hippos.exception.IncorrectParameterException;
+import hippos.math.AlphaNumber;
 import utils.Log;
 
 import java.math.BigDecimal;
@@ -602,5 +603,10 @@ public class HorsesHelper {
 
     }
 
+    public static AlphaNumber toProcents(BigDecimal number) {
+        number = number.multiply(BigDecimal.valueOf(100.00));
+
+        return new AlphaNumber(number.setScale(2), "%");
+    }
 }
 
