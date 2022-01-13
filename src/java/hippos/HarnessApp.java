@@ -315,8 +315,8 @@ public class HarnessApp {
             if(!HarnessApp.isRunning()) {
                 HarnessApp app = HarnessApp.getInstance();
                 if (HarnessApp.fetchNewFiles) {
-                    // Edellinen cuori
-                    //app.haeUudetTiedostot(raceCalendarEarliestYearUrl, conn);
+                    // Edellinen vuosi
+                    app.haeUudetTiedostot(raceCalendarEarliestYearUrl, conn);
 
                     // Kuluva vuosi
                     app.haeUudetTiedostot(raceCalendarEarlierYearUrl, conn);

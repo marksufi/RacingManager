@@ -4,6 +4,7 @@ import hippos.RaceProgramStart;
 import hippos.exception.RegressionModelException;
 import hippos.math.AlphaNumber;
 import hippos.math.regression.HipposUpdatingRegression;
+import hippos.util.Mapper;
 import hippos.util.QuarterTimes;
 import org.apache.commons.math3.stat.regression.ModelSpecificationException;
 import utils.Log;
@@ -13,25 +14,36 @@ import java.sql.*;
 import java.util.*;
 
 public class TimeForm extends Form {
+
+    private static final String C = "C";
+    private static final String K = "->";
+    private static final String X = "-x";
+
     private String raceMode;
     private BigDecimal lastRanking;
-    private Form cForm = new Form("C"); // Puhtaat juoksut
-    private Form kForm = new Form("->"); // Keulapaikkajuoksut
-    private Form xForm = new Form("-x"); // Laukkajuoksut
+    //private Form cForm = new Form("C"); // Puhtaat juoksut
+    //private Form kForm = new Form("->"); // Keulapaikkajuoksut
+    //private Form xForm = new Form("-x"); // Laukkajuoksut
 
     //private AlphaNumber recordTime;
     private SortedSet<AlphaNumber> recordTimes = new TreeSet<>();
     private SortedSet<AlphaNumber> aRecordTimes = new TreeSet<>();
     private SortedSet<AlphaNumber> tRecordTimes = new TreeSet<>();
 
-    private List<TimeForm> forms = new ArrayList();
+    private Mapper<Form> forms = new Mapper<>();
 
     public TimeForm(String label) {
         super(label);
+
+        forms.put("C", new Form(C));
+        forms.put("->", new Form(K));
+        forms.put("-x", new Form(X));
+
     }
 
     public TimeForm(String label, String initstring) {
-        super(label);
+        this(label);
+
         init(initstring);
     }
 
@@ -63,13 +75,13 @@ public class TimeForm extends Form {
             setKcode(new BigDecimal(tokens[5]));
             setXcode(new BigDecimal(tokens[6]));
 
-            kForm.setStarts(new BigDecimal(tokens[7]));
-            kForm.setFirsts(new BigDecimal(tokens[8]));
-            kForm.setSeconds(new BigDecimal(tokens[9]));
-            kForm.setThirds(new BigDecimal(tokens[10]));
-            kForm.setAwards(new BigDecimal(tokens[11]));
-            kForm.setKcode(new BigDecimal(tokens[12]));
-            kForm.setXcode(new BigDecimal(tokens[13]));
+            forms.get(K).setStarts(new BigDecimal(tokens[7]));
+            forms.get(K).setFirsts(new BigDecimal(tokens[8]));
+            forms.get(K).setSeconds(new BigDecimal(tokens[9]));
+            forms.get(K).setThirds(new BigDecimal(tokens[10]));
+            forms.get(K).setAwards(new BigDecimal(tokens[11]));
+            forms.get(K).setKcode(new BigDecimal(tokens[12]));
+            forms.get(K).setXcode(new BigDecimal(tokens[13]));
 
             // Lisää ennätykset
             String times = tokens[14];
@@ -79,7 +91,7 @@ public class TimeForm extends Form {
                 addRecordTime(new AlphaNumber(st.nextToken()));
             }
 
-            kForm.setProbability(getStarts().add(kForm.getStarts()));
+            forms.get(K).setProbability(getStarts().add(forms.get(K).getStarts()));
 
         } catch (NullPointerException e) {
             // str tai joku muu on null
@@ -112,29 +124,27 @@ public class TimeForm extends Form {
     }
 
     public Form getcForm() {
-        return cForm;
+        return forms.get("C");
     }
 
     public Form getkForm() {
-        return kForm;
+        return forms.get("->");
     }
 
-
-
-    public void setkForm(Form kForm) {
-        this.kForm = kForm;
+    public Mapper<Form> getForms() {
+        return forms;
     }
 
     public void add(SubForm form) {
         try {
             if(form.getXcode().intValue() > 0) {
                 // Laukkatilastot omaan
-                xForm.add(form);
+                forms.get(X).add(form);
             } else if (form.getKcode().intValue() > 0) {
                 // Paalutilastot omaan
-                kForm.add(form);
+                forms.get(K).add(form);
             } else {
-                cForm.add(form);
+                forms.get(C).add(form);
             }
 
             super.add(form);
@@ -154,11 +164,11 @@ public class TimeForm extends Form {
 
         sb.append(" " + recordTimes);
 
+        /*
         sb.append("\n\t" + cForm.toString());
         sb.append("\n\t" + kForm.toString());
         sb.append("\n\t" + xForm.toString());
-
-
+        */
 
         return sb.toString();
     }
@@ -168,7 +178,7 @@ public class TimeForm extends Form {
 
         sb.append(super.getAsString());
 
-        sb.append(kForm.getAsString());
+        sb.append(forms.get(K).getAsString());
 
         sb.append(GetRecordTimeList());
 

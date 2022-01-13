@@ -11,6 +11,8 @@ public class RaceProgramDriver extends Person {
     public RaceProgramDriver(String name) {
 
         super(name);
+
+        driverForm = new DriverForm(getName());
     }
 
     public RaceProgramDriver(ResultSet raceSet) throws SQLException {

@@ -175,7 +175,7 @@ public class ValueHorse implements Comparable {
 
             FullStatistics fullStatistics = raceProgramHorse.getFullStatistics();
 
-            for(SubForm subForm : fullStatistics.getSubForms()) {
+            for(SubForm subForm : fullStatistics.getSubForms().getValues()) {
                 try {
                     regY = subForm.getRegY(fullStatistics);
 
@@ -189,7 +189,7 @@ public class ValueHorse implements Comparable {
 
             YearStatistics yearStatistics = raceProgramHorse.getYearStatistics();
 
-            for(SubForm subForm : yearStatistics.getSubForms()) {
+            for(SubForm subForm : yearStatistics.getSubForms().getValues()) {
                 try {
                     regY = subForm.getRegY(yearStatistics);
 

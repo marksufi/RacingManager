@@ -436,6 +436,9 @@ public class RaceProgramStart extends RaceStart {
 
                 observerMap.add(key, winOdds);
 
+            } catch (NullPointerException e) {
+                // sijoitus puuttuu
+
             } catch (Exception e) {
                 Log.write(e);
                 e.printStackTrace();
@@ -485,7 +488,7 @@ public class RaceProgramStart extends RaceStart {
                  */
                 key = "WP";
                 HObservable hobservable2 = new HObservable(
-                        raceProgramHorse.getYearStatistics().getForm().firstRateProcents(2),
+                        HorsesHelper.toProcents(raceProgramHorse.getYearStatistics().getForm().firstRate()),
                         raceProgramHorse.getYearStatistics().getForm().toTinyString(),
                         raceProgramHorse,
                         new DissendingComparator());
@@ -504,6 +507,78 @@ public class RaceProgramStart extends RaceStart {
 
                 observerMap.getOrCreate(key, new TreeSet<>()).add(hobservable3);
 
+                /*
+                    1. Väliaika prosentteina
+                 */
+                try {
+                    BigDecimal prop1 = raceProgramHorse.getTimeStatistics().getFirstQuarter().getPropbabilty();
+                    if(prop1.compareTo(BigDecimal.ZERO) > 0) {
+
+                        observerMap.getOrCreate("V1%", new TreeSet<>()).add(
+                                new HObservable(
+                                    raceProgramHorse.getTimeStatistics().getFirstQuarter().getPropabiltyProcents(),
+                                    raceProgramHorse.getTimeStatistics().getFirstQuarter().getValueSet().first(),
+                                    raceProgramHorse,
+                                    new DissendingComparator()));
+                    }
+                } catch (Exception e) {
+                    Log.write(e);
+                    e.printStackTrace();
+                }
+
+                                /*
+                    1. Väliaika aikana
+                 */
+
+                try {
+                    if(!raceProgramHorse.getTimeStatistics().getFirstQuarter().getValueSet().isEmpty()) {
+
+                        observerMap.getOrCreate("1T", new TreeSet<>()).add(
+                                new HObservable(
+                                    raceProgramHorse.getTimeStatistics().getFirstQuarter().getValueSet().first(),
+                                    raceProgramHorse.getTimeStatistics().getFirstQuarter().getPropabiltyProcents(),
+                                    raceProgramHorse));
+                    }
+                } catch (Exception e) {
+                    Log.write(e);
+                    e.printStackTrace();
+                }
+
+                 /*
+                    2. Väliaika prosentteina
+                 */
+                try {
+                    BigDecimal prop2 = raceProgramHorse.getTimeStatistics().getSecondQuarter().getPropbabilty();
+                    if(prop2.compareTo(BigDecimal.ZERO) > 0) {
+                        observerMap.getOrCreate("V2%", new TreeSet<>()).add(
+                                new HObservable(
+                                        raceProgramHorse.getTimeStatistics().getSecondQuarter().getPropabiltyProcents(),
+                                        raceProgramHorse.getTimeStatistics().getSecondQuarter().getValueSet().first(),
+                                        raceProgramHorse,
+                                        new DissendingComparator()));
+                    }
+                } catch (Exception e) {
+                    Log.write(e);
+                    e.printStackTrace();
+                }
+
+                                /*
+                    2. Väliaika aikana
+                 */
+
+                try {
+                    if(!raceProgramHorse.getTimeStatistics().getSecondQuarter().getValueSet().isEmpty()) {
+
+                        observerMap.getOrCreate("2T", new TreeSet<>()).add(
+                                new HObservable(
+                                        raceProgramHorse.getTimeStatistics().getSecondQuarter().getValueSet().first(),
+                                        raceProgramHorse.getTimeStatistics().getSecondQuarter().getPropabiltyProcents(),
+                                        raceProgramHorse));
+                    }
+                } catch (Exception e) {
+                    Log.write(e);
+                    e.printStackTrace();
+                }
 
 
             } catch (Exception e) {

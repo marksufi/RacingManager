@@ -119,7 +119,8 @@ public class RaceResultFile extends RaceFile implements FileParser {
                 try {
                     raceResultStart.insert(conn);
                 } catch (Exception e) {
-                    Log.write(e);
+                    Log.write(e, getName());
+                    e.printStackTrace();
                 }
             }
 

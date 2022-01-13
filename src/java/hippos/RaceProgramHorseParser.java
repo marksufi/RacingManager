@@ -504,6 +504,10 @@ public class RaceProgramHorseParser implements FileParser {
      *          S Markkula
      *      </a>
      *      (aA)</td>
+     *
+     *      <td> <a href="/heppa/racing/RaceProgramOneRace,getDriverName.$DirectLink.sdirect?sp=l5965274316357593994&amp;sp=SPERSON&amp;sp=X" class="original_driver" onclick="setStatusText(selectText)"> Kim Åkerlund
+     * </a>
+     * (A)</td>
      */
     private void parseJockeyLine() throws IOException {
         try {
@@ -536,7 +540,7 @@ public class RaceProgramHorseParser implements FileParser {
 
             parseSubStart(line);
         } catch (Exception e) {
-            Log.write(e);
+            Log.write(e, raceProgramHorse.getId());
             throw new IOException();
         }
     }

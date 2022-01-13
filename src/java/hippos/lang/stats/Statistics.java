@@ -2,6 +2,7 @@ package hippos.lang.stats;
 
 import hippos.RaceProgramHorse;
 import hippos.database.Statements;
+import hippos.util.Mapper;
 import hippos.utils.DateUtils;
 import utils.Log;
 
@@ -19,7 +20,7 @@ public abstract class Statistics extends TimeForm {
     protected String name;
     protected String race;
 
-    private List<SubForm> subForms = new ArrayList<>();
+    private Mapper<SubForm> subForms = new Mapper<>();
 
     public Statistics(String label, RaceProgramHorse raceProgramHorse) {
         super(label);
@@ -77,7 +78,7 @@ public abstract class Statistics extends TimeForm {
             while(set.next()) {
                 SubForm subForm = new SubForm(set);
 
-                subForms.add(subForm);
+                subForms.getOrCreate(subForm.getLabel(), subForm);
 
                 super.add(subForm);
             }
@@ -97,9 +98,10 @@ public abstract class Statistics extends TimeForm {
 
         str.append(super.toString());
 
+        /*
         for(SubForm subForm : subForms) {
             str.append("\n\t" + subForm);
-        }
+        }*/
 
         return str.toString();
     }
@@ -210,7 +212,7 @@ public abstract class Statistics extends TimeForm {
         return raceProgramHorse;
     }
 
-    public List<SubForm> getSubForms() {
+    public Mapper<SubForm> getSubForms() {
         return subForms;
     }
 }

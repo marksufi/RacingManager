@@ -4,6 +4,8 @@ import hippos.RaceProgramHorse;
 import hippos.math.AlphaNumber;
 import hippos.math.StatisticalValue;
 import hippos.math.Value;
+import hippos.utils.HorsesHelper;
+import utils.Log;
 
 import java.math.BigDecimal;
 import java.math.RoundingMode;
@@ -58,11 +60,12 @@ public class QuarterTime extends StatisticalValue implements Comparable {
     }
 
     public BigDecimal getPropbabilty() {
+        //return propbabilty.divide(BigDecimal.valueOf(100.00), 4, RoundingMode.HALF_UP);
         return propbabilty;
     }
 
-    public BigDecimal getPropabiltyProcents() {
-        return propbabilty != null ? propbabilty.divide(BigDecimal.valueOf(100.00), 2, RoundingMode.HALF_UP) : BigDecimal.ZERO;
+    public AlphaNumber getPropabiltyProcents() {
+        return propbabilty != null ? new AlphaNumber(propbabilty, "%") : new AlphaNumber(BigDecimal.ZERO, "%");
     }
 
     public int compareTo(Object o) {
@@ -90,15 +93,6 @@ public class QuarterTime extends StatisticalValue implements Comparable {
             e.printStackTrace();
         }
         return -1;
-    }
-
-    private void setProbability(BigDecimal trackProb, BigDecimal horseprob) {
-        try {
-            //BigDecimal prop = trackProb.multiply(horseprob).multiply(BigDecimal.valueOf(100.00));
-            BigDecimal prop = trackProb.multiply(horseprob);
-            this.propbabilty = BigDecimal.valueOf(Math.sqrt(prop.doubleValue())).setScale(1, RoundingMode.HALF_UP);
-        } catch (Exception e) {
-        }
     }
 
     public String getRaceMode() {
@@ -149,9 +143,14 @@ public class QuarterTime extends StatisticalValue implements Comparable {
         StringBuffer sb = new StringBuffer();
 
         try {
+            BigDecimal avg = average(1, BigDecimal.ZERO);
+            sb.append(HorsesHelper.toProcents(avg));
+            /*
             if (propbabilty != null) {
                 sb.append(propbabilty + "%");
             }
+            */
+
             sb.append(getRecords());
 
             /*
@@ -201,6 +200,8 @@ public class QuarterTime extends StatisticalValue implements Comparable {
 
             //this.propbabilty = BigDecimal.valueOf(Math.sqrt(prop.doubleValue())).setScale(1, RoundingMode.HALF_UP);
         } catch (Exception e) {
+            Log.write(e);
+            e.printStackTrace();
         }
     }
 

@@ -757,7 +757,7 @@ public class RaceProgramHorse extends Horse {
             xList.add(fullStatistics.getAwardRate());
 
             QuarterTimes qt1 = timeStatistics.getSecondQuarter();
-            BigDecimal p1 = qt1.getPropabiltyProcents();
+            BigDecimal p1 = qt1.getPropabiltyProcents().getBigDecimal();
 
             xList.add(form1.getKcode(p1));
             xList.add(form1.firstRate(p1));
@@ -771,7 +771,7 @@ public class RaceProgramHorse extends Horse {
             xList.add(driverFirstRate);
 
             double bestTime = 0.0;
-            for(SubForm subForm : yearStatistics.getSubForms()) {
+            for(SubForm subForm : yearStatistics.getSubForms().getValues()) {
                 try {
                     double regY = subForm.getRegY(yearStatistics);
 
@@ -825,7 +825,7 @@ public class RaceProgramHorse extends Horse {
 
             regressionMap.add(x, raceResultPrize.doubleValue());
 
-            for (SubForm subForm : fullStatistics.getSubForms()) {
+            for (SubForm subForm : fullStatistics.getSubForms().getValues()) {
                 try {
                     subForm.addObservations(raceResultPrize, fullStatistics);
 
@@ -836,7 +836,7 @@ public class RaceProgramHorse extends Horse {
                 }
             }
 
-            for (SubForm subForm : yearStatistics.getSubForms()) {
+            for (SubForm subForm : yearStatistics.getSubForms().getValues()) {
                 try {
                     subForm.addObservations(raceResultPrize, yearStatistics);
 
@@ -878,6 +878,10 @@ public class RaceProgramHorse extends Horse {
         return xList;
     }
 
+    public TimeStatistics getTimeStatistics() {
+        return timeStatistics;
+    }
+
     public String toString() {
         try {
             StringBuffer str = new StringBuffer();
@@ -891,10 +895,21 @@ public class RaceProgramHorse extends Horse {
 
             str.append("\n");
 
-            //str.append("\t" + fullStatistics);
-            //str.append("\n");
-            str.append("\t" + yearStatistics);
+            str.append("\t" + fullStatistics + "\n");
+
+            for(Object key : fullStatistics.getForms().getKeys()) {
+                str.append("\t\t" + fullStatistics.getForms().get(key) + "\n");
+            }
+
+            str.append("\t" + yearStatistics + "\n");
+
+            str.append("\t" + fullStatistics.getSubForms().get(this.getRaceMode()) + "\n");
             str.append("\n");
+            /*
+            for(SubForm subForm : yearStatistics.getSubForms()) {
+                str.append("\n\t" + subForm);
+            }*/
+
             //str.append("\t" + fullStatistics != null ? fullStatistics.getTimeStatistics().getFinalTimes().toString() : "");
 
             //str.append("\n\t" + fullStatistics.getFeaturedStats().get(Collections.singletonList(BigDecimal.ZERO)));
