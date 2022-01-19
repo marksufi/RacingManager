@@ -180,6 +180,11 @@ public class RaceResultFile extends RaceFile implements FileParser {
         return null;
     }
 
+    @Override
+    public Object parse(Connection conn) throws Exception {
+        return null;
+    }
+
     public void setTrackCondition(String trackCondition) {
         this.trackCondition = trackCondition;
         //Log.write("TrackCondition: " + trackCondition);

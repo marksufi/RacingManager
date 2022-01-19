@@ -355,7 +355,7 @@ public class RaceProgramFile extends RaceFile {
                             "C:\\Users\\Markus\\My Projects\\Filebase\\hippos\\ohjelma",
                             "CF1471986000000_CEH_CC5.php");
             RaceProgramFileParser raceProgramFileParser = new RaceProgramFileParser(racebookFile, conn);
-            racebookFile = (RaceProgramFile)raceProgramFileParser.parse();
+            racebookFile = (RaceProgramFile)raceProgramFileParser.parse(conn);
             //racebookFile.delete(conn);
         } catch (Exception e) {
             e.printStackTrace();

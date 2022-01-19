@@ -10,6 +10,7 @@ import utils.HTMLParser;
 import utils.Log;
 
 import java.io.IOException;
+import java.sql.Connection;
 import java.util.Iterator;
 import java.util.List;
 import java.util.StringTokenizer;
@@ -47,6 +48,11 @@ public class RaceResultFileParser implements FileParser {
         }
 
         return raceResultFile;
+    }
+
+    @Override
+    public Object parse(Connection conn) throws Exception {
+        return null;
     }
 
     /**

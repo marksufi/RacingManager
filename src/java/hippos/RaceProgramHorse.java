@@ -74,6 +74,7 @@ public class RaceProgramHorse extends Horse {
         this.raceProgramStart = raceProgramStart;
 
         this.timeStatistics = new TimeStatistics(this);
+        this.fullStatistics = new FullStatistics("Yht", this);
     }
 
 
@@ -86,7 +87,7 @@ public class RaceProgramHorse extends Horse {
      * @throws SQLException
      */
     public RaceProgramHorse(ResultSet raceSet, Connection conn, RaceProgramStart raceProgramStart) throws SQLException {
-        super(raceProgramStart);
+        this(raceProgramStart);
 
         this.raceProgramStart = raceProgramStart;
 
@@ -113,11 +114,11 @@ public class RaceProgramHorse extends Horse {
             initSubStart(raceSet.getString("SUBSTART_3"));
             initSubStart(raceSet.getString("SUBSTART_4"));
             initSubStart(raceSet.getString("SUBSTART_5"));
-            initSubStart(raceSet.getString("SUBSTART_6"));
-            initSubStart(raceSet.getString("SUBSTART_7"));
-            initSubStart(raceSet.getString("SUBSTART_8"));
+            //initSubStart(raceSet.getString("SUBSTART_6"));
+            //initSubStart(raceSet.getString("SUBSTART_7"));
+            //initSubStart(raceSet.getString("SUBSTART_8"));
 
-            this.timeStatistics = new TimeStatistics(this);
+            //this.timeStatistics = new TimeStatistics(this);
 
             addWeeksKey();
 
@@ -161,7 +162,7 @@ public class RaceProgramHorse extends Horse {
             stmt.setBigDecimal( i++, driverStats.getKcode());
             stmt.setBigDecimal( i++, driverStats.getXcode());
 
-            for(int is = 0; is < 8; is++) {
+            for(int is = 0; is < 5; is++) {
                 StringBuffer sb = new StringBuffer();
 
                 if(is < subStartList.size()) {
@@ -193,8 +194,10 @@ public class RaceProgramHorse extends Horse {
                         sb.append(subStart.getkCode());
 
                         sb.append(";");
-                        BigDecimal subDriverFirstRate = subStart.getSubDriver().getForm().firstRate();
-                        sb.append(subDriverFirstRate);
+                        sb.append(subStart.getSubDriver().getName());
+                        sb.append(";");
+                        sb.append(subStart.getSubDriver().getWinRate());
+                        sb.append(";");
 
                     } catch (Exception e) {
                         e.printStackTrace();
@@ -210,6 +213,7 @@ public class RaceProgramHorse extends Horse {
             //}
         } catch (Exception e) {
             Log.write(e, this.getId());
+            e.printStackTrace();
         } finally {
             try{ stmt.close(); } catch (Exception e) {}
         }
@@ -373,7 +377,7 @@ public class RaceProgramHorse extends Horse {
             while(set.next()) {
                 try {
                     SubStart subStart = new SubStart(set, this);
-                    subStart.getSubDriver().fetchRaceTypeForm(conn, subStart.getDate(), subStart.getRaceMode().toString());
+                    //subStart.getSubDriver().fetchRaceTypeForm(conn, subStart.getDate(), subStart.getRaceMode().toString());
                     add(subStart);
                 } catch(Exception se) {
                     Log.write(se);
@@ -468,13 +472,13 @@ public class RaceProgramHorse extends Horse {
     /**
      * Tämä vie aikaa
      */
-    public void setStatistics() {
+    public void setStatistics(Connection conn) {
         try {
 
             //if(getRaceHorseName().equals("Saran Vappu"))
             //    System.out.println("RaceProgramHorse.setStatistics: Saran Vappu");
 
-            Connection conn = Database.getConnection();
+            //Connection conn = Database.getConnection();
 
             initFullStatistics(conn);
 
@@ -489,10 +493,11 @@ public class RaceProgramHorse extends Horse {
                 raceProgramDriver.getDriverForm().fetchRaceTypeForm(conn, this.getRaceDate(), this.getRaceMode());
             }
 
-            fetchSubStarts(conn, 8);
+            fetchSubStarts(conn, 5);
 
-        } catch (Exception throwables) {
-            throwables.printStackTrace();
+        } catch (Exception e) {
+            Log.write(e);
+            e.printStackTrace();
         }
     }
 
@@ -620,7 +625,7 @@ public class RaceProgramHorse extends Horse {
         }
     }
 
-    private void appendSubStart(StringBuilder str, int line) {
+    private void appendSubStartString(StringBuilder str, int line) {
         try {
             int startPoint = 36;
             if (line < subStartList.size()) {
@@ -710,29 +715,29 @@ public class RaceProgramHorse extends Horse {
         StringBuilder str = new StringBuilder();
         switch(line) {
             case 0: str.append(age + " v " + color + " " + sex + " " + sire + " -");
-                appendSubStart(str, line);
+                appendSubStartString(str, line);
                 break;
             case 1: str.append(dam + " - " + sireOfDam);
-                appendSubStart(str, line);
+                appendSubStartString(str, line);
                 break;
             case 2: str.append(color1 + " - " + color2);
-                appendSubStart(str, line);
+                appendSubStartString(str, line);
                 break;
             case 3: str.append(owner + ", " + ownerLocation);
-                appendSubStart(str, line);
+                appendSubStartString(str, line);
                 break;
             case 4: str.append("(" + coach + ")");
-                appendSubStart(str, line);
+                appendSubStartString(str, line);
                 break;
             case 5: str.append(getRaceProgramDriver() != null ? getRaceProgramDriver().toString().toUpperCase() : "");
-                appendSubStart(str, line);
+                appendSubStartString(str, line);
                 break;
             //if (driver.getDriverStats(conn, this).jockeyClass != null) str.append(" (" + driver.getDriverStats(conn, this).jockeyClass + ")"); break;
             case 6: str.append(StringUtils.toColumn(getRaceProgramDriver().getDriverForm().getForm().toString(), 40));
-                appendSubStart(str, line);
+                appendSubStartString(str, line);
                 break;
             case 7: //str.append(driver.getDriverStats().getYearForm().toString());
-                appendSubStart(str, line);
+                appendSubStartString(str, line);
                 break;
             case 8: //str.append(driver.getFullYearForm().toString());
                 break;
@@ -930,10 +935,15 @@ public class RaceProgramHorse extends Horse {
             if(this.raceProgramDriver != null) {
                 str.append("\n\t" + raceProgramDriver.getDriverForm().getForm());
             }
+
+            for(SubStart subStart : subStartList) {
+                str.append("\n\t\t" + subStart);
+            }
             /*
             for (int i = 0; i < 9; i++) {
                 str.append("\n" + toString(i));
             }*/
+
 
             return str.toString();
         } catch (Exception e) {

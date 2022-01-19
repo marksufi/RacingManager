@@ -8,6 +8,7 @@ import utils.Log;
 
 import java.io.IOException;
 import java.math.BigDecimal;
+import java.sql.Connection;
 import java.util.Date;
 import java.util.Iterator;
 import java.util.StringTokenizer;
@@ -45,7 +46,7 @@ public class RaceProgramHorseParser implements FileParser {
         }
     }
 
-    public Object parse() throws OutOfHorsesException, DataObjectException, AbsentException {
+    public Object parse(Connection conn) throws OutOfHorsesException, DataObjectException, AbsentException {
         try {
             // Etsii seuraavan hevosen aloituskohdan
             HTMLParser.readBlock(lines, "td", "program_divider");
@@ -89,7 +90,7 @@ public class RaceProgramHorseParser implements FileParser {
                         try {
                             RaceHorseHistoryParser raceHorseHistoryParser = new RaceHorseHistoryParser(raceProgramHorse);
 
-                            raceProgramHorse = (RaceProgramHorse) raceHorseHistoryParser.parse();
+                            raceProgramHorse = (RaceProgramHorse) raceHorseHistoryParser.parse(conn);
                         } catch (Exception e) {
                             e.printStackTrace();
                         }
@@ -108,9 +109,15 @@ public class RaceProgramHorseParser implements FileParser {
             throw e;
         } catch (Exception e) {
             Log.write(e);
+            e.printStackTrace();
         }
 
         return this.raceProgramHorse;
+    }
+
+    @Override
+    public Object parse() throws Exception {
+        return null;
     }
 
     /**

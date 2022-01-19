@@ -12,6 +12,7 @@ import utils.HTMLParser;
 import utils.Log;
 
 import java.math.BigDecimal;
+import java.sql.Connection;
 import java.text.ParseException;
 import java.util.Iterator;
 import java.util.StringTokenizer;
@@ -42,12 +43,12 @@ public class RaceProgramStartParser implements FileParser {
         }
     }
 
-    public Object parse() throws UnvalidStartException {
+    public Object parse(Connection conn) throws UnvalidStartException {
         try {
             parseNumber();
             raceProgramStart.setId(raceProgramFile, raceProgramStart.getStartNumber());
             System.out.println(raceProgramStart.toString());
-            parseHorses();
+            parseHorses(conn);
 
         } catch (OutOfHorsesException e) {
             //System.out.print("");
@@ -55,8 +56,14 @@ public class RaceProgramStartParser implements FileParser {
             throw e;
         } catch (Exception e) {
             Log.write(e);
+            e.printStackTrace();
         }
         return raceProgramStart;
+    }
+
+    @Override
+    public Object parse() throws Exception {
+        return null;
     }
 
     /**
@@ -185,14 +192,14 @@ public class RaceProgramStartParser implements FileParser {
         }
     } */
 
-    private void parseHorses() throws OutOfHorsesException {
+    private void parseHorses(Connection conn) throws OutOfHorsesException {
         RaceProgramHorseParser raceProgramHorseParser = null;
         while(lines.hasNext()) {
             try {
                 raceProgramHorseParser = new RaceProgramHorseParser(raceProgramStart, lines);
                 RaceProgramHorse raceProgramHorse = null;
                 try {
-                    raceProgramHorse = (RaceProgramHorse) raceProgramHorseParser.parse();
+                    raceProgramHorse = (RaceProgramHorse) raceProgramHorseParser.parse(conn);
 
                     RaceResultHorse raceResultHorse = null;
                     if(raceProgramStart.getRaceResultStart() != null) {
@@ -203,7 +210,7 @@ public class RaceProgramStartParser implements FileParser {
                     }
                     raceProgramHorse.setRaceResultHorse(raceResultHorse);
 
-                    raceProgramHorse.setStatistics();
+                    raceProgramHorse.setStatistics(conn);
 
                     System.out.println(raceProgramHorse.toString());
                     raceProgramStart.add(raceProgramHorse);

@@ -28,6 +28,7 @@ public class Form {
     private BigDecimal awards = BigDecimal.ZERO;
     private BigDecimal kcode = BigDecimal.ZERO;
     private BigDecimal xcode = BigDecimal.ZERO;
+    private BigDecimal driverWinRates = BigDecimal.ZERO;
 
     private BigDecimal probability = null;
 
@@ -53,6 +54,7 @@ public class Form {
             setAwards(set.getBigDecimal(i++));
             setKcode(set.getBigDecimal(i++));
             setXcode(set.getBigDecimal(i++));
+            setDriverWinRates(set.getBigDecimal(i++));
         } catch (Exception e) {
             Log.write(e);
         }
@@ -130,6 +132,7 @@ public class Form {
         try { awards = awards.add(hv.awards); } catch (NullPointerException e) {}
         try { kcode = kcode.add(hv.kcode); } catch (NullPointerException e) {}
         try { xcode = xcode.add(hv.xcode); } catch (NullPointerException e) {}
+        try { driverWinRates = driverWinRates.add(hv.driverWinRates); } catch (NullPointerException e) {}
     }
 
     public String getLabel() {
@@ -304,6 +307,7 @@ public class Form {
             setAwards(set.getBigDecimal(i++));
             setKcode(set.getBigDecimal(i++));
             setXcode(set.getBigDecimal(i++));
+            setDriverWinRates(set.getBigDecimal(i++));
         }
     }
 
@@ -323,7 +327,7 @@ public class Form {
     }
 
     public static String getSelect() {
-        return "select count(*), sum(S_1), sum(S_2), sum(S_3), sum(palkinto), sum(KCODE), count(XCODE)";
+        return "select count(*), sum(S_1), sum(S_2), sum(S_3), sum(palkinto), sum(KCODE), count(XCODE), SUM(KVP)";
     }
 
     public static PreparedStatement getStatement(Connection conn, String name, String race, Date startDate, Date endDate) {
@@ -429,6 +433,14 @@ public class Form {
 
     }
 
+    public BigDecimal getDriverWinRates() {
+        return driverWinRates;
+    }
+
+    public void setDriverWinRates(BigDecimal driverWinRates) {
+        this.driverWinRates = driverWinRates;
+    }
+
     public String toTinyString() {
 
         return (starts + " " + firsts + "-" + seconds + "-" + thirds + " (" + getAwardRate()+ "€/s)");
@@ -455,6 +467,24 @@ public class Form {
         } catch (Exception e) { e.printStackTrace(); }
 
         str.append(")");
+
+        try {
+            str.append(" D(");
+            str.append(driverWinRates.divide(starts, 2, RoundingMode.HALF_UP) + "%");
+            str.append(")");
+        } catch (NullPointerException e) {
+            str.append(BigDecimal.ZERO);
+            str.append("%)");
+
+        } catch (ArithmeticException e) {
+            str.append(BigDecimal.ZERO);
+            str.append("%)");
+
+        } catch (Exception e) {
+            Log.write(e);
+            e.printStackTrace();
+        }
+
 
         return str.toString();
     }

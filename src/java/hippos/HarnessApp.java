@@ -234,7 +234,7 @@ public class HarnessApp {
 
                         /* Parsii uuden ohjelmatiedon */
                         RaceProgramFileParser raceProgramFileParser = new RaceProgramFileParser(raceProgramFile, raceResultFile, conn);
-                        raceProgramFile = (RaceProgramFile) raceProgramFileParser.parse();
+                        raceProgramFile = (RaceProgramFile) raceProgramFileParser.parse(conn);
                         raceProgramFile.insert(conn);
 
                         RaceProgramStart raceProgramStart = raceProgramFile.getRaceProgramStart();
@@ -277,6 +277,7 @@ public class HarnessApp {
                 } catch (Exception e) {
                     try { conn.rollback(); } catch (SQLException e1) { e1.printStackTrace(); }
                     Log.write( new Exception( raceProgramFile.getName(), e));
+                    e.printStackTrace();
                 }
             }
             System.out.print(""); // stop here if don't  want to loose data

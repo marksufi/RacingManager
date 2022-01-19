@@ -54,14 +54,14 @@ public class RaceProgramFileParser {
         this.raceProgramFile = raceProgramFile;
     }*/
 
-    public Object parse() throws UnvalidStartException {
+    public Object parse(Connection conn) throws UnvalidStartException {
         try {
             HTMLParser reader = new HTMLParser(raceProgramFile);
             List lineList = reader.getLines();
             Iterator lines = lineList.iterator();
             parseLocality(lines);
             RaceProgramStartParser raceProgramStartParser = new RaceProgramStartParser(raceProgramFile, raceResultFile, lines);
-            RaceProgramStart raceProgramStart = (RaceProgramStart)raceProgramStartParser.parse();
+            RaceProgramStart raceProgramStart = (RaceProgramStart)raceProgramStartParser.parse(conn);
             //raceProgramStart.setValues();
             raceProgramFile.setRaceProgramStart(raceProgramStart);
             return raceProgramFile;
@@ -69,6 +69,7 @@ public class RaceProgramFileParser {
             throw e;
         } catch (Exception e) {
             Log.write(e, raceProgramFile.toString());
+            e.printStackTrace();
         }
         return null;
     }
@@ -113,7 +114,7 @@ public class RaceProgramFileParser {
 
             RaceProgramFile raceProgramFile = (RaceProgramFile) raceProgramDirectory.createFile(filename);
             RaceProgramFileParser raceProgramFileParser = new RaceProgramFileParser(raceProgramFile, conn);
-            raceProgramFile = (RaceProgramFile)raceProgramFileParser.parse();
+            raceProgramFile = (RaceProgramFile)raceProgramFileParser.parse(conn);
 
         } catch (IOException e) {
             e.printStackTrace();

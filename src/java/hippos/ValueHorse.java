@@ -221,15 +221,16 @@ public class ValueHorse implements Comparable {
         sb.append("\n\n");
         sb.append(raceProgramHorse.toString());
 
-        sb.append("\n\t    Reg: " + raceProgramHorse.getxList());
+        sb.append("\n\n\t    Reg: " + raceProgramHorse.getxList());
         sb.append("\n\t    Max: " + maxValue);
         sb.append("\n\t    Min: " + minValue);
         //sb.append("\n\t    Val: " + value);
 
         //for(int i = raceProgramHorse.getSubStartList().size(); i > 0; i--) {
+        /*
         for(SubStart subStart : raceProgramHorse.getSubStartList()) {
             sb.append("\n\t\t" + subStart.toValueString());
-        }
+        }*/
 
         /*
         sb.append("\n" + raceProgramHorse.getRaceProgramDriver().toString());

@@ -71,15 +71,19 @@ public class Voittajapeli implements Totopeli {
             BigDecimal panos = BigDecimal.valueOf(-1);
 
             for(RaceResultHorse raceResultHorse : voittajaHevoset) {
-                String totoNimi = totoHevonen.getRaceProgramHorse().getRaceHorseName();
-                String tulosNimi = raceResultHorse.getRaceHorseName();
+                try {
+                    String totoNimi = totoHevonen.getRaceProgramHorse().getRaceHorseName();
+                    String tulosNimi = raceResultHorse.getRaceHorseName();
 
-                if(totoNimi.equals(tulosNimi)) {
-                    // Voitto
-                    BigDecimal voittokerroin = raceResultHorse.getRaceResultWinOdds();
-                    panos = panos.add(voittokerroin);
+                    if(totoNimi.equals(tulosNimi)) {
+                        // Voitto
+                        BigDecimal voittokerroin = raceResultHorse.getRaceResultWinOdds();
+                        panos = panos.add(voittokerroin);
 
-                    System.out.println(panos + "€");
+                        System.out.println(panos + "€");
+                    }
+                } catch (Exception e) {
+                    e.printStackTrace();
                 }
             }
             gameStats.add(panos);

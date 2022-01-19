@@ -14,8 +14,11 @@ import java.io.IOException;
 import java.math.BigDecimal;
 import java.net.MalformedURLException;
 import java.net.URL;
+import java.sql.Connection;
+import java.util.ArrayList;
 import java.util.Date;
 import java.text.SimpleDateFormat;
+import java.util.List;
 import java.util.StringTokenizer;
 
 /**
@@ -72,7 +75,7 @@ public class RaceHorseHistoryParser implements FileParser {
 
             this.raceLinkPage = new WebPage(raceHistoryPageUrl);
 
-            System.out.println("RaceHorseHistoryParser.RaceHorseHistoryParser: " + raceHistoryPageUrl);
+            System.out.println("\n\nRaceHorseHistoryParser.RaceHorseHistoryParser: " + raceHistoryPageUrl);
 
         } catch (MalformedURLException e) {
             e.printStackTrace();
@@ -81,11 +84,14 @@ public class RaceHorseHistoryParser implements FileParser {
     }
 
     @Override
-    public Object parse() {
-        try {
+    public Object parse() throws Exception {
+        return null;
+    }
 
-            if (raceProgramHorse.getRaceHorseName().equals("Citius S"))
-                System.out.print("Citius");
+    public Object parse(Connection conn) {
+        List<SubStart> newSubStarts = new ArrayList<>();
+
+        try {
 
             if (raceLinkPage != null) {
 
@@ -285,7 +291,10 @@ public class RaceHorseHistoryParser implements FileParser {
 
                                 //Yrittää tallettaa tuloksen, ja heittää ExistsInDatabaseException(), jos jo tietokannassa
                                 if(raceProgramHorse != null) {
-                                    subStart.insert(raceProgramHorse);
+                                    if(subStart.existsInDatabase(conn))
+                                        throw new ExistsInDatabaseException();
+
+                                    newSubStarts.add(0, subStart);
                                 }
                                 //}
                             } catch (AbsentException ae) {
@@ -303,9 +312,15 @@ public class RaceHorseHistoryParser implements FileParser {
                                 String racePLace = subStart.getRacePlace();
                                 if(!racePLace.equals(subStart.getLocality())) {
                                     subStart.delete();
-                                    subStart.insert(raceProgramHorse);
+                                    newSubStarts.add(0, subStart);
+                                    //subStart.insert(raceProgramHorse);
                                     continue;
                                 }
+
+                                for(SubStart newSubStart : newSubStarts) {
+                                    newSubStart.insert(conn, raceProgramHorse);
+                                }
+
                                 throw e;
                             } catch (Exception e) {
                                 if(raceProgramHorse != null)
@@ -314,6 +329,11 @@ public class RaceHorseHistoryParser implements FileParser {
                                     e.printStackTrace();
                             }
                         }
+
+                        for(SubStart newSubStart : newSubStarts) {
+                            newSubStart.insert(conn, raceProgramHorse);
+                        }
+
                     }
                 }
 

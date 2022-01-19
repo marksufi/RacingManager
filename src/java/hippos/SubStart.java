@@ -12,6 +12,7 @@ import utils.Log;
 import java.io.IOException;
 import java.io.Writer;
 import java.math.BigDecimal;
+import java.math.RoundingMode;
 import java.sql.Connection;
 import java.sql.PreparedStatement;
 import java.sql.ResultSet;
@@ -84,6 +85,7 @@ public class SubStart implements Comparable {
         trackId = set.getString("RATA_TUNNISTE");
         weather = set.getString("WEATHER");
         subDriver = new SubDriver(set.getString("KULJETTAJA"));
+        subDriver.setWinRate(set.getBigDecimal("KVP"));
         coach = new Coach(set.getString("VALMENTAJA"));
         locality = set.getString("PAIKKA");
         date = set.getDate("PVM");
@@ -123,7 +125,7 @@ public class SubStart implements Comparable {
         try {
             int i = 0;
             if (subStart != null) {
-                String[] tokens = subStart.split(";", 9);
+                String[] tokens = subStart.split(";", 10);
                 trackId = tokens[i++];
                 if(trackId.contains("null"))
                     trackId = null;
@@ -151,8 +153,10 @@ public class SubStart implements Comparable {
                 award = new AlphaNumber(tokens[i++]).getBigDecimal();
                 kCode = new BigDecimal(tokens[i++]);
 
-                String driverClass = tokens[i++];
-                this.driverRaceTypeClass = new BigDecimal(driverClass);
+                String driver = tokens[i++];
+                this.subDriver = new SubDriver(driver);
+
+                this.subDriver.setWinRate(new AlphaNumber(tokens[i++]).getBigDecimal());
 
                 setDate(raceProgramHorse.getRaceProgramStart().getDate(), new BigDecimal(dateDiffStr));
                 setRaceMode(new RaceMode(subTime.getAlpha()));
@@ -232,15 +236,12 @@ public class SubStart implements Comparable {
         this.coach = coach;
     }
 
-    public void insert(RaceProgramHorse raceProgramHorse) throws ExistsInDatabaseException {
+    public void insert(Connection conn, RaceProgramHorse raceProgramHorse) throws ExistsInDatabaseException {
         PreparedStatement stmt = null;
-        Connection conn;
         String name = raceProgramHorse.getRaceHorseName();
         int i = 1;
 
         try {
-            conn = Database.getConnection();
-
             if(existsInDatabase(conn))
                 throw new ExistsInDatabaseException();
 
@@ -248,7 +249,7 @@ public class SubStart implements Comparable {
 
             stmt.setString(i++, name);
             stmt.setString(i++, this.raceLiteral);
-            stmt.setString(i++, this.subDriver.toString());
+            stmt.setString(i++, this.subDriver.getName());
             stmt.setString(i++, this.coach.toString());
             stmt.setString(i++, this.locality);
             stmt.setString(i++, this.weather);
@@ -280,6 +281,45 @@ public class SubStart implements Comparable {
         } finally {
             try { if(stmt != null) stmt.close(); } catch (SQLException e) { e.printStackTrace();}
         }
+
+        insertDriverWinRate(conn, raceProgramHorse);
+    }
+
+
+    private void insertDriverWinRate(Connection conn, RaceProgramHorse raceProgramHorse) {
+
+        PreparedStatement stmt = null;
+        try {
+
+            BigDecimal driwerWinRate = subDriver.fetchWinRate(conn, this);
+            if(driwerWinRate != null) {
+                driwerWinRate = driwerWinRate.multiply(BigDecimal.valueOf(100.00)).setScale(2, RoundingMode.HALF_UP);
+            }
+
+            StringBuilder sb = new StringBuilder();
+            sb.append("update SUBRESULT set KVP=? ");
+            sb.append("where NIMI=? and LAJI=? and PVM=? and LAHTONUMERO=?");
+
+            stmt = conn.prepareStatement(sb.toString());
+            stmt.setBigDecimal(1, driwerWinRate);
+            stmt.setString(2, this.raceProgramHorse.getRaceHorseName());
+            stmt.setString(3, this.raceLiteral);
+            stmt.setDate(4, DateUtils.toSQLDate(this.date));
+            stmt.setBigDecimal(5, this.startNumber);
+
+            stmt.executeUpdate();
+            conn.commit();
+
+        } catch (Exception e) {
+            e.printStackTrace();
+        } finally {
+            try {
+                stmt.close();
+            } catch (SQLException e) {
+                e.printStackTrace();
+            }
+        }
+
     }
 
     public static PreparedStatement getInsertStatement(Connection conn) {
@@ -300,6 +340,7 @@ public class SubStart implements Comparable {
         return stmt;
     }
 
+    /*
     public void insert(Connection conn, String hid, RaceResultHorse raceResultHorse) throws ExistsInDatabaseException {
         PreparedStatement stmt = null;
         String name = raceResultHorse.getRaceHorseName().toString();
@@ -363,7 +404,7 @@ public class SubStart implements Comparable {
         } finally {
             try { if(stmt != null) stmt.close(); } catch (SQLException e) { e.printStackTrace();}
         }
-    }
+    }*/
 
     public boolean existsInDatabase(Connection conn) {
         PreparedStatement statement = null;
@@ -606,7 +647,9 @@ public class SubStart implements Comparable {
 
         StringBuffer p = new StringBuffer();
         try {
-            p.append(StringUtils.parse(subDriver != null ? (String) subDriver.getName() : "", ' ', 25, StringUtils.ALIGN_LEFT));
+            p.append(StringUtils.parse(subDriver != null ? (String) subDriver.toString() : "", ' ', 35, StringUtils.ALIGN_LEFT));
+            //if (subDriver != null)
+            //    p.append("(" + subDriver.winRate + "%)");
             p.append(StringUtils.parse(locality != null ? locality : "", ' ', 4, StringUtils.ALIGN_LEFT));
             p.append(StringUtils.parse(date != null ? df.format(date) : "", ' ', 10, StringUtils.ALIGN_LEFT));
             //p.append(StringUtils.parse(gapString != null ? gapString : "", ' ', 4, StringUtils.ALIGN_LEFT));

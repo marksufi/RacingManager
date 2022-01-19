@@ -2,6 +2,7 @@ package hippos.io;
 
 
 import java.io.IOException;
+import java.sql.Connection;
 
 /**
  * Created by IntelliJ IDEA.
@@ -16,4 +17,5 @@ import java.io.IOException;
  */
 public interface FileParser {
     public Object parse() throws Exception;
+    public Object parse(Connection conn) throws Exception;
 }
