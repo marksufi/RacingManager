@@ -6,6 +6,7 @@ import hippos.util.Mapper;
 import hippos.math.Value;
 import hippos.math.betting.*;
 import hippos.math.racing.SectionalTime;
+import hippos.utils.HorsesHelper;
 import utils.Log;
 
 import java.io.IOException;
@@ -340,21 +341,33 @@ public class RaceResultStart extends RaceStart {
         return statement;
     }*/
 
-    private PreparedStatement getRaceResultHorsesStatement(Connection conn, String lid) throws SQLException {
+    private PreparedStatement getRaceResultHorsesStatement(Connection conn, String id) throws SQLException {
         PreparedStatement statement = null;
-        StringBuffer sb = new StringBuffer();
 
-        sb.append("select NUMERO, SIJOITUS, NIMI, KULJETTAJA, ");
-        sb.append("AIKA, LAHTOTYYPPI, XCODE, X, KERROIN, PALKINTO, MATKA, RATA, TASOITUS, RATA_TUNNISTE, ");
-        sb.append("VA_1, VA_2, V500 ");
-        //sb.append("from RESULTHORSE where ID like ?");
-        sb.append("from RESULTHORSE where PVM=? and LAHTONUMERO=? ");
-        sb.append("order by NUMERO");
+        try {
 
-        statement = conn.prepareStatement(sb.toString());
-        //statement.setString(1, lid + "%");
-        statement.setDate(1, this.getSQLDate());
-        statement.setBigDecimal(2, this.getStartNumber());
+            String shortlocality = HorsesHelper.getShortLocalityFromId(id);
+
+            StringBuffer sb = new StringBuffer();
+
+            sb.append("select NUMERO, SIJOITUS, NIMI, KULJETTAJA, ");
+            sb.append("AIKA, LAHTOTYYPPI, XCODE, X, KERROIN, PALKINTO, MATKA, RATA, TASOITUS, RATA_TUNNISTE, ");
+            sb.append("VA_1, VA_2, V500 ");
+            //sb.append("from RESULTHORSE where ID like ?");
+            sb.append("from RESULTHORSE where PVM=? and LAHTONUMERO=? and PAIKKA=? ");
+            sb.append("order by NUMERO");
+
+            statement = conn.prepareStatement(sb.toString());
+            //statement.setString(1, lid + "%");
+            statement.setDate(1, this.getSQLDate());
+            statement.setBigDecimal(2, this.getStartNumber());
+            statement.setString(3, shortlocality);
+
+        } catch (SQLException e) {
+            Log.write(e);
+            e.printStackTrace();
+
+        }
 
         return statement;
     }

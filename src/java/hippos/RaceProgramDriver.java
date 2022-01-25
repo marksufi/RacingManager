@@ -56,7 +56,8 @@ public class RaceProgramDriver extends Person {
 
         try {
             sb.append(super.toString());
-            sb.append("(" + driverForm.raceTypeForm.firstRateProcents(2) + "%)");
+            //sb.append("(" + driverForm.raceTypeForm.firstRateProcents(2) + "%)");
+            //sb.append("(" + driverForm.getJockeyClass() + ")");
 
         } catch (Exception e) {
             e.printStackTrace();

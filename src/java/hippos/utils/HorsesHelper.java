@@ -608,5 +608,25 @@ public class HorsesHelper {
 
         return new AlphaNumber(number.setScale(2), "%");
     }
+
+    public static String getShortLocalityFromId(String id) {
+
+        String lind = null;
+
+        try {
+            lind = id.substring(id.indexOf("_CE") + 3);
+
+            for(int i = lind.indexOf("_"); i >= 0; i=-1)
+                lind = lind.substring(0, i);
+
+        } catch (Exception e) {
+            Log.write(e);
+            e.printStackTrace();
+
+        }
+
+        return lind;
+
+    }
 }
 

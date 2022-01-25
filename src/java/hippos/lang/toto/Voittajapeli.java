@@ -3,6 +3,7 @@ package hippos.lang.toto;
 import hippos.*;
 import hippos.io.RaceProgramFile;
 import hippos.math.betting.BetRate;
+import utils.Log;
 
 import java.math.BigDecimal;
 import java.sql.Connection;
@@ -78,11 +79,15 @@ public class Voittajapeli implements Totopeli {
                     if(totoNimi.equals(tulosNimi)) {
                         // Voitto
                         BigDecimal voittokerroin = raceResultHorse.getRaceResultWinOdds();
-                        panos = panos.add(voittokerroin);
+                        if(voittokerroin != null)
+                            panos = panos.add(voittokerroin);
+                        else
+                            panos = BigDecimal.ZERO;
 
                         System.out.println(panos + "€");
                     }
                 } catch (Exception e) {
+                    Log.write(e, raceResultHorse.getId());
                     e.printStackTrace();
                 }
             }

@@ -290,7 +290,7 @@ public class RaceResultHorse extends Horse implements Comparable {
             //	VA_2 NUMBER ( 3, 1 ),
             //	V500 NUMBER ( 3, 1 ),
 
-            //stmt.setString(i++, getId());
+            stmt.setString(i++, this.getRaceResultStart().raceResultFile.getLocality().getShortLocality());
             stmt.setDate(i++, getSQLDate());
             stmt.setBigDecimal(i++, getRaceResultStart().getStartNumber());
             stmt.setBigDecimal(i++, getRaceRanking());
@@ -319,6 +319,7 @@ public class RaceResultHorse extends Horse implements Comparable {
             throw e;
         } catch (Exception e) {
             Log.write(e, getId());
+            e.printStackTrace();
         } finally {
             try { stmt.close(); } catch ( Exception e ) { }
         }
@@ -330,12 +331,12 @@ public class RaceResultHorse extends Horse implements Comparable {
         try {
             StringBuffer sb = new StringBuffer();
             sb.append("insert into RESULTHORSE ");
-            sb.append("(PVM, LAHTONUMERO, SIJOITUS, NUMERO, NIMI, ");
+            sb.append("(PAIKKA, PVM, LAHTONUMERO, SIJOITUS, NUMERO, NIMI, ");
             sb.append("LAJI, KULJETTAJA, AIKA, LAHTOTYYPPI, XCODE, ");
             sb.append("X, KERROIN, PALKINTO, MATKA, RATA, TASOITUS, RATA_TUNNISTE, ");
             sb.append("VA_1, VA_2, V500) ");
 
-            sb.append("values(?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?)");
+            sb.append("values(?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?)");
 
             stmt = conn.prepareStatement(sb.toString());
         } catch (Exception e) {

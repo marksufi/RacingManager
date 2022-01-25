@@ -1,4 +1,5 @@
 DROP TABLE SUBRESULT;
+DROP INDEX subresult_nimi_idx;
 DROP INDEX subresult_kuljettaja_idx;
 DROP INDEX subresult_lahtotyyppi_idx;
 
@@ -28,7 +29,8 @@ CREATE TABLE SUBRESULT (
     PALKINTO NUMBER ( 7, 0 ),
 	CONSTRAINT PK_SUBRESULT PRIMARY KEY (NIMI, LAJI, PVM, LAHTONUMERO)
 	);
-CREATE INDEX subresult_kuljettaja_idx on subresult(kuljettaja, pvm);
+CREATE INDEX subresult_nimi_idx on subresult(nimi);
+CREATE INDEX subresult_kuljettaja_idx on subresult(kuljettaja, pvm, kerroin);
 CREATE INDEX subresult_lahtotyyppi_idx on subresult(lahtotyyppi, kcode, x);
 
 commit;

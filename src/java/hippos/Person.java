@@ -12,6 +12,11 @@ public class Person {
 
     public Person(String name) {
         try {
+            /* Ei tarvi enään
+            for(int i = name.indexOf("(") ; i >= 0; i = -1) {
+                name = name.substring(0, i);
+            };*/
+
             this.name = name;
 
             StringTokenizer st = new StringTokenizer(this.name);
@@ -65,6 +70,7 @@ public class Person {
     }
 
     public void setName(String name) {
+
         this.name = name;
     }
 

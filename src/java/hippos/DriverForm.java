@@ -2,7 +2,10 @@ package hippos;
 
 import hippos.lang.stats.Form;
 import hippos.utils.DateUtils;
+import utils.Log;
 
+import java.math.BigDecimal;
+import java.math.RoundingMode;
 import java.sql.Connection;
 import java.sql.PreparedStatement;
 import java.sql.ResultSet;
@@ -43,6 +46,17 @@ public class DriverForm extends Person implements Comparable {
         raceTypeForm.setAwards(raceSet.getBigDecimal("K_R"));
         raceTypeForm.setKcode(raceSet.getBigDecimal("K_PAALU"));
         raceTypeForm.setXcode(raceSet.getBigDecimal("K_X"));
+
+        try {
+            BigDecimal winrate = raceTypeForm.getFirsts().divide(raceTypeForm.getStarts(), 4, RoundingMode.HALF_UP);
+            winrate = winrate.multiply(BigDecimal.valueOf(100.00));
+
+            raceTypeForm.setDriverWinRates(winrate);
+        } catch (ArithmeticException e) {
+            // jaettuna nollalla startilla
+        } catch (Exception e) {
+            Log.write(e);
+        }
     }
 
     public Form fetchRaceTypeForm(Connection conn, Date date, String raceType) {
@@ -57,7 +71,7 @@ public class DriverForm extends Person implements Comparable {
             sb.append("from SUBRESULT ");
             sb.append("where kuljettaja like ? ");
             sb.append("and pvm < ? ");
-            sb.append("and lahtotyyppi = ? ");
+            //sb.append("and lahtotyyppi = ? ");
             sb.append("and KERROIN is not null");
 
             stmt = conn.prepareStatement(sb.toString());
@@ -66,7 +80,7 @@ public class DriverForm extends Person implements Comparable {
 
             stmt.setString(1, sqlSearchName);
             stmt.setDate(2, sqlEndDate);
-            stmt.setString(3, raceType);
+            //stmt.setString(3, raceType);
             rs = stmt.executeQuery();
 
             raceTypeForm.init(rs);

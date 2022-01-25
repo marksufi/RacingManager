@@ -157,10 +157,12 @@ public class TimeForm extends Form {
 
     public String toString() {
         StringBuffer sb = new StringBuffer();
-        sb.append(getLabel() + ": " + getStarts() + " " + getFirsts() + "-" + getSeconds() + "-" + getThirds() + " (" + getAwardRate() + "€/s) " );
-        sb.append("-> " + getKcode() + "(" + getKcodeProcents(BigDecimal.ZERO) + "%)");
-        sb.append(" - " + getXcode() + "x(" + getXcodeProcents(BigDecimal.ZERO) + "%)");
+        //sb.append(getLabel() + ": " + getStarts() + " " + getFirsts() + "-" + getSeconds() + "-" + getThirds() + " (" + getAwardRate() + "€/s) " );
+        //sb.append("-> " + getKcode() + "(" + getKcodeProcents(BigDecimal.ZERO) + "%)");
+        //sb.append(" - " + getXcode() + "x(" + getXcodeProcents(BigDecimal.ZERO) + "%)");
         //sb.append("{" + getProbability() + "%} ");
+
+        sb.append(super.toString());
 
         sb.append(" " + recordTimes);
 

@@ -433,12 +433,29 @@ public class Form {
 
     }
 
+    public BigDecimal getDriverWinratesAverage(int scale) {
+        try {
+            return driverWinRates.divide(starts, scale, RoundingMode.HALF_UP);
+
+        } catch (NullPointerException e) {
+
+        } catch (ArithmeticException e) {
+
+        } catch (Exception e) {
+            Log.write(e);
+            e.printStackTrace();
+        }
+        return BigDecimal.ZERO;
+    }
+
     public BigDecimal getDriverWinRates() {
         return driverWinRates;
     }
 
     public void setDriverWinRates(BigDecimal driverWinRates) {
-        this.driverWinRates = driverWinRates;
+        if(driverWinRates != null) {
+            this.driverWinRates = driverWinRates;
+        }
     }
 
     public String toTinyString() {
@@ -470,7 +487,7 @@ public class Form {
 
         try {
             str.append(" D(");
-            str.append(driverWinRates.divide(starts, 2, RoundingMode.HALF_UP) + "%");
+            str.append(getDriverWinratesAverage(2) + "%");
             str.append(")");
         } catch (NullPointerException e) {
             str.append(BigDecimal.ZERO);

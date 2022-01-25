@@ -368,7 +368,8 @@ select PVM, TYYPPI, LAHTOTYYPPI, AIKA, SIJOITUS as SIJA, X, XCODE, PALKINTO from
 
 select count(*), sum(S_1), sum(S_2), sum(S_3), MAX( SIJOITUS ) KEEP ( DENSE_RANK LAST ORDER BY PVM ) AS lastResult, sum(palkinto), sum(KCODE), sum(X), min(AIKA) Aika, TYYPPI, LAHTOTYYPPI from SUBRESULT where NIMI='Uljas Suomalainen' and laji='K' group by TYYPPI, LAHTOTYYPPI, KCODE;
 select count(*), sum(S_1), sum(S_2), sum(S_3), MAX( SIJOITUS ) KEEP ( DENSE_RANK LAST ORDER BY PVM ) AS lastResult, sum(palkinto), sum(KCODE), sum(X), min(AIKA) Aika, TYYPPI, LAHTOTYYPPI from SUBRESULT where NIMI='Little Star Ear' and laji='L' and PVM < '1-JAN-12' group by TYYPPI, LAHTOTYYPPI, KCODE;
-select count(*), sum(S_1), sum(S_2), sum(S_3), MAX( SIJOITUS ) KEEP ( DENSE_RANK LAST ORDER BY PVM ) AS lastResult, sum(palkinto), sum(KCODE), sum(X), min(AIKA) Aika, LAHTOTYYPPI from SUBRESULT where NIMI='Wendietta' and laji='K' and PVM < '1-JAN-12' group by LAHTOTYYPPI, KCODE, X;
+select count(*), sum(S_1), sum(S_2), sum(S_3), MAX( SIJOITUS ) KEEP ( DENSE_RANK LAST ORDER BY PVM ) AS lastResult, sum(palkinto), sum(KCODE), sum(X), sum(KVP), min(AIKA) Aika, LAHTOTYYPPI from SUBRESULT where NIMI='Romme' and laji='K' and PVM < '16-APR-12' group by LAHTOTYYPPI, KCODE, X;
+select * from SUBRESULT where NIMI='Romme' and laji='K';
 
 MAX( SIJOITUS ) KEEP ( DENSE_RANK LAST ORDER BY PVM ) AS lastResult
 

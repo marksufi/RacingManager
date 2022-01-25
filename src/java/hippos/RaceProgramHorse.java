@@ -146,8 +146,8 @@ public class RaceProgramHorse extends Horse {
             stmt.setString( i++, getLid());
             stmt.setString( i++, getTrackId());
             stmt.setBigDecimal( i++, getHorseProgNumber());
-            stmt.setString( i++, getRaceHorseName().toString());
-            stmt.setString( i++, getRaceProgramDriver().toString());
+            stmt.setString( i++, getRaceHorseName());
+            stmt.setString( i++, getRaceProgramDriver().getName());
             stmt.setString( i++, coach.toString());
             stmt.setBigDecimal( i++, getRaceLength());
             stmt.setBigDecimal( i++, getRaceTrack());
@@ -893,7 +893,7 @@ public class RaceProgramHorse extends Horse {
 
             str.append(getHorseProgNumber());
             str.append("(" + getTrackId() + ")");
-            str.append("\t" + getRaceHorseName() + " (" + getRaceProgramDriver() + ")");
+            str.append("\t" + getRaceHorseName());
             if (raceResultHorse != null) {
                 str.append(" => " + raceResultHorse.toString());
             }
@@ -933,7 +933,8 @@ public class RaceProgramHorse extends Horse {
 
             //str.append("\n\t" + coach);
             if(this.raceProgramDriver != null) {
-                str.append("\n\t" + raceProgramDriver.getDriverForm().getForm());
+                str.append("\n\t" + getRaceProgramDriver().toString());
+                str.append("\n\t" + raceProgramDriver.getDriverForm().getForm().toString());
             }
 
             for(SubStart subStart : subStartList) {
