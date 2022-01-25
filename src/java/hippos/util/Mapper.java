@@ -57,10 +57,14 @@ public class Mapper<T> {
      * @return      Tannettu arvo, jos löytyy, muuten null
      */
     public T get(List keys) {
+        iKey = null;
+
         return get(initMap, keys.iterator(), null);
     }
 
     public T get(Object key)  {
+        iKey = null;
+
         return get(initMap, Collections.singletonList(key).iterator(), null);
     }
 
@@ -73,11 +77,13 @@ public class Mapper<T> {
      * @return  Tannettu arvo, jos löytyy, muuten uusi newT tietue
      */
     public T getOrCreate(List keys, T newT) {
+        iKey = null;
 
         return get(initMap, keys.iterator(), newT);
     }
 
     public T getOrCreate(Object key, T newT) {
+        iKey = null;
 
         return get(initMap, Collections.singletonList(key).iterator(), newT);
     }
@@ -105,10 +111,14 @@ public class Mapper<T> {
      * @param value Tallennettava tieto
      */
     public void put(List keys, T value) {
+        iKey = null;
+
         add(initMap, keys.iterator(), value);
     }
 
     public void put(Object key, T value) {
+        iKey = null;
+
         add(initMap, Collections.singletonList(key).iterator(), value);
     }
 
@@ -133,10 +143,14 @@ public class Mapper<T> {
     private class MapperCell<T> {
         TreeMap <Object, MapperCell> cellMap = new TreeMap<>();
         TreeMap <Object, T> valuemap = new TreeMap<>();
+        T value;
 
         public T getValue(Object iKey, T newT) {
-            if(iKey == null)
-                return newT;
+            if(iKey == null) {
+                if(newT != null && value == null)
+                    value = newT;
+                return value;
+            }
 
             if(newT != null && !valuemap.containsKey(iKey))
                 valuemap.put(iKey, newT);
@@ -152,7 +166,10 @@ public class Mapper<T> {
 
         public void put(Object iKey, T value) {
             try {
-                valuemap.put(iKey, value);
+                if(iKey != null)
+                    valuemap.put(iKey, value);
+                else
+                    this.value = value;
             } catch (Exception e) {
                 e.printStackTrace();
             }
@@ -160,7 +177,10 @@ public class Mapper<T> {
 
         public T get(Object key)  {
             try {
-                return valuemap.get(key);
+                if(key != null)
+                    return valuemap.get(key);
+
+                return this.value;
             } catch (NullPointerException e) {
                 // Avainta ei löyvy
             } catch (Exception e) {
@@ -190,6 +210,9 @@ public class Mapper<T> {
         Mapper <Value> mapper = new Mapper();
 
         // tyhjä
+
+        //mapper.put(keyList, new Value(0.0));
+        mapper.getOrCreate(keyList, new Value(0));
         System.out.println("Mapper.main " + keyList + " => " + mapper.get(keyList));
 
         //
@@ -221,6 +244,8 @@ public class Mapper<T> {
         mapper.getOrCreate(keyList, new Value()).add(4);
         System.out.println("Mapper.main " + keyList + " => " + mapper.get(keyList));
 
+        mapper.getOrCreate(new ArrayList(), new Value()).add(5);
+        System.out.println("Mapper.main " + new ArrayList<>() + " => " + mapper.get(new ArrayList()));
 
     }
 
