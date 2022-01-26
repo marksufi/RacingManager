@@ -10,6 +10,7 @@ import utils.Log;
 import java.math.BigDecimal;
 import java.math.RoundingMode;
 import java.util.Date;
+import java.util.List;
 
 /**
  * Created by IntelliJ IDEA.
@@ -627,6 +628,18 @@ public class HorsesHelper {
 
         return lind;
 
+    }
+
+    public static double [] mapToDouble(List <Double> list) {
+        try {
+            double[] arr = list.stream().mapToDouble(Double::doubleValue).toArray();
+
+            return arr;
+        } catch (Exception e) {
+            e.printStackTrace();
+        }
+
+        return null;
     }
 }
 
