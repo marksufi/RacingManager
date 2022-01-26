@@ -1,6 +1,7 @@
 package hippos.utils;
 
 import hippos.ValueHorse;
+import utils.Log;
 
 import java.math.BigDecimal;
 
@@ -12,27 +13,32 @@ public class ValueComparator implements Comparable {
         }
 
         public int compareTo(Object o) {
-            ValueHorse anotherHorse = (ValueHorse)o;
+            BigDecimal valueA = null;
+            BigDecimal valueB = null;
+            try {
+                ValueHorse anotherHorse = (ValueHorse)o;
 
-            //BigDecimal maxListA = horse.getPowerValue();
-            //BigDecimal maxListB = this.getPowerValue();
+                valueA = valueHorse.getValue().average();
+                valueB = anotherHorse.getValue().average();
 
-            BigDecimal maxListA = anotherHorse.getValue();
-            BigDecimal maxListB = valueHorse.getValue();
+                if(valueHorse.hashCode() == anotherHorse.hashCode())
+                    return 0;
 
-            if(maxListA != null) {
-                if(maxListB != null) {
-                    if(!maxListA.equals(maxListB)){
-                        int c = maxListA.compareTo(maxListB);
-                        return c;
-                    }
-                }
+                if(valueA.compareTo(valueB) == 0)
+                    return -1;
+
+                return valueA.compareTo(valueB);
+            } catch (ArithmeticException e) {
+
+            } catch (Exception e) {
+                Log.write(e);
             }
 
-            if(this.equals(anotherHorse)) {
-                return 0;
-            }
-            return 1;
+            if(valueA == null)
+                return -1;
+            if(valueB == null)
+                return 1;
+            return -1;
         }
 }
 

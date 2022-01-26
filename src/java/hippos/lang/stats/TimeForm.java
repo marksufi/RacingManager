@@ -210,6 +210,10 @@ public class TimeForm extends Form {
 
     }
 
+    public SortedSet<AlphaNumber> getRecordTimes() {
+        return recordTimes;
+    }
+
     /*
     private double[] getRegX(TimeStatistics timeStatistics) throws RegressionModelException {
         try {

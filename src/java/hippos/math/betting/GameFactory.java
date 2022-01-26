@@ -189,13 +189,13 @@ public class GameFactory {
             while(itr.hasNext()) {
                 ValueHorse horse = (ValueHorse)itr.next();
 
-                List valueList = horse.getValueListA();
+                //List valueList = horse.getValueListA();
 
                 //BigDecimal listMax = horse.getPowerValue();
                 //BigDecimal listAvg = HorsesHelper.getAverage(valueList);
-                BigDecimal listMax = horse.getMaxValue().average(2, BigDecimal.ZERO);
-                BigDecimal listAvg = horse.getMinValue().average(2, BigDecimal.ZERO);
-
+                //BigDecimal listMax = horse.getMaxValue().average(2, BigDecimal.ZERO);
+                //BigDecimal listAvg = horse.getMinValue().average(2, BigDecimal.ZERO);
+                /*
                 if(listMax != null && listAvg!= null) {
                     //BigDecimal avg = ( listMax.add(listAvg)).divide(BigDecimal.valueOf(2.0), 2, BigDecimal.ROUND_HALF_UP);
                     BigDecimal avg = listAvg;

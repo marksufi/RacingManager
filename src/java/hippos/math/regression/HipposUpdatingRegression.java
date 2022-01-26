@@ -67,13 +67,7 @@ public class HipposUpdatingRegression extends MillerUpdatingRegression {
             System.out.println("getCovarianceOfParameters(1, 2): " + regress().getCovarianceOfParameters(1, 2));
             System.out.println("getCovarianceOfParameters(1, 3): " + regress().getCovarianceOfParameters(1, 3));
             System.out.println("getCovarianceOfParameters(2, 3): " + regress().getCovarianceOfParameters(2, 3));
-
-
-            double c = x[3] / x[0];
-
-            System.out.println("B <> C = " + b + " <> " + c);
             */
-
             return b;
         } catch (ModelSpecificationException me) {
             throw me;

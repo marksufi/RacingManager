@@ -8,6 +8,7 @@ import hippos.lang.stats.YearStatistics;
 import hippos.math.*;
 import hippos.math.regression.HipposRegressionResults;
 import hippos.util.SubValueList;
+import hippos.utils.HorsesHelper;
 import hippos.utils.ValueComparator;
 import org.apache.commons.math3.distribution.NormalDistribution;
 import org.apache.commons.math3.exception.NotStrictlyPositiveException;
@@ -15,6 +16,7 @@ import org.apache.commons.math3.stat.regression.ModelSpecificationException;
 import utils.Log;
 
 import java.math.BigDecimal;
+import java.math.RoundingMode;
 import java.util.*;
 import java.util.Date;
 
@@ -30,14 +32,9 @@ import java.util.Date;
 public class ValueHorse implements Comparable {
     private RaceProgramHorse raceProgramHorse;
     private RaceResultHorse raceResultHorse;
+    private Value value = new Value();
 
-    private SubValueList value = new SubValueList();
-    private SubValueList maxValue = new SubValueList();
-    private SubValueList minValue = new SubValueList();
-    //private Value timeValue = new Value();
-    //private Value rankValue = new Value();
-
-    private List valueListA = new Vector();
+    private List <AlphaNumber> observaleList = new ArrayList();
 
     private Comparable valueComparator;
     private double[] splitTimeEffects;
@@ -55,29 +52,10 @@ public class ValueHorse implements Comparable {
 
     }
 
-    /*
-    public ValueHorse(ResultSet raceSet, Connection conn, RaceProgramStart raceProgramStart) throws SQLException {
-        this.raceProgramHorse = new RaceProgramHorse(raceSet, conn, raceProgramStart);
-        //valueComparator = new MaxValueAverageValueHorseComparator(this);
-        valueComparator = new ValueComparator(this);
-    }*/
-
-    public List getValueListA() {
-        return valueListA;
-    }
-
     public int getIndex() {
         if (index < 0)
             System.out.println("Warning! ValueHorse.getIndex(): index not set");
         return index;
-    }
-
-    public Value getMaxValue() {
-        return maxValue.getValue();
-    }
-
-    public Value getMinValue() {
-        return minValue.getValue();
     }
 
     public int compareTo(Object o) {
@@ -131,8 +109,8 @@ public class ValueHorse implements Comparable {
         return raceProgramHorse;
     }
 
-    public BigDecimal getValue() {
-        return value.getValue().average(2, BigDecimal.ZERO);
+    public Value getValue() {
+        return value;
     }
 
     public RaceResultHorse getRaceResultHorse() {
@@ -169,74 +147,46 @@ public class ValueHorse implements Comparable {
     public void setRegValues() {
         try {
 
-            double regY = raceProgramHorse.getObservation();
+            this.value = raceProgramHorse.getObservation();
 
-            maxValue.add(new Value(regY));
-
-            FullStatistics fullStatistics = raceProgramHorse.getFullStatistics();
-
-            for(SubForm subForm : fullStatistics.getSubForms().getValues()) {
-                try {
-                    regY = subForm.getRegY(fullStatistics);
-
-                    //maxValue.add(new Value(regY));
-                } catch (RegressionModelException e) {
-                    // Ei onnistunut
-                } catch (Exception e) {
-                    e.printStackTrace();
-                }
-            }
-
-            YearStatistics yearStatistics = raceProgramHorse.getYearStatistics();
-
-            for(SubForm subForm : yearStatistics.getSubForms().getValues()) {
-                try {
-                    regY = subForm.getRegY(yearStatistics);
-
-                    //maxValue.add(new Value(regY));
-                } catch (RegressionModelException e) {
-                    // Ei onnistunut
-                } catch (Exception e) {
-                    e.printStackTrace();
-                }
-            }
-
-            minValue = maxValue;
-            value = maxValue;
+        } catch (ArithmeticException e) {
+            e.printStackTrace();
 
         } catch (ModelSpecificationException e) {
-            //
-
-        } catch (NullPointerException e) {
-            // regressionMap does not exist
+            e.printStackTrace();
 
         } catch (Exception e) {
-            e.printStackTrace();
+            Log.write(e);
         }
     }
 
+    public List<AlphaNumber> getObservaleList() {
+        return observaleList;
+    }
+
+    public void setObservaleList(List<AlphaNumber> observaleList) {
+        this.observaleList = observaleList;
+    }
+
     public String toString() {
+
+        BigDecimal observerValue = null;
+        AlphaNumber presentationValue = new AlphaNumber("N/A");
+        try {
+            observerValue = this.value.average(4, BigDecimal.ZERO);
+            observerValue = BigDecimal.ONE.divide(observerValue, 4, RoundingMode.HALF_UP);
+            presentationValue = HorsesHelper.toProcents(observerValue);
+        } catch (Exception e) {
+            //e.printStackTrace();
+        }
 
         StringBuffer sb = new StringBuffer();
         sb.append("\n\n");
         sb.append(raceProgramHorse.toString());
 
-        sb.append("\n\n\t    Reg: " + raceProgramHorse.getxList());
-        sb.append("\n\t    Max: " + maxValue);
-        sb.append("\n\t    Min: " + minValue);
-        //sb.append("\n\t    Val: " + value);
+        sb.append("\n\n\t    Value: " + presentationValue);
+        sb.append(" " + raceProgramHorse.getObservableList());
 
-        //for(int i = raceProgramHorse.getSubStartList().size(); i > 0; i--) {
-        /*
-        for(SubStart subStart : raceProgramHorse.getSubStartList()) {
-            sb.append("\n\t\t" + subStart.toValueString());
-        }*/
-
-        /*
-        sb.append("\n" + raceProgramHorse.getRaceProgramDriver().toString());
-        sb.append("\n" + raceProgramHorse.getRaceProgramDriver().getForm().toString());
-        sb.append(" (" + raceProgramHorse.getRaceProgramDriver().getForm().getAwardRate() + "€/s)");
-        */
         return sb.toString();
     }
 

@@ -4,10 +4,13 @@ import hippos.database.Database;
 import hippos.database.Statements;
 import hippos.exception.RegressionModelException;
 import hippos.lang.stats.*;
+import hippos.math.AlphaNumber;
+import hippos.math.Value;
 import hippos.math.regression.HipposUpdatingRegression;
 import hippos.util.Mapper;
 import hippos.math.Progress;
 import hippos.math.racing.QuarterTime;
+import hippos.util.ObservationFramework;
 import hippos.util.QuarterTimes;
 import hippos.utils.DateUtils;
 import hippos.utils.StringUtils;
@@ -41,7 +44,8 @@ public class RaceProgramHorse extends Horse {
 
     //private static final int regressionSize = 9;
     //private static HipposUpdatingRegression regressionMap = new HipposUpdatingRegression(regressionSize, false);
-    private static HipposUpdatingRegression regressionMap;
+    //private static HipposUpdatingRegression regressionMap;
+    private static ObservationFramework observationFramework = new ObservationFramework(3);
     private List<BigDecimal> xList = new ArrayList();
 
     BigDecimal age;
@@ -68,6 +72,7 @@ public class RaceProgramHorse extends Horse {
     private BigDecimal trackFirstQuarterPropability;
     private BigDecimal trackSecondQuarterPropability;
     private QuarterTime quarterTime2;
+    private List<AlphaNumber> observableList;
 
     public RaceProgramHorse(RaceProgramStart raceProgramStart) {
         super(raceProgramStart);
@@ -818,18 +823,43 @@ public class RaceProgramHorse extends Horse {
         return null;
     }
 
+    public List<AlphaNumber> getObservableList() {
+        List <AlphaNumber> observableList = new ArrayList();
+
+        try {
+            observableList.add(new AlphaNumber(fullStatistics.getStarts()));
+            observableList.add(new AlphaNumber(fullStatistics.getFirsts()));
+            observableList.add(new AlphaNumber(fullStatistics.getSeconds()));
+            observableList.add(new AlphaNumber(fullStatistics.getThirds()));
+
+            Set<AlphaNumber> recordTimes = fullStatistics.getRecordTimes();
+
+            int size = 0;
+            for(AlphaNumber recordTime : recordTimes) {
+                observableList.add(new AlphaNumber(recordTime));
+                if(size++ > 0)
+                    break;
+            }
+        } catch (Exception e) {
+            Log.write(e);
+        }
+
+        return observableList;
+    }
+
     public void addObservations() {
         try {
-            BigDecimal raceResultPrize = raceResultHorse.getRaceResultPrize();
 
+            BigDecimal ranking = raceResultHorse.getRaceRanking();
+            BigDecimal x = raceResultHorse.getX();
 
-            double x[] = getRegX();
+            if(ranking != null && x.intValue() == 0) {
+                List observableList = getObservableList();
 
-            if(regressionMap == null)
-                regressionMap = new HipposUpdatingRegression(x.length, false);
+                observationFramework.addObservations(observableList, ranking);
+            }
 
-            regressionMap.add(x, raceResultPrize.doubleValue());
-
+            /*
             for (SubForm subForm : fullStatistics.getSubForms().getValues()) {
                 try {
                     subForm.addObservations(raceResultPrize, fullStatistics);
@@ -850,25 +880,27 @@ public class RaceProgramHorse extends Horse {
                 } catch (Exception e) {
                     e.printStackTrace();
                 }
-            }
+            }*/
         } catch (NullPointerException e) {
-            //
+            if(raceResultHorse != null)
+                e.printStackTrace();
+
         } catch (Exception e) {
-            e.printStackTrace();
+            Log.write(e);
+
         }
     }
 
-    public double getObservation() throws ModelSpecificationException, NullPointerException {
+    public Value getObservation() throws ModelSpecificationException, NullPointerException {
         try {
-            double x[] = getRegX();
+            this.observableList = getObservableList();
 
-            return regressionMap.get(x);
+            return observationFramework.getObservations(this.observableList);
 
         } catch (ModelSpecificationException e) {
             throw e;
 
         } catch (NullPointerException e) {
-            // regressionMap does not exist yet
 
             throw e;
 

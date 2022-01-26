@@ -38,33 +38,28 @@ public class ObservationFramework {
     private Value
         getLevel(Observation map, List<AlphaNumber> observerList, Value observerValue, List baseRegX, int aStartIndex, int iLevel) {
 
-        try {
-            for(int i = aStartIndex; i < observerList.size(); i++) {
+        for(int i = aStartIndex; i < observerList.size(); i++) {
 
-                try {
-                    BigDecimal key = BigDecimal.valueOf(i);
+            try {
+                BigDecimal key = BigDecimal.valueOf(i);
 
-                    List regX = new ArrayList(baseRegX);
-                    regX.add(observerList.get(i));
+                List regX = new ArrayList(baseRegX);
+                regX.add(observerList.get(i));
 
-                    if(!map.containsKey(key))
-                        continue;
+                if(!map.containsKey(key))
+                    continue;
 
-                    if(iLevel < level) {
-                        observerValue.add(getLevel(map.get(key), observerList, observerValue, regX, i, iLevel + 1));
-                    }
-
-                    observerValue.add(map.get(key).get(regX));
-                } catch (ModelSpecificationException e) {
-                    //e.printStackTrace();
-                } catch (Exception e) {
-                    e.printStackTrace();
+                if(iLevel < level) {
+                    Value yValue = getLevel(map.get(key), observerList, observerValue, regX, i, iLevel + 1);
                 }
+
+                double doubleValue = map.get(key).get(regX);
+                observerValue.add(doubleValue);
+            } catch (ModelSpecificationException e) {
+            } catch (NullPointerException e) {
+            } catch (Exception e) {
+                e.printStackTrace();
             }
-        } catch (ModelSpecificationException e) {
-            e.printStackTrace();
-        } catch (Exception e) {
-            e.printStackTrace();
         }
 
         return observerValue;
@@ -100,7 +95,7 @@ public class ObservationFramework {
     }
 
     public static void main(String args[]) {
-        ObservationFramework observationFramework = new ObservationFramework(2);
+        ObservationFramework observationFramework = new ObservationFramework(3);
 
         List observerList1 = new ArrayList();
         observerList1.add(new AlphaNumber(22));
@@ -220,6 +215,9 @@ public class ObservationFramework {
                 return observationMap.get(alphas).get(numbers);
 
             } catch (ModelSpecificationException e) {
+                throw e;
+
+            } catch (NullPointerException e) {
                 throw e;
 
             } catch (Exception e) {
