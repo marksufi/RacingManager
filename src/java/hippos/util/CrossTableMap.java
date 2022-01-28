@@ -43,7 +43,7 @@ public class CrossTableMap implements Serializable {
     public BigDecimal get(String s1, String s2) {
         Value value = compareMethod.get(x, s1,s2);
 
-        if(value.size() > 0)
+        if(value.size().compareTo(BigDecimal.ZERO) > 0)
             return value.procents(trustLimit, scale);
         return null;
     }

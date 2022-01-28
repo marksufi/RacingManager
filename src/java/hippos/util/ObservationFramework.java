@@ -7,6 +7,7 @@ import org.apache.commons.math3.stat.regression.ModelSpecificationException;
 
 import java.math.BigDecimal;
 import java.util.ArrayList;
+import java.util.Arrays;
 import java.util.List;
 import java.util.TreeMap;
 
@@ -53,8 +54,9 @@ public class ObservationFramework {
                     Value yValue = getLevel(map.get(key), observerList, observerValue, regX, i, iLevel + 1);
                 }
 
-                double doubleValue = map.get(key).get(regX);
-                observerValue.add(doubleValue);
+                double [] doubleValue = map.get(key).get(regX);
+                observerValue.add(doubleValue[0], 1.0);
+
             } catch (ModelSpecificationException e) {
             } catch (NullPointerException e) {
             } catch (Exception e) {
@@ -199,7 +201,7 @@ public class ObservationFramework {
             }
         }
 
-        public double get(List <AlphaNumber> regX) throws ModelSpecificationException {
+        public double [] get(List <AlphaNumber> regX) throws ModelSpecificationException {
             try {
                 List alphas = new ArrayList();
                 double [] numbers = new double[regX.size()];
@@ -212,7 +214,11 @@ public class ObservationFramework {
                     numbers[i++] = alphaNumber.getNumber().doubleValue();
                 }
 
-                return observationMap.get(alphas).get(numbers);
+                double [] regress = observationMap.get(alphas).getWithR(numbers);
+                //System.out.println(Arrays.toString(numbers) + "=>"+ Arrays.toString(regress));
+
+                return regress;
+                //return observationMap.get(alphas).get(numbers);
 
             } catch (ModelSpecificationException e) {
                 throw e;

@@ -47,7 +47,6 @@ public class HipposUpdatingRegression extends MillerUpdatingRegression {
             for(int i = 0; i < x.length; i++) {
                 b += itc ? x[i] * B[i+1] : x[i] * B[i];
             }
-
             /*
             System.out.println();
             System.out.println("getPartialCorrelations(X): " + Arrays.toString(x));
@@ -75,6 +74,50 @@ public class HipposUpdatingRegression extends MillerUpdatingRegression {
             e.printStackTrace();
             throw e;
         }
+    }
+
+    public double [] getWithR(double[] x) throws ModelSpecificationException {
+        double [] value = new double[2];
+
+        try {
+            double B[] = regress().getParameterEstimates();
+            boolean itc = hasIntercept();
+            double b = itc ? B[0] : 0.0;
+
+            for(int i = 0; i < x.length; i++) {
+                b += itc ? x[i] * B[i+1] : x[i] * B[i];
+            }
+            /*
+            System.out.println();
+            System.out.println("getPartialCorrelations(X): " + Arrays.toString(x));
+            System.out.println("getPartialCorrelations(B): " + Arrays.toString(B));
+            System.out.println("getPartialCorrelations(0): " + Arrays.toString(this.getPartialCorrelations(0)));
+            System.out.println("getPartialCorrelations(1): " + Arrays.toString(this.getPartialCorrelations(1)));
+            System.out.println("getPartialCorrelations(2): " + Arrays.toString(this.getPartialCorrelations(2)));
+            System.out.println("getPartialCorrelations(3): " + Arrays.toString(this.getPartialCorrelations(3)));
+            System.out.println("getDiagonalOfHatMatrix(x): " + this.getDiagonalOfHatMatrix(x));
+            System.out.println("getOrderOfRegressors(): " + Arrays.toString(this.getOrderOfRegressors()));
+            System.out.println("getParameterEstimates(): " + Arrays.toString(regress().getParameterEstimates()));
+
+            System.out.println("getCovarianceOfParameters(1, 0): " + regress().getCovarianceOfParameters(1, 0));
+            System.out.println("getCovarianceOfParameters(0, 1): " + regress().getCovarianceOfParameters(0, 1));
+            System.out.println("getCovarianceOfParameters(0, 2): " + regress().getCovarianceOfParameters(0, 2));
+            System.out.println("getCovarianceOfParameters(0, 3): " + regress().getCovarianceOfParameters(0, 3));
+            System.out.println("getCovarianceOfParameters(1, 2): " + regress().getCovarianceOfParameters(1, 2));
+            System.out.println("getCovarianceOfParameters(1, 3): " + regress().getCovarianceOfParameters(1, 3));
+            System.out.println("getCovarianceOfParameters(2, 3): " + regress().getCovarianceOfParameters(2, 3));
+            */
+
+            value[0] = b;
+            value[1] = super.regress().getRSquared();
+        } catch (ModelSpecificationException me) {
+            throw me;
+        } catch (Exception e) {
+            e.printStackTrace();
+            throw e;
+        }
+
+        return value;
     }
 
     public double get(double x) throws ModelSpecificationException {

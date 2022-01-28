@@ -1,6 +1,7 @@
 package hippos.math;
 
 import org.apache.commons.math3.dfp.DfpField;
+import utils.Log;
 
 import java.math.BigDecimal;
 import java.math.RoundingMode;
@@ -14,8 +15,8 @@ import java.math.RoundingMode;
  */
 //public class SetValue implements DataEntry {
 public class Value implements Comparable {
-    private BigDecimal sum = new BigDecimal(0);;
-    private int count = 0;
+    private BigDecimal sum = BigDecimal.ZERO;
+    private BigDecimal count = BigDecimal.ZERO;
 
     public Value() {
     }
@@ -24,14 +25,13 @@ public class Value implements Comparable {
         this();
         if(data != null) {
             this.sum = data;
-            this.count = 1;
+            this.count = BigDecimal.ONE;
         }
     }
 
-
     public Value(BigDecimal sum, int count) {
         this.sum = sum;
-        this.count = count;
+        this.count = BigDecimal.valueOf(count);
     }
 
     public Value(Value value) {
@@ -45,24 +45,47 @@ public class Value implements Comparable {
         add(initValue);
     }
 
+    public Value(BigDecimal sum, BigDecimal count) {
+        this.sum = sum;
+        this.count = count;
+    }
+
     public Value add(BigDecimal entry) {
-        if(entry != null) {
-            sum = sum.add(entry);
-            count ++;
+        try {
+            if(entry != null) {
+                sum = sum.add(entry);
+                count = count.add(BigDecimal.ONE);
+            }
+        } catch (Exception e) {
+            Log.write(e);
         }
         return this;
     }
 
     public void add(double v) {
-        if(!Double.isInfinite(v) && !Double.isNaN(v)) {
-            add(new BigDecimal(v));
+        try {
+            add(BigDecimal.valueOf(v));
+        } catch (Exception e) {
+            Log.write(e);
         }
     }
 
-    public void add(BigDecimal entry, int count) {
-        if(entry != null) {
-            sum = sum.add(entry);
-            this.count += count;
+    public void add(double [] v) {
+        try {
+            add(v[0], v[1]);
+        } catch (Exception e) {
+            Log.write(e);
+        }
+    }
+
+    public void add(double entry, double count) {
+        try {
+            sum = sum.add(BigDecimal.valueOf(entry));
+            this.count = this.count.add(BigDecimal.valueOf(count));
+        } catch (NumberFormatException e) {
+            // entry: NaN
+        } catch(Exception e) {
+            Log.write(e);
         }
     }
 
@@ -70,8 +93,8 @@ public class Value implements Comparable {
 
         BigDecimal avgA = this.average(2, null);
         BigDecimal avgB = value2.average(2, null);
-        BigDecimal countA = new BigDecimal(this.count);
-        BigDecimal countB = new BigDecimal(value2.count);
+        BigDecimal countA = this.count;
+        BigDecimal countB = value2.count;
         BigDecimal minCount = new BigDecimal(Math.min(countA.intValue(), countB.intValue()));
 
         BigDecimal sum = avgA.subtract(avgB);
@@ -84,7 +107,9 @@ public class Value implements Comparable {
 
     public BigDecimal average() {
         try {
-            return sum.divide(BigDecimal.valueOf(count), 10, RoundingMode.HALF_UP);
+            return sum.divide(count, 10, RoundingMode.HALF_UP);
+        } catch (ArithmeticException e) {
+            throw e;
         } catch (Exception e) {
             throw e;
         }
@@ -105,33 +130,41 @@ public class Value implements Comparable {
 
     public BigDecimal average(int scale) {
         try {
-            return sum.divide(BigDecimal.valueOf(count), scale, RoundingMode.HALF_UP);
+            return sum.divide(count, scale, RoundingMode.HALF_UP);
         } catch (Exception e) {
             throw e;
         }
     }
 
     public BigDecimal average(int scale, BigDecimal returnIfEmpty) {
-        if(count > 0)
-            return sum.divide(BigDecimal.valueOf(count), scale, RoundingMode.HALF_UP);
+
+        try {
+            return sum.divide(count, scale, RoundingMode.HALF_UP);
+
+        } catch (ArithmeticException e) {
+            // Jako nollalla
+        } catch(Exception e) {
+            Log.write(e);
+        }
         return returnIfEmpty;
     }
 
     public Value subtract(Value v) {
         sum = sum.subtract(v.sum);
-        count+=v.count;
+        count = count.add(v.count);
+
         return this;
     }
 
     public Value subtract(BigDecimal v) {
         sum = sum.subtract(v);
-        count++;
+        count = count.subtract(BigDecimal.ONE);
         return this;
     }
 
     public Value remove(BigDecimal v) {
         sum = sum.subtract(v);
-        count--;
+        count = count.subtract(BigDecimal.ONE);
         return this;
     }
 
@@ -147,18 +180,18 @@ public class Value implements Comparable {
 
     public BigDecimal procents(int limit, int scale) {
         BigDecimal procents = new BigDecimal(1);
-        if(count < limit) {
-            procents = new BigDecimal((double)count / (double)limit);
+        if(count.compareTo(BigDecimal.valueOf(limit)) < 0) {
+            procents = count.divide(BigDecimal.valueOf(limit), scale, RoundingMode.HALF_UP);
         }
         //return average(4).multiply(new BigDecimal("100.00")).setScale(i, BigDecimal.ROUND_HALF_UP);
 
         BigDecimal avg = average(scale);
         if(avg != null)
-            return average(scale).multiply(procents).setScale(scale, BigDecimal.ROUND_HALF_UP);
+            return average(scale).multiply(procents).setScale(scale, RoundingMode.HALF_UP);
         return null;
     }
 
-    public int size() {
+    public BigDecimal size() {
         return count;
     }
 
@@ -166,12 +199,8 @@ public class Value implements Comparable {
         return sum;
     }
 
-    public int getCount() {
+    public BigDecimal getCount() {
         return count;
-    }
-
-    public BigDecimal getBigDecimalCount() {
-        return BigDecimal.valueOf(count);
     }
 
     public BigDecimal multiply(Value aValue) {
@@ -198,11 +227,11 @@ public class Value implements Comparable {
 
     public void add(Value value) {
         sum = sum.add(value.getSum());
-        count += value.getCount();
+        count = count.add(value.getCount());
     }
 
     public boolean isEmpty() {
-        return count > 0 ? false : true;
+        return count.compareTo(BigDecimal.ZERO) > 0 ? false : true;
     }
 
     public BigDecimal divide(Value aValue) {
@@ -229,7 +258,7 @@ public class Value implements Comparable {
 
     public BigDecimal divide(Value aValue, int scale, BigDecimal returnIfZero) {
         try {
-            if(aValue.count == 0)
+            if(aValue.count.equals(BigDecimal.ZERO))
                 return returnIfZero;
 
             BigDecimal avg = average(scale);

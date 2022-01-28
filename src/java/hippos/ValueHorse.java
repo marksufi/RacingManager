@@ -8,6 +8,7 @@ import hippos.lang.stats.YearStatistics;
 import hippos.math.*;
 import hippos.math.regression.HipposRegressionResults;
 import hippos.util.SubValueList;
+import hippos.utils.AssendingValueComparator;
 import hippos.utils.HorsesHelper;
 import hippos.utils.ValueComparator;
 import org.apache.commons.math3.distribution.NormalDistribution;
@@ -49,6 +50,7 @@ public class ValueHorse implements Comparable {
     public ValueHorse(RaceProgramHorse raceProgramHorse) {
         this.raceProgramHorse = raceProgramHorse;
         valueComparator = new ValueComparator(this);
+        //valueComparator = new AssendingValueComparator(this);
 
     }
 

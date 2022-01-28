@@ -61,11 +61,15 @@ public class Form {
     }
 
     public BigDecimal firstRate() {
-        if(starts != null && starts.intValue() != 0) {
+        try {
             return firsts.divide(starts, 4, RoundingMode.HALF_UP);
+        } catch (ArithmeticException e) {
+            // ei yhtään starttia
+        } catch (Exception e) {
+            Log.write(e);
         }
 
-        return new BigDecimal(0);
+        return BigDecimal.ZERO;
     }
 
     public BigDecimal firstRateProcents(int scale) {
@@ -258,7 +262,7 @@ public class Form {
         } catch (ArithmeticException e) {
             // starts is zero
         } catch (Exception e) {
-            e.printStackTrace();
+            Log.write(e);
         }
         return ifZero;
     }

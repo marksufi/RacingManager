@@ -52,10 +52,10 @@ public class QuarterTime extends StatisticalValue implements Comparable {
             this.propbabilty = BigDecimal.ZERO;
             this.palkinto.add(palkinto);
 
-            super.add(qtCount, startCount.intValue());
+            super.add(qtCount.doubleValue(), startCount.doubleValue());
 
         } catch (Exception e) {
-            e.printStackTrace();
+            Log.write(e);
         }
     }
 
@@ -207,6 +207,14 @@ public class QuarterTime extends StatisticalValue implements Comparable {
 
     public QuarterTime getQuarterTime() {
         return this;
+    }
+
+    public TreeSet<AlphaNumber> getaRecordSet() {
+        return aRecordSet;
+    }
+
+    public TreeSet<AlphaNumber> gettRecordSet() {
+        return tRecordSet;
     }
 
     public boolean isEmpty() {

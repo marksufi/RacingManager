@@ -48,10 +48,11 @@ public class DriverForm extends Person implements Comparable {
         raceTypeForm.setXcode(raceSet.getBigDecimal("K_X"));
 
         try {
-            BigDecimal winrate = raceTypeForm.getFirsts().divide(raceTypeForm.getStarts(), 4, RoundingMode.HALF_UP);
-            winrate = winrate.multiply(BigDecimal.valueOf(100.00));
+            BigDecimal winrateSum = raceTypeForm.getFirsts().divide(raceTypeForm.getStarts(), 10, RoundingMode.HALF_UP);
+            winrateSum = winrateSum.multiply(BigDecimal.valueOf(100.00));
+            winrateSum = winrateSum.multiply(raceTypeForm.getStarts().setScale(2, RoundingMode.HALF_UP));
 
-            raceTypeForm.setDriverWinRates(winrate);
+            raceTypeForm.setDriverWinRates(winrateSum);
         } catch (ArithmeticException e) {
             // jaettuna nollalla startilla
         } catch (Exception e) {

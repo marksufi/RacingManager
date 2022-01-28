@@ -827,13 +827,32 @@ public class RaceProgramHorse extends Horse {
         List <AlphaNumber> observableList = new ArrayList();
 
         try {
+            // Startit ja sijoitukset
             observableList.add(new AlphaNumber(fullStatistics.getStarts()));
             observableList.add(new AlphaNumber(fullStatistics.getFirsts()));
             observableList.add(new AlphaNumber(fullStatistics.getSeconds()));
             observableList.add(new AlphaNumber(fullStatistics.getThirds()));
 
-            Set<AlphaNumber> recordTimes = fullStatistics.getRecordTimes();
+            // Luokat
+            observableList.add(new AlphaNumber(fullStatistics.awardRate()));
+            observableList.add(new AlphaNumber(yearStatistics.awardRate()));
 
+            // Paalupaikat
+            observableList.add(new AlphaNumber(trackSecondQuarterPropability));
+            observableList.add(new AlphaNumber(fullStatistics.getKcodeProcents(BigDecimal.ZERO)));
+            /* parhaat väliajat, kun olet keksinyt ratkaisun puuttuville tiedoille
+                timeStatistics.getSecondQuarter().getaRecordSet().first();
+                timeStatistics.getSecondQuarter().gettRecordSet().first();
+             */
+
+            // Kuljettajan muutos
+            BigDecimal exDrivers = fullStatistics.getDriverWinratesAverage(2);
+            BigDecimal newDriver = this.getRaceProgramDriver().getDriverForm().getForm().firstRateProcents(2);
+            BigDecimal driverChange = newDriver.subtract(exDrivers);
+            observableList.add(new AlphaNumber(driverChange.setScale(2)));
+
+            // Ennätykset
+            Set<AlphaNumber> recordTimes = yearStatistics.getRecordTimes();
             int size = 0;
             for(AlphaNumber recordTime : recordTimes) {
                 observableList.add(new AlphaNumber(recordTime));
@@ -851,6 +870,7 @@ public class RaceProgramHorse extends Horse {
         try {
 
             BigDecimal ranking = raceResultHorse.getRaceRanking();
+            BigDecimal award = raceResultHorse.getRaceResultPrize();
             BigDecimal x = raceResultHorse.getX();
 
             if(ranking != null && x.intValue() == 0) {
@@ -932,7 +952,18 @@ public class RaceProgramHorse extends Horse {
 
             str.append("\n");
 
-            str.append("\t" + fullStatistics + "\n");
+            if(fullStatistics != null) {
+                str.append("\n[" + trackFirstQuarterPropability + "%]");
+                str.append("\t500m:  " + timeStatistics.getFirstQuarter().toString());
+
+                str.append("\n[" + trackSecondQuarterPropability + "%]");
+                str.append("\t1000m: " + timeStatistics.getSecondQuarter().toString());
+
+                //str.append("\n");
+                //str.append("\tV500m: " + timeStatistics.getLastQuarter().toString());
+            }
+
+            str.append("\n\n\t" + fullStatistics + "\n");
 
             for(Object key : fullStatistics.getForms().getKeys()) {
                 str.append("\t\t" + fullStatistics.getForms().get(key) + "\n");
@@ -940,8 +971,14 @@ public class RaceProgramHorse extends Horse {
 
             str.append("\t" + yearStatistics + "\n");
 
-            str.append("\t" + fullStatistics.getSubForms().get(this.getRaceMode()) + "\n");
-            str.append("\n");
+            if(fullStatistics.getSubForms().get(this.getRaceMode()) != null) {
+                str.append("\t" + fullStatistics.getSubForms().get(this.getRaceMode()) + "\n");
+            }
+
+            for(SubStart subStart : subStartList) {
+                str.append("\n\t\t" + subStart);
+            }
+
             /*
             for(SubForm subForm : yearStatistics.getSubForms()) {
                 str.append("\n\t" + subForm);
@@ -952,26 +989,12 @@ public class RaceProgramHorse extends Horse {
             //str.append("\n\t" + fullStatistics.getFeaturedStats().get(Collections.singletonList(BigDecimal.ZERO)));
             //str.append("\n\t" + fullStatistics.getFeaturedStats().get(Collections.singletonList(BigDecimal.ONE)));
 
-            if(fullStatistics != null) {
-                str.append("\n[" + trackFirstQuarterPropability + "%]");
-                str.append("\t500m:  " + timeStatistics.getFirstQuarter().toString());
-
-                str.append("\n[" + trackSecondQuarterPropability + "%]");
-                str.append("\t1000m: " + timeStatistics.getSecondQuarter().toString());
-
-                str.append("\n");
-                str.append("\tV500m: " + timeStatistics.getLastQuarter().toString());
-            }
-
             //str.append("\n\t" + coach);
             if(this.raceProgramDriver != null) {
                 str.append("\n\t" + getRaceProgramDriver().toString());
                 str.append("\n\t" + raceProgramDriver.getDriverForm().getForm().toString());
             }
 
-            for(SubStart subStart : subStartList) {
-                str.append("\n\t\t" + subStart);
-            }
             /*
             for (int i = 0; i < 9; i++) {
                 str.append("\n" + toString(i));

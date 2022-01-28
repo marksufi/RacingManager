@@ -44,13 +44,6 @@ public class Progress {
         }
     }
 
-    public BigDecimal getMultiplier() {
-        if(awards.getCount() > 100) {
-            return final_awards.divide(awards, 2, BigDecimal.ONE);
-        }
-        return BigDecimal.ONE;
-    }
-
     public String toString() {
         return awards.toString() + " => " + final_awards.toString();
     }

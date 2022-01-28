@@ -35,9 +35,9 @@ public class ValueComparator implements Comparable {
             }
 
             if(valueA == null)
-                return -1;
-            if(valueB == null)
                 return 1;
+            if(valueB == null)
+                return -1;
             return -1;
         }
 }

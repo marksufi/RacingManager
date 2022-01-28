@@ -75,7 +75,7 @@ public class SumReg {
     }
 
     public int size() {
-        return xValue.getCount();
+        return xValue.getCount().intValue();
     }
 
 }
