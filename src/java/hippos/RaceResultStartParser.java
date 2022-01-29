@@ -11,14 +11,17 @@ import utils.Log;
 
 import java.io.IOException;
 import java.math.BigDecimal;
+import java.sql.Connection;
 import java.util.*;
 
 public class RaceResultStartParser {
     RaceResultStart raceResultStart;
     RaceResultFile raceResultFile;
+    Connection conn;
 
-    public RaceResultStartParser(RaceResultFile raceResultFile) {
+    public RaceResultStartParser(RaceResultFile raceResultFile, Connection conn) {
         this.raceResultFile = raceResultFile;
+        this.conn = conn;
         this.raceResultStart = new RaceResultStart(raceResultFile);
     }
 
@@ -38,7 +41,7 @@ public class RaceResultStartParser {
                     line = line.substring(0, line.indexOf('.'));
                     raceResultPlacing = new BigDecimal(line);
                 }
-                RaceResultHorseParser parser = new RaceResultHorseParser(raceResultStart, raceResultPlacing);
+                RaceResultHorseParser parser = new RaceResultHorseParser(raceResultStart, conn, raceResultPlacing);
 
                 RaceResultHorse raceResultHorse = (RaceResultHorse)parser.parse(lines);
                 if(raceResultHorse.present) {

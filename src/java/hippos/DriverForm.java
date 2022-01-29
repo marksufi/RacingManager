@@ -2,6 +2,7 @@ package hippos;
 
 import hippos.lang.stats.Form;
 import hippos.utils.DateUtils;
+import oracle.jdbc.proxy.annotation.Pre;
 import utils.Log;
 
 import java.math.BigDecimal;
@@ -60,33 +61,24 @@ public class DriverForm extends Person implements Comparable {
         }
     }
 
-    public Form fetchRaceTypeForm(Connection conn, Date date, String raceType) {
+    public DriverForm(String name, Connection conn, java.util.Date date) {
+        this(name);
+
+        fetchRaceTypeForm(conn, date);
+    }
+
+    public Form fetchRaceTypeForm(Connection conn, java.util.Date date) {
         PreparedStatement stmt = null;
         ResultSet rs = null;
 
         try {
-            java.sql.Date sqlEndDate = DateUtils.toSQLDate(date);
-            StringBuilder sb = new StringBuilder();
-
-            sb.append(raceTypeForm.getSelect() + " ");
-            sb.append("from SUBRESULT ");
-            sb.append("where kuljettaja like ? ");
-            sb.append("and pvm < ? ");
-            //sb.append("and lahtotyyppi = ? ");
-            sb.append("and KERROIN is not null");
-
-            stmt = conn.prepareStatement(sb.toString());
-
             String sqlSearchName = initSQLSearchStr();
-
-            stmt.setString(1, sqlSearchName);
-            stmt.setDate(2, sqlEndDate);
-            //stmt.setString(3, raceType);
+            java.sql.Date sqlEndDate = DateUtils.toSQLDate(date);
+            stmt = getInitStatement(conn, sqlSearchName, sqlEndDate);
             rs = stmt.executeQuery();
 
             raceTypeForm.init(rs);
 
-            stmt.close();
         } catch (SQLException e) {
             e.printStackTrace();
         } finally {
@@ -102,6 +94,35 @@ public class DriverForm extends Person implements Comparable {
             }
         }
         return raceTypeForm;
+    }
+
+    public PreparedStatement getInitStatement(Connection conn, String sqlSearchName, java.sql.Date sqlEndDate) throws SQLException {
+        try {
+            PreparedStatement stmt = null;
+
+            StringBuilder sb = new StringBuilder();
+
+            sb.append(raceTypeForm.getSelect() + " ");
+            sb.append("from SUBRESULT ");
+            sb.append("where kuljettaja like ? ");
+            sb.append("and pvm < ? ");
+            //sb.append("and lahtotyyppi = ? ");
+            sb.append("and KERROIN is not null");
+
+            stmt = conn.prepareStatement(sb.toString());
+            stmt.setString(1, sqlSearchName);
+            stmt.setDate(2, sqlEndDate);
+
+            return stmt;
+
+        } catch (SQLException e) {
+            throw e;
+
+        } catch (Exception e) {
+            Log.write(e);
+            throw e;
+
+        }
     }
 
     public String getJockeyClass() {

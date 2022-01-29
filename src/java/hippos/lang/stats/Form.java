@@ -60,6 +60,21 @@ public class Form {
         }
     }
 
+    public void init(ResultSet set) throws SQLException {
+        if(set.next()) {
+            int i = 1;
+            setStarts(set.getBigDecimal(i++));
+            setFirsts(set.getBigDecimal(i++));
+            setSeconds(set.getBigDecimal(i++));
+            setThirds(set.getBigDecimal(i++));
+            setAwards(set.getBigDecimal(i++));
+            setKcode(set.getBigDecimal(i++));
+            setXcode(set.getBigDecimal(i++));
+            setDriverWinRates(set.getBigDecimal(i++));
+        }
+    }
+
+
     public BigDecimal firstRate() {
         try {
             return firsts.divide(starts, 4, RoundingMode.HALF_UP);
@@ -296,22 +311,6 @@ public class Form {
             this.xcode = xcode;
         } else {
             System.out.println("");
-        }
-    }
-
-
-
-    public void init(ResultSet set) throws SQLException {
-        if(set.next()) {
-            int i = 1;
-            setStarts(set.getBigDecimal(i++));
-            setFirsts(set.getBigDecimal(i++));
-            setSeconds(set.getBigDecimal(i++));
-            setThirds(set.getBigDecimal(i++));
-            setAwards(set.getBigDecimal(i++));
-            setKcode(set.getBigDecimal(i++));
-            setXcode(set.getBigDecimal(i++));
-            setDriverWinRates(set.getBigDecimal(i++));
         }
     }
 

@@ -170,19 +170,20 @@ public class RaceResultFile extends RaceFile implements FileParser {
     }*/
 
     public Object parse() throws RacesCancelledException {
+        return null;
+    }
+
+    @Override
+    public Object parse(Connection conn) throws Exception {
         try {
-            return new RaceResultFileParser(this).parse();
+            return new RaceResultFileParser(this, conn).parse();
         } catch (RacesCancelledException e) {
             throw e;
         } catch (Exception e) {
             Log.write(e);
         }
         return null;
-    }
 
-    @Override
-    public Object parse(Connection conn) throws Exception {
-        return null;
     }
 
     public void setTrackCondition(String trackCondition) {

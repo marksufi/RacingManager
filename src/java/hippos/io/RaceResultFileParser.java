@@ -26,10 +26,12 @@ public class RaceResultFileParser implements FileParser {
     HTMLParser reader;
     List lineList;
     Iterator lines;
+    Connection conn;
     RaceResultFile raceResultFile;
 
-    public RaceResultFileParser(RaceFile resultFile) {
+    public RaceResultFileParser(RaceFile resultFile, Connection conn) {
         this.raceResultFile = (RaceResultFile)resultFile;
+        this.conn = conn;
     }
 
     public Object parse() throws RacesCancelledException {
@@ -97,7 +99,7 @@ public class RaceResultFileParser implements FileParser {
     private void parseStarts() throws RacesCancelledException {
         while(lines.hasNext()) {
             try {
-                RaceResultStartParser raceResultStartParser = new RaceResultStartParser(raceResultFile);
+                RaceResultStartParser raceResultStartParser = new RaceResultStartParser(raceResultFile, conn);
                 RaceResultStart raceResultStart = (RaceResultStart) raceResultStartParser.parse(lines);
                 raceResultFile.add(raceResultStart);
             } catch (RacesCancelledException e) {

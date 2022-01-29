@@ -58,7 +58,7 @@ public class RaceProgramHorse extends Horse {
     String color2;
     String owner;
     String ownerLocation;
-    private RaceProgramDriver raceProgramDriver;
+    private RaceDriver raceProgramDriver;
     private Coach coach;
     private String registerNumber;
 
@@ -487,16 +487,17 @@ public class RaceProgramHorse extends Horse {
 
             initFullStatistics(conn);
 
+            /*
             if(raceResultHorse != null) {
                 DriverForm raceResultdriverForm = raceResultHorse.getRaceResultDriver().getDriverForm();
-                raceResultdriverForm.fetchRaceTypeForm(conn, getRaceDate(), getRaceMode());
+                raceResultdriverForm.fetchRaceTypeForm(conn, getRaceDate());
 
                 raceProgramDriver.setName(raceResultdriverForm.getName());
                 raceProgramDriver.getDriverForm().setForm(raceResultdriverForm.getForm());
 
             } else {
-                raceProgramDriver.getDriverForm().fetchRaceTypeForm(conn, this.getRaceDate(), this.getRaceMode());
-            }
+                raceProgramDriver.getDriverForm().fetchRaceTypeForm(conn, this.getRaceDate());
+            }*/
 
             fetchSubStarts(conn, 5);
 
@@ -538,13 +539,13 @@ public class RaceProgramHorse extends Horse {
 
             if(raceResultHorse != null) {
                 DriverForm raceResultdriverForm = raceResultHorse.getRaceResultDriver().getDriverForm();
-                raceResultdriverForm.fetchRaceTypeForm(conn, getRaceDate(), getRaceMode());
+                raceResultdriverForm.fetchRaceTypeForm(conn, getRaceDate());
 
                 raceProgramDriver.setName(raceResultdriverForm.getName());
                 raceProgramDriver.getDriverForm().setForm(raceResultdriverForm.getForm());
 
             } else {
-                raceProgramDriver.getDriverForm().fetchRaceTypeForm(conn, this.getRaceDate(), this.getRaceMode());
+                raceProgramDriver.getDriverForm().fetchRaceTypeForm(conn, this.getRaceDate());
             }
 
             fetchSubStarts(conn, 8);
@@ -598,11 +599,11 @@ public class RaceProgramHorse extends Horse {
 
 
 
-    public RaceProgramDriver getRaceProgramDriver() {
+    public RaceDriver getRaceProgramDriver() {
         return raceProgramDriver;
     }
 
-    public void setRaceProgramDriver(RaceProgramDriver raceProgramDriver) {
+    public void setRaceProgramDriver(RaceDriver raceProgramDriver) {
         this.raceProgramDriver = raceProgramDriver;
     }
 

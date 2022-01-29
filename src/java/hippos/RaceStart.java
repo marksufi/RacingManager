@@ -193,6 +193,9 @@ public abstract class RaceStart {
 
     public BigDecimal getRaceLength() {
         try {
+            if(raceLength.size() == 0) {
+                System.out.println("miksi?");
+            }
             return (BigDecimal) raceLength.first();
         } catch (Exception e) {
             e.printStackTrace();

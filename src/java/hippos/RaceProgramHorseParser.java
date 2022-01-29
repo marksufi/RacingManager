@@ -22,7 +22,6 @@ import java.util.StringTokenizer;
  */
 public class RaceProgramHorseParser implements FileParser {
     RaceProgramHorse raceProgramHorse;
-    //RaceResultHorse raceResultHorse;
     Date raceDate;
     Iterator lines;
     private RaceProgramStart raceProgramStart;
@@ -81,9 +80,7 @@ public class RaceProgramHorseParser implements FileParser {
                 parseColorLine();
                 parseOwnerLine();
                 parseTraineeLine();
-                parseJockeyLine();
-                parseJockeyStatisticLine();
-                parseJockeyYearStatisticLine();
+                parseJockeyLine(conn);
 
                 if(HarnessApp.useHorseRaceHistoryLink) {
                     if(!raceProgramHorse.existsInDatabase() || HarnessApp.debugMode == true) {
@@ -98,6 +95,9 @@ public class RaceProgramHorseParser implements FileParser {
                         System.out.println("RaceProgramHorseParser.parse: " + raceProgramHorse.getId());
                     }
                 }
+
+                parseJockeyStatisticLine(conn);
+                parseJockeyYearStatisticLine();
 
                 break;
             }
@@ -218,7 +218,7 @@ public class RaceProgramHorseParser implements FileParser {
         String registerIdStr = "";
         int startIndex = line.indexOf("?sp=");
         if(startIndex > 0) {
-            int e = -1;
+            int e;
             registerIdStr = line.substring(startIndex + 4);
             //int endIndex = registerIdStr.indexOf("&amp;sp=X");
             //if(endIndex > 0) {
@@ -237,26 +237,25 @@ public class RaceProgramHorseParser implements FileParser {
         String line = HTMLParser.readBlock(lines, "h2");
 
         if(line.length() > 0) {
-            if(line.indexOf("POISSA") >= 0) {
+            if(line.contains("POISSA")) {
                 defaultTrack = defaultTrack.add(BigDecimal.ONE);
                 throw new AbsentException(this.raceProgramHorse.getId());
             }
             StringTokenizer st = new StringTokenizer(line, ":");
             switch (st.countTokens()) {
-                case 1:
+                case 1 -> {
                     raceProgramHorse.setRaceTrack(new BigDecimal(st.nextToken().trim()));
-                    if(raceProgramHorse.getRaceTrack().compareTo(defaultTrack) <= 0) {
+                    if (raceProgramHorse.getRaceTrack().compareTo(defaultTrack) <= 0) {
                         defaultDistance = defaultDistance.add(new BigDecimal("20"));
                     }
                     raceProgramHorse.setRaceLength(defaultDistance);
-                    break;
-                case 2:
+                }
+                case 2 -> {
                     raceProgramHorse.setRaceLength(new BigDecimal(st.nextToken().trim()));
                     defaultDistance = raceProgramHorse.getRaceLength();
                     raceProgramHorse.setRaceTrack(new BigDecimal(st.nextToken().trim()));
-                    break;
-                default:
-                    throw new DataObjectException("not a raceLength:raceTrack data: " + line);
+                }
+                default -> throw new DataObjectException("not a raceLength:raceTrack data: " + line);
             }
             defaultTrack = raceProgramHorse.getRaceTrack();
             raceProgramHorse.setRaceMode(raceProgramStart.getRaceMode());
@@ -387,18 +386,18 @@ public class RaceProgramHorseParser implements FileParser {
 
     public void parseSubStart(String line) throws DataObjectException, AbsentException {
         try {
-            if(HarnessApp.useHorseRaceHistoryLink == false || HarnessApp.debugMode == true) {
+            if(!HarnessApp.useHorseRaceHistoryLink || HarnessApp.debugMode) {
                 SubStartParser subStartParser = new SubStartParser(lines, raceDate, raceProgramHorse);
                 SubStart subStart = (SubStart)subStartParser.parse();
 
                 System.out.println("RaceProgramHorseParser.parseSubStart: " + subStart.toString());
-                if(HarnessApp.useHorseRaceHistoryLink == false) {
+                if(!HarnessApp.useHorseRaceHistoryLink) {
                     // Ottaa lähtölistojen startit käyttöön, jos historialinkkiä ei käytetä
                     raceProgramHorse.add(subStart);
                 }
             } else {
                 // Etsii rivin loppukohdan
-                while(line.indexOf("</tr>") < 0 && lines.hasNext()) {
+                while(!line.contains("</tr>") && lines.hasNext()) {
                     line = (String) lines.next();
                 }
             }
@@ -407,7 +406,7 @@ public class RaceProgramHorseParser implements FileParser {
             // do nothing
         } catch (UnvalidStartException ue) {
             // Tarkista jatkuuko ohjemla tästä oikein
-            System.out.println("RaceProgramHorseParser.parseSubStart: " + ue.toString());
+            Log.write(ue);
 
         }
     }
@@ -417,7 +416,6 @@ public class RaceProgramHorseParser implements FileParser {
      *
      * <td>vihr musta - vihr</td>
      *
-     * @param line string containing the required information
      * f.e. "[VALK MUSTA PUN - VALK][C Mayr][T ][5.8.  ][3 ][2100/11][22,9a          ][11             ][309 ]"
      * @throws IOException if line format doesn't match
      */
@@ -516,7 +514,7 @@ public class RaceProgramHorseParser implements FileParser {
      * </a>
      * (A)</td>
      */
-    private void parseJockeyLine() throws IOException {
+    private void parseJockeyLine(Connection conn) throws IOException {
         try {
             String line = HTMLParser.readBlock(lines, "td", "getDriverName");
             if(line != null) {
@@ -526,17 +524,31 @@ public class RaceProgramHorseParser implements FileParser {
                     driverClass = line.substring(line.lastIndexOf("(") + 1);
                     driverClass = driverClass.substring(0, driverClass.indexOf(")"));
                 }
-                RaceProgramDriver raceProgramDriver = new RaceProgramDriver(sDriver.strip());
+                if(this.raceProgramHorse.raceResultHorse == null) {
+                    // Käsiohjelmalle ei löydyparsittua tulostiedostoa, joten luo uuden joka sisältää tilastot
+                    //RaceProgramDriver raceProgramDriver = new RaceProgramDriver(sDriver.strip(), conn, this.raceProgramStart.getDate());
+                    RaceProgramDriver raceProgramDriver = new RaceProgramDriver(sDriver.strip());
 
-                if(driverClass != null) {
-                    if(driverClass.length() < 4) {
-                        raceProgramDriver.getDriverForm().setJockeyClass(driverClass);
-                    } else {
-                        Log.write("Too long driverClass: " + driverClass + ": " + raceProgramHorse.getId());
+                    // Ajajan luokka on vain käsiohjelmassa, ei lulostiedoissa, joten tekeekö sillä mitään?
+                    if (driverClass != null) {
+                        if (driverClass.length() < 4) {
+                            raceProgramDriver.getDriverForm().setJockeyClass(driverClass);
+                        } else {
+                            Log.write("Too long driverClass: " + driverClass + ": " + raceProgramHorse.getId());
+                        }
                     }
+
+                    raceProgramHorse.setRaceProgramDriver(raceProgramDriver);
+                } else {
+                    // Alustaa kuljettajaksi suoraan tulostietojen kuljettajan, koska
+                    // kuljettaja saattaa olla vaintunut käohjelmasta, jolle hakee tilastot
+                    RaceProgramDriver raceProgramDriver =
+                            new RaceProgramDriver(raceProgramHorse.raceResultHorse.getRaceResultDriver().getName());
+
+                    raceProgramHorse.setRaceProgramDriver(raceProgramDriver);
+
                 }
 
-                raceProgramHorse.setRaceProgramDriver(raceProgramDriver);
             } else {
                 System.out.println("RaceProgramHorseParser.parseJockeyLine");
             }
@@ -555,15 +567,15 @@ public class RaceProgramHorseParser implements FileParser {
     /**
      * Set the total statistics of the raceDriverName and adds substart information if existsInDatabase
      *
-     * @param line string containing the required information
      * f.e. "[Yht:31478 3877-3310-2940   8.958.423 e][H Koivunen][P ][19.12.][3 ][2100/ 4][23,7a          ][10             ][*52 ]"
-     * @throws IOException if line format doesn't match
      */
-    //private void parseJockeyStatisticLine() throws IOException {
-    private void parseJockeyStatisticLine() throws IOException {
+    private void parseJockeyStatisticLine(Connection conn) {
         String line = "";
         try {
             String form = HTMLParser.readBlock(lines, "td");
+
+            raceProgramHorse.getRaceProgramDriver().getDriverForm().fetchRaceTypeForm(conn, raceDate);
+
             /*
             while(lines.hasNext()) {
                 line = (String)lines.next();
@@ -584,9 +596,8 @@ public class RaceProgramHorseParser implements FileParser {
     /**
      * Set the year statistics of the raceDriverName and adds substart information if existsInDatabase
      *
-     * @param line string containing the required information
      * f.e. "[04 :   48    6-   5-   1      13.150 e][To Salo][T ][30.12.][8 ][2100/ 2][21,1a          ][7              ][160 ]"
-     * @throws IOException if line format doesn't match
+     *
      */
     //private void parseJockeyYearStatisticLine() throws IOException {
     private void parseJockeyYearStatisticLine() {
@@ -620,7 +631,7 @@ public class RaceProgramHorseParser implements FileParser {
     public static String formatName(String unformalName) {
         //System.out.println("Horse.formatName(" + unformalName + ")");
         unformalName = unformalName.toLowerCase();
-        StringBuffer formalName = new StringBuffer();
+        StringBuilder formalName = new StringBuilder();
         StringTokenizer s = new StringTokenizer(unformalName, " -", true);
         while(s.hasMoreTokens()) {
             String p = s.nextToken();

@@ -8,16 +8,19 @@ import utils.Log;
 
 import java.math.BigDecimal;
 import java.math.RoundingMode;
+import java.sql.Connection;
 import java.util.Iterator;
 import java.util.StringTokenizer;
 
  public class RaceResultHorseParser  {
     RaceResultStart raceResultStart;
     RaceResultHorse resultRaceHorse = null;
+    Connection conn;
 
-     public RaceResultHorseParser(RaceResultStart raceResultStart, BigDecimal raceResultPlacing) {
+     public RaceResultHorseParser(RaceResultStart raceResultStart, Connection conn, BigDecimal raceResultPlacing) {
          this.raceResultStart = raceResultStart;
          resultRaceHorse = new RaceResultHorse(raceResultStart);
+         this.conn = conn;
          resultRaceHorse.raceResultRanking = new SubRank(raceResultPlacing);
      }
 
@@ -25,7 +28,7 @@ import java.util.StringTokenizer;
         try {
             while(lines.hasNext()) {
                 parseHorseNumber(lines);
-                parseNames(lines);
+                parseNames(lines, conn);
                 parseRaceResultTime(lines);
                 parseShortNote(lines);
                 parseRaceResultWinOdds(lines);
@@ -82,7 +85,7 @@ import java.util.StringTokenizer;
      *      Windsong's Love*
      *  </a>
      */
-    private void parseNames(Iterator lines) throws DataObjectException {
+    private void parseNames(Iterator lines, Connection conn) throws DataObjectException {
         try {
             String line = HTMLParser.readBlock(lines, "td", "raceResultHorseName");
             line = line.strip();
@@ -95,7 +98,7 @@ import java.util.StringTokenizer;
             resultRaceHorse.setRaceHorseName(raceResultHorseName);
 
             String raceResultDriverName = HTMLParser.readBlock(sbLine, "a");
-            resultRaceHorse.setRaceResultDriver(raceResultDriverName.strip());
+            resultRaceHorse.raceResultDriver = new RaceResultDriver(raceResultDriverName.strip());
 
         } catch (Exception e) {
             throw new DataObjectException(e, resultRaceHorse.toString());

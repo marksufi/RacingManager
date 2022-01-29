@@ -1,11 +1,15 @@
 package hippos;
 
+import utils.Log;
+
 import java.math.BigDecimal;
 import java.math.RoundingMode;
+import java.sql.Connection;
+import java.sql.Date;
 import java.sql.ResultSet;
 import java.sql.SQLException;
 
-public class RaceProgramDriver extends Person {
+public class RaceProgramDriver extends Person implements RaceDriver {
     private DriverForm driverForm;
 
     public RaceProgramDriver(String name) {
@@ -19,6 +23,17 @@ public class RaceProgramDriver extends Person {
         this(raceSet.getString("KULJETTAJA"));
 
         driverForm = new DriverForm(getName(), raceSet);
+    }
+
+    public RaceProgramDriver(String name, Connection conn, java.util.Date date) {
+        super(name);
+
+        try {
+            driverForm = new DriverForm(getName(), conn, date);
+
+        } catch (Exception e) {
+            Log.write(e);
+        }
     }
 
     public BigDecimal getDriverDiff(SubStart subStart) {

@@ -223,10 +223,10 @@ public class HarnessApp {
                         if (raceResultFile == null || !raceResultFile.getName().equals(resultFilename)) {
                             raceResultFile = (RaceResultFile) raceResultDirectory.createFile(resultFilename);
                             if(raceResultFile.exists()) {
-                                raceResultFile = (RaceResultFile) raceResultFile.parse();
-                                //if (!raceResultFile.existsInDatabase(conn)) {
+                                raceResultFile = (RaceResultFile) raceResultFile.parse(conn);
+                                if (!raceResultFile.existsInDatabase(conn)) {
                                     raceResultFile.insert(conn);
-                                //}
+                                }
                             } else {
                                 raceResultFile = null;
                             }

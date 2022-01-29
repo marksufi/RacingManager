@@ -199,8 +199,7 @@ public class RaceProgramStartParser implements FileParser {
                 raceProgramHorseParser = new RaceProgramHorseParser(raceProgramStart, lines);
                 RaceProgramHorse raceProgramHorse = null;
                 try {
-                    raceProgramHorse = (RaceProgramHorse) raceProgramHorseParser.parse(conn);
-
+                    /*
                     RaceResultHorse raceResultHorse = null;
                     if(raceProgramStart.getRaceResultStart() != null) {
                         raceResultHorse = raceProgramStart.getRaceResultStart().getRaceResultHorse(raceProgramHorse.getRaceHorseName());
@@ -209,6 +208,8 @@ public class RaceProgramStartParser implements FileParser {
                         }
                     }
                     raceProgramHorse.setRaceResultHorse(raceResultHorse);
+                     */
+                    raceProgramHorse = (RaceProgramHorse) raceProgramHorseParser.parse(conn);
 
                     raceProgramHorse.setStatistics(conn);
 
@@ -220,6 +221,10 @@ public class RaceProgramStartParser implements FileParser {
                 }
             } catch (AbsentException e) {
                 //  Hevonen poissa
+            } catch (OutOfHorsesException e) {
+                throw e;
+            } catch (Exception e) {
+                Log.write(e);
             }
         }
         //System.out.print("");

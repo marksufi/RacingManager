@@ -18,7 +18,7 @@ import java.util.List;
  */
 public class RaceResultHorse extends Horse implements Comparable {
     private RaceResultStart raceResultStart;
-    private RaceResultDriver raceResultDriver;
+    RaceDriver raceResultDriver;
     SubRank raceResultRanking;
     AlphaNumber raceResultTime;
     AlphaNumber totalTime;
@@ -60,7 +60,7 @@ public class RaceResultHorse extends Horse implements Comparable {
 
             //setHorseProgNumber(resultSet.getBigDecimal("HEVOSEN_NUMERO"));
             setRaceHorseName(resultSet.getString("NIMI"));
-            setRaceResultDriver(resultSet.getString("KULJETTAJA"));
+            setRaceResultDriver(new RaceResultDriver(resultSet.getString("KULJETTAJA")));
             setRaceResultTime(new AlphaNumber(resultSet.getBigDecimal("AIKA")));
             setRaceMode(resultSet.getString("LAHTOTYYPPI"));
             setShortNote(new AlphaNumber(resultSet.getString("XCODE")));
@@ -415,16 +415,16 @@ public class RaceResultHorse extends Horse implements Comparable {
         this.shortNote = shortNote;
     }
 
-    public RaceResultDriver getRaceResultDriver() {
+    public RaceDriver getRaceResultDriver() {
         return raceResultDriver;
     }
 
-    public void setRaceResultDriver(RaceResultDriver raceResultDriver) {
+    public void setRaceResultDriver(RaceDriver raceResultDriver) {
         this.raceResultDriver = raceResultDriver;
     }
 
-    public void setRaceResultDriver(String raceResultDriver) {
-        this.raceResultDriver = new RaceResultDriver(raceResultDriver);
+    public void initRaceResultDriver(String raceResultDriver, Connection conn, java.util.Date date) {
+        this.raceResultDriver = new RaceResultDriver(raceResultDriver, conn, date);
     }
 
     public void updateRaceProgramDriver(Connection conn) {
@@ -432,34 +432,75 @@ public class RaceResultHorse extends Horse implements Comparable {
         int i = 1;
 
         try {
-            StringBuffer sb = new StringBuffer();
-            sb.append("update PROGRAMHORSE ");
-            sb.append("set KULJETTAJA=?, ");
-            sb.append("K_S=?, K_1=?, K_2=?, K_3=?, K_R=? ");
+            String raceProgramHorseDriver = getRaceProgramHorseDriver(conn);
+            if(raceProgramHorseDriver != null && !raceProgramHorseDriver.equals(getRaceResultDriver().getName())) {
+                // Kuljettaja löytyi, mutta on eri kuin käsiohjelmatiedoissa, ja vasta nyt
+                // tarvii hakea tilastot
+
+                raceResultDriver.getDriverForm().fetchRaceTypeForm(conn, this.raceResultStart.getDate());
+
+                StringBuffer sb = new StringBuffer();
+                sb.append("update PROGRAMHORSE ");
+                sb.append("set KULJETTAJA=?, ");
+                sb.append("K_S=?, K_1=?, K_2=?, K_3=?, K_R=?, K_PAALU=?, K_X=? ");
+                sb.append("where LID=? and NUMERO=?");
+
+                stmt = conn.prepareStatement(sb.toString());
+
+                stmt.setString(i++, getRaceResultDriver().getName());
+                stmt.setBigDecimal(i++, getRaceResultDriver().getDriverForm().getForm().getStarts());
+                stmt.setBigDecimal(i++, getRaceResultDriver().getDriverForm().getForm().getFirsts());
+                stmt.setBigDecimal(i++, getRaceResultDriver().getDriverForm().getForm().getSeconds());
+                stmt.setBigDecimal(i++, getRaceResultDriver().getDriverForm().getForm().getThirds());
+                stmt.setBigDecimal(i++, getRaceResultDriver().getDriverForm().getForm().getAwards());
+                stmt.setBigDecimal(i++, getRaceResultDriver().getDriverForm().getForm().getKcode());
+                stmt.setBigDecimal(i++, getRaceResultDriver().getDriverForm().getForm().getXcode());
+
+                stmt.setString(i++, getLid());
+                stmt.setBigDecimal(i++, getHorseProgNumber());
+
+                stmt.executeUpdate();
+                conn.commit();
+            }
+        } catch (Exception e) {
+            Log.write(e, getId());
+
+        } finally {
+            try { stmt.close(); } catch ( Exception e ) { }
+        }
+    }
+
+    public String getRaceProgramHorseDriver(Connection conn) {
+        PreparedStatement stmt = null;
+        ResultSet rs = null;
+        String driver = null;
+
+        try {
+            StringBuilder sb = new StringBuilder();
+            sb.append("select KULJETTAJA from PROGRAMHORSE ");
             sb.append("where LID=? and NUMERO=?");
 
             stmt = conn.prepareStatement(sb.toString());
 
-            stmt.setString(i++, getRaceResultDriver().getName());
-            stmt.setBigDecimal(i++, getRaceResultDriver().getDriverForm().getForm().getStarts());
-            stmt.setBigDecimal(i++, getRaceResultDriver().getDriverForm().getForm().getFirsts());
-            stmt.setBigDecimal(i++, getRaceResultDriver().getDriverForm().getForm().getSeconds());
-            stmt.setBigDecimal(i++, getRaceResultDriver().getDriverForm().getForm().getThirds());
-            stmt.setBigDecimal(i++, getRaceResultDriver().getDriverForm().getForm().getAwards());
+            stmt.setString(1, getLid());
+            stmt.setBigDecimal(2, getHorseProgNumber());
 
-            stmt.setString(i++, getLid());
-            stmt.setBigDecimal(i++, getHorseProgNumber());
+            rs = stmt.executeQuery();
 
-            stmt.executeUpdate();
-            conn.commit();
+            if(rs.next()) {
+                driver = rs.getString("KULJETTAJA");
+            }
 
-        } catch (SQLException e) {
-            e.printStackTrace();
         } catch (Exception e) {
-            Log.write(e, getId());
+            Log.write(e);
+
         } finally {
-            try { stmt.close(); } catch ( Exception e ) { }
+            try { stmt.close(); } catch (Exception e) { }
+            try { rs.close(); } catch (Exception e) { }
         }
+
+        return driver;
+
     }
 
     public void deleteRaceProgramHorse(Connection conn) {
@@ -514,6 +555,7 @@ public class RaceResultHorse extends Horse implements Comparable {
             Log.write(e, getId());
         }
     }
+
 
     public String toRankingString() {
         try {
