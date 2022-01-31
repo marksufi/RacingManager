@@ -190,7 +190,6 @@ public class SubRank extends AlphaNumber implements RegressionMapObservation {
 
         try {
             double y = subRankMapper.get(this);
-            // TODO: aktivoi kun mapperi valmis
             subValue.updateValue(y);
 
         } catch (RegressionModelException e) {

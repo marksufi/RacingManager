@@ -47,6 +47,7 @@ public class HipposUpdatingRegression extends MillerUpdatingRegression {
             for(int i = 0; i < x.length; i++) {
                 b += itc ? x[i] * B[i+1] : x[i] * B[i];
             }
+
             /*
             System.out.println();
             System.out.println("getPartialCorrelations(X): " + Arrays.toString(x));
@@ -54,7 +55,6 @@ public class HipposUpdatingRegression extends MillerUpdatingRegression {
             System.out.println("getPartialCorrelations(0): " + Arrays.toString(this.getPartialCorrelations(0)));
             System.out.println("getPartialCorrelations(1): " + Arrays.toString(this.getPartialCorrelations(1)));
             System.out.println("getPartialCorrelations(2): " + Arrays.toString(this.getPartialCorrelations(2)));
-            System.out.println("getPartialCorrelations(3): " + Arrays.toString(this.getPartialCorrelations(3)));
             System.out.println("getDiagonalOfHatMatrix(x): " + this.getDiagonalOfHatMatrix(x));
             System.out.println("getOrderOfRegressors(): " + Arrays.toString(this.getOrderOfRegressors()));
             System.out.println("getParameterEstimates(): " + Arrays.toString(regress().getParameterEstimates()));
@@ -62,11 +62,9 @@ public class HipposUpdatingRegression extends MillerUpdatingRegression {
             System.out.println("getCovarianceOfParameters(1, 0): " + regress().getCovarianceOfParameters(1, 0));
             System.out.println("getCovarianceOfParameters(0, 1): " + regress().getCovarianceOfParameters(0, 1));
             System.out.println("getCovarianceOfParameters(0, 2): " + regress().getCovarianceOfParameters(0, 2));
-            System.out.println("getCovarianceOfParameters(0, 3): " + regress().getCovarianceOfParameters(0, 3));
             System.out.println("getCovarianceOfParameters(1, 2): " + regress().getCovarianceOfParameters(1, 2));
-            System.out.println("getCovarianceOfParameters(1, 3): " + regress().getCovarianceOfParameters(1, 3));
-            System.out.println("getCovarianceOfParameters(2, 3): " + regress().getCovarianceOfParameters(2, 3));
             */
+
             return b;
         } catch (ModelSpecificationException me) {
             throw me;
@@ -109,7 +107,7 @@ public class HipposUpdatingRegression extends MillerUpdatingRegression {
             */
 
             value[0] = b;
-            value[1] = super.regress().getRSquared();
+            value[1] = super.getDiagonalOfHatMatrix(x);
         } catch (ModelSpecificationException me) {
             throw me;
         } catch (Exception e) {

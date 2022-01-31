@@ -211,7 +211,7 @@ public class RaceProgramStart extends RaceStart {
     }
 
 
-    public TreeSet getValueHorseSet() {
+    public TreeSet <ValueHorse> getValueHorseSet() {
         return new TreeSet(valueHorseHashMap.values());
     }
 

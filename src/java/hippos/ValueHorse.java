@@ -183,11 +183,11 @@ public class ValueHorse implements Comparable {
         }
 
         StringBuffer sb = new StringBuffer();
-        sb.append("\n\n");
-        sb.append(raceProgramHorse.toString());
-
-        sb.append("\n\n\t    Value: " + presentationValue);
+        sb.append("\n\nValue:\t" + presentationValue);
         sb.append(" " + raceProgramHorse.getObservableList());
+
+        sb.append("\n");
+        sb.append(raceProgramHorse.toString());
 
         return sb.toString();
     }

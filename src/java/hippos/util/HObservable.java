@@ -2,6 +2,7 @@ package hippos.util;
 
 import hippos.RaceProgramHorse;
 import hippos.RaceResultHorse;
+import utils.Log;
 
 import java.util.Comparator;
 
@@ -32,14 +33,21 @@ public class HObservable implements Comparable {
 
     @Override
     public int compareTo(Object o) {
-        HObservable ho = (HObservable) o;
+        try {
+            HObservable ho = (HObservable) o;
 
-        if(hashCode() == o.hashCode())
-            return 0;
+            if(hashCode() == o.hashCode())
+                return 0;
 
-        return comparator.compare(element, ho.element);
+            int c = comparator.compare(element, ho.element);
 
-        //return element.compareTo(ho.element);
+            return c != 0 ? c : raceProgramHorse.getRaceHorseName().compareTo(ho.raceProgramHorse.getRaceHorseName());
+
+        } catch (Exception e) {
+            Log.write(e);
+            return -1;
+        }
+
     }
 
     public String toString() {

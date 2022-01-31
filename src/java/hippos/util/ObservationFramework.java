@@ -4,6 +4,7 @@ import hippos.math.AlphaNumber;
 import hippos.math.Value;
 import hippos.math.regression.HipposUpdatingRegression;
 import org.apache.commons.math3.stat.regression.ModelSpecificationException;
+import utils.Log;
 
 import java.math.BigDecimal;
 import java.util.ArrayList;
@@ -55,7 +56,7 @@ public class ObservationFramework {
                 }
 
                 double [] doubleValue = map.get(key).get(regX);
-                observerValue.add(doubleValue[0], 1.0);
+                observerValue.add(doubleValue[0], doubleValue[0]);
 
             } catch (ModelSpecificationException e) {
             } catch (NullPointerException e) {
@@ -191,13 +192,14 @@ public class ObservationFramework {
                     numbers[i++] = alphaNumber.getNumber().doubleValue();
                 }
 
-
                 if(observationMap == null)
                     observationMap = new Mapper<>();
 
                 observationMap.getOrCreate(alphas, new HipposUpdatingRegression(regX.size(), true)).add(numbers, observerValue.doubleValue());
+            } catch (NullPointerException e) {
+
             } catch (Exception e) {
-                e.printStackTrace();
+                Log.write(e);
             }
         }
 
@@ -227,8 +229,7 @@ public class ObservationFramework {
                 throw e;
 
             } catch (Exception e) {
-                //Log.write(e);
-                e.printStackTrace();
+                Log.write(e);
 
                 throw e;
             }

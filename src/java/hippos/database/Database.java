@@ -12,7 +12,8 @@ public class Database {
     public static String PROTOCOL = "jdbc:oracle:thin:@localhost:1521:hippos";
     public static String DRIVER = "oracle.jdbc.driver.OracleDriver";
     public static String USERNAME = "system";
-    public static String PASSWORD = "hcJ1CFJL";
+    //public static String PASSWORD = "hcJ1CFJL";
+    public static String PASSWORD = "HCj1cfjl";
     //public static final String PASSWORD = "BN3896jK";
 
     private static Database database = null;

@@ -80,7 +80,7 @@ public class Value implements Comparable {
 
     public void add(double entry, double count) {
         try {
-            sum = sum.add(BigDecimal.valueOf(entry));
+            sum = sum.add(BigDecimal.valueOf(entry).multiply(BigDecimal.valueOf(count)));
             this.count = this.count.add(BigDecimal.valueOf(count));
         } catch (NumberFormatException e) {
             // entry: NaN

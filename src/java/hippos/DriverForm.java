@@ -41,6 +41,7 @@ public class DriverForm extends Person implements Comparable {
     public DriverForm(String name, ResultSet raceSet) throws SQLException {
         this(name);
         raceTypeForm.setStarts(raceSet.getBigDecimal("K_S"));
+        raceTypeForm.setKertoimet(raceTypeForm.getStarts());
         raceTypeForm.setFirsts(raceSet.getBigDecimal("K_1"));
         raceTypeForm.setSeconds(raceSet.getBigDecimal("K_2"));
         raceTypeForm.setThirds(raceSet.getBigDecimal("K_3"));

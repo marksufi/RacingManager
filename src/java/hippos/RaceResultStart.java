@@ -130,8 +130,8 @@ public class RaceResultStart extends RaceStart {
                 RaceResultHorse raceResultHorse = new RaceResultHorse(raceSet, this);
                 raceResultHorses.put(raceResultHorse.getRaceHorseName(), raceResultHorse);
             }
-        } catch (SQLException e) {
-            e.printStackTrace();
+        } catch (Exception e) {
+            Log.write(e);
         } finally {
             try { raceSet.close();} catch (SQLException e) { e.printStackTrace(); }
             try { raceStmt.close();} catch (SQLException e) { e.printStackTrace(); }

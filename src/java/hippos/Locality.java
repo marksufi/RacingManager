@@ -106,7 +106,7 @@ public class Locality {
         }
     }
     public String getShortLocality() {
-        return shortLocality;
+        return shortLocality.toUpperCase();
     }
 
     public void setShortLocality(String shortLocality) {

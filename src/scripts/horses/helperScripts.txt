@@ -373,5 +373,6 @@ select * from SUBRESULT where NIMI='Romme' and laji='K';
 
 MAX( SIJOITUS ) KEEP ( DENSE_RANK LAST ORDER BY PVM ) AS lastResult
 
-SELECT pvm, lahto, numero, nimi, sijoitus from resulthorse
+SELECT paikka, pvm, lahtonumero, numero, nimi, sijoitus from resulthorse where PVM='2012-01-06';
 select avg(palkinto) from SUBRESULT where nimi = 'Tuviker' and xcode is null;
+select NUMERO, SIJOITUS, NIMI, KULJETTAJA, AIKA, LAHTOTYYPPI, XCODE, X, KERROIN, PALKINTO, MATKA, RATA, TASOITUS, RATA_TUNNISTE, VA_1, VA_2, V500 from RESULTHORSE where PVM='2012-01-06' and LAHTONUMERO=1 and PAIKKA='JO' order by NUMERO;

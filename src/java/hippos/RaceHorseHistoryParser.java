@@ -58,7 +58,7 @@ public class RaceHorseHistoryParser implements FileParser {
 
             this.raceLinkPage = new WebPage(raceHistoryPageUrl);
 
-            System.out.println("RaceHorseHistoryParser.RaceHorseHistoryParser: " + raceHistoryPageUrl);
+            System.out.println("\n\nRaceHorseHistoryParser.RaceHorseHistoryParser: " + raceHistoryPageUrl);
 
             // Miksi tämä?
             SubStart.deleteAll(this.raceProgramHorse);

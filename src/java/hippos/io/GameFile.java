@@ -1,6 +1,7 @@
 package hippos.io;
 
 import hippos.RaceProgramStart;
+import hippos.ValueHorse;
 import hippos.math.betting.GameFactory;
 
 import java.io.File;
@@ -8,6 +9,7 @@ import java.io.FileOutputStream;
 import java.io.PrintWriter;
 import java.math.BigDecimal;
 import java.util.ArrayList;
+import java.util.Arrays;
 import java.util.List;
 
 /**
@@ -84,7 +86,17 @@ public class GameFile extends File {
             PrintWriter out = new PrintWriter(new FileOutputStream(getAbsolutePath(), true));
 
             out.println(raceProgramStart.toString() + "\n");
-            out.println(gameFactory.toString());
+
+            List totoHorses = new ArrayList();
+            for(ValueHorse valueHorse : raceProgramStart.getValueHorseSet()) {
+                if(totoHorses.size() < 4) {
+                    totoHorses.add(valueHorse.getRaceProgramHorse().getHorseProgNumber());
+                } else {
+                    break;
+                }
+            }
+            out.println("Toto:\t" + totoHorses);
+
             out.println(raceProgramStart.getValueHorseSet());
             out.println("\n");
 
@@ -95,11 +107,13 @@ public class GameFile extends File {
         }
     }
 
+    /*
     public String toString() {
         StringBuffer sb = new StringBuffer();
         sb.append(this.getName() + "\n");
         sb.append("V-peli: " + V_Horses + "\n");
         sb.append("Toto:   " + A_Horses + " / " + B_Horses + " / " + C_Horses);
+        race
         return sb.toString();
-    }
+    }*/
 }

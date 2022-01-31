@@ -205,9 +205,7 @@ public abstract class Horse {
             this.trackId = sb.toString();
 
         } catch (Exception e) {
-            // TODO: ota käyttöön, kun kanta on ajettu uudelleen
-            //e.printStackTrace();
-            //Log.write(e);
+            Log.write(e);
         }
     }
 }

@@ -22,6 +22,7 @@ import java.util.TreeSet;
 public class Form {
     private String label;
     private BigDecimal starts = BigDecimal.ZERO;
+    private BigDecimal kertoimet = BigDecimal.ZERO;
     private BigDecimal firsts = BigDecimal.ZERO;
     private BigDecimal seconds = BigDecimal.ZERO;
     private BigDecimal thirds = BigDecimal.ZERO;
@@ -48,6 +49,7 @@ public class Form {
         try {
             int i = 1;
             setStarts(set.getBigDecimal(i++));
+            setKertoimet(set.getBigDecimal(i++));
             setFirsts(set.getBigDecimal(i++));
             setSeconds(set.getBigDecimal(i++));
             setThirds(set.getBigDecimal(i++));
@@ -64,6 +66,7 @@ public class Form {
         if(set.next()) {
             int i = 1;
             setStarts(set.getBigDecimal(i++));
+            setKertoimet(set.getBigDecimal(i++));
             setFirsts(set.getBigDecimal(i++));
             setSeconds(set.getBigDecimal(i++));
             setThirds(set.getBigDecimal(i++));
@@ -77,7 +80,7 @@ public class Form {
 
     public BigDecimal firstRate() {
         try {
-            return firsts.divide(starts, 4, RoundingMode.HALF_UP);
+            return firsts.divide(kertoimet, 4, RoundingMode.HALF_UP);
         } catch (ArithmeticException e) {
             // ei yhtään starttia
         } catch (Exception e) {
@@ -93,32 +96,32 @@ public class Form {
     }
 
     public BigDecimal secondRate() {
-        if(starts != null && starts.intValue() != 0) {
-            return seconds.divide(starts, 4, RoundingMode.HALF_UP);
+        if(kertoimet != null && kertoimet.intValue() != 0) {
+            return seconds.divide(kertoimet, 4, RoundingMode.HALF_UP);
         }
         return new BigDecimal(0);
     }
 
     public BigDecimal thirdRate() {
-        if(starts != null && starts.intValue() != 0) {
-            return thirds.divide(starts, 4, RoundingMode.HALF_UP);
+        if(kertoimet != null && kertoimet.intValue() != 0) {
+            return thirds.divide(kertoimet, 4, RoundingMode.HALF_UP);
         }
         return new BigDecimal(0);
     }
 
     public BigDecimal awardRate() {
         BigDecimal awardRate = BigDecimal.ZERO;
-        if(awards != null && starts != null && starts.intValue() != 0) {
-            awardRate = awards.divide(starts, 0, RoundingMode.HALF_UP);
+        if(awards != null && starts != null && kertoimet.intValue() != 0) {
+            awardRate = awards.divide(kertoimet, 0, RoundingMode.HALF_UP);
         }
         return awardRate;
     }
 
     public BigDecimal awardRate(BigDecimal ifZero) {
-        if(starts.intValue() > 0) {
+        if(kertoimet.intValue() > 0) {
             BigDecimal awardRate = BigDecimal.ZERO;
-            if (awards != null && starts != null && starts.intValue() != 0) {
-                awardRate = awards.divide(starts, 0, RoundingMode.HALF_UP);
+            if (awards != null && kertoimet != null && kertoimet.intValue() != 0) {
+                awardRate = awards.divide(kertoimet, 0, RoundingMode.HALF_UP);
             }
             return awardRate;
         }
@@ -132,7 +135,7 @@ public class Form {
             sijat = sijat.add(seconds);
             sijat = sijat.add(thirds);
 
-            return sijat.divide(starts, 4, RoundingMode.HALF_UP);
+            return sijat.divide(kertoimet, 4, RoundingMode.HALF_UP);
 
         } catch (ArithmeticException e) {
             // ei startteja
@@ -145,6 +148,7 @@ public class Form {
 
     public void add(Form hv) {
         try { starts = starts.add(hv.starts); } catch (NullPointerException e) {}
+        try { kertoimet = kertoimet.add(hv.kertoimet); } catch (NullPointerException e) {}
         try { firsts = firsts.add(hv.firsts); } catch (NullPointerException e) {}
         try { seconds = seconds.add(hv.seconds); } catch (NullPointerException e) {}
         try { thirds = thirds.add(hv.thirds); } catch (NullPointerException e) {}
@@ -179,7 +183,7 @@ public class Form {
     }
 
     public BigDecimal getAwardRate() {
-        return (starts.intValue() > 0 ? awards.divide(starts, 0, RoundingMode.HALF_UP) : BigDecimal.ZERO);
+        return (kertoimet.intValue() > 0 ? awards.divide(kertoimet, 0, RoundingMode.HALF_UP) : BigDecimal.ZERO);
     }
 
     public void setLabel(String label) {
@@ -223,6 +227,10 @@ public class Form {
             String gallop = subStart.getxCode();
 
             this.starts = this.starts.add(BigDecimal.ONE);
+
+            if(subStart.getRating() != null)
+                this.kertoimet = this.kertoimet.add(BigDecimal.ONE);
+
             if(raceRanking != null) {
                 switch(raceRanking.intValue()) {
                     case 1: firsts = firsts.add(BigDecimal.ONE);
@@ -257,25 +265,14 @@ public class Form {
         return kcode;
     }
 
-    public BigDecimal getKcodeRate() {
-        try {
-            return kcode.divide(starts, 2, RoundingMode.HALF_UP);
-        } catch (ArithmeticException e) {
-            // starts is zero
-        } catch (Exception e) {
-            e.printStackTrace();
-        }
-        return BigDecimal.ZERO;
-    }
-
     public BigDecimal getKcodeProcents(BigDecimal ifZero) {
         try {
             BigDecimal kcoderate = this.kcode.multiply(BigDecimal.valueOf(100.00));
-            kcoderate = kcoderate.divide(starts, 0, RoundingMode.HALF_UP);
+            kcoderate = kcoderate.divide(kertoimet, 0, RoundingMode.HALF_UP);
 
             return kcoderate;
         } catch (ArithmeticException e) {
-            // starts is zero
+            // kertoimia nolla
         } catch (Exception e) {
             Log.write(e);
         }
@@ -292,20 +289,6 @@ public class Form {
         return xcode;
     }
 
-    public BigDecimal getXcodeProcents(BigDecimal ifZero) {
-        try {
-            BigDecimal xcoderate = this.xcode.multiply(BigDecimal.valueOf(100.00));
-            xcoderate = xcoderate.divide(starts, 0, RoundingMode.HALF_UP);
-
-            return xcoderate;
-        } catch (ArithmeticException e) {
-            // starts is zero
-        } catch (Exception e) {
-            e.printStackTrace();
-        }
-        return ifZero;
-    }
-
     public void setXcode(BigDecimal xcode) {
         if(xcode != null) {
             this.xcode = xcode;
@@ -316,7 +299,7 @@ public class Form {
 
     public void setProbability(BigDecimal allStartCount) {
         try {
-            probability = starts.divide(allStartCount, 2, RoundingMode.HALF_UP).multiply(BigDecimal.valueOf(100));
+            probability = kertoimet.divide(allStartCount, 2, RoundingMode.HALF_UP).multiply(BigDecimal.valueOf(100));
         } catch (ArithmeticException e) {
             //divide by zero
             probability = BigDecimal.ZERO;
@@ -330,7 +313,7 @@ public class Form {
     }
 
     public static String getSelect() {
-        return "select count(*), sum(S_1), sum(S_2), sum(S_3), sum(palkinto), sum(KCODE), count(XCODE), SUM(KVP)";
+        return "select count(*), count(kerroin), sum(S_1), sum(S_2), sum(S_3), sum(palkinto), sum(KCODE), count(XCODE), SUM(KVP)";
     }
 
     public static PreparedStatement getStatement(Connection conn, String name, String race, Date startDate, Date endDate) {
@@ -365,6 +348,7 @@ public class Form {
         StringBuffer sb = new StringBuffer();
 
         sb.append(starts + ":");
+        sb.append(kertoimet + ":");
         sb.append(firsts + ":");
         sb.append(seconds + ":");
         sb.append(thirds + ":");
@@ -461,14 +445,22 @@ public class Form {
         }
     }
 
+    public BigDecimal getKertoimet() {
+        return kertoimet;
+    }
+
+    public void setKertoimet(BigDecimal kertoimet) {
+        this.kertoimet = kertoimet;
+    }
+
     public String toTinyString() {
 
-        return (starts + " " + firsts + "-" + seconds + "-" + thirds + " (" + getAwardRate()+ "€/s)");
+        return (starts + " " + kertoimet + " " + firsts + "-" + seconds + "-" + thirds + " (" + getAwardRate()+ "€/s)");
     }
 
     public String toString() {
         StringBuffer str = new StringBuffer();
-        str.append(label + ": " + starts + " " + firsts + "-" + seconds + "-" + thirds + " (" + getAwardRate()+ "€/s)");
+        str.append(label + ": " + starts + " " + kertoimet + " " + firsts + "-" + seconds + "-" + thirds + " (" + getAwardRate()+ "€/s)");
 
         if(kcode != null) {
             str.append("->" + kcode + " ");

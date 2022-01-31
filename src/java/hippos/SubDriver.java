@@ -29,7 +29,7 @@ public class SubDriver extends DriverForm {
         try {
             java.sql.Date sqlEndDate = DateUtils.toSQLDate(subStart.date);
 
-            stmt = conn.prepareStatement("select avg(S_1) from SUBRESULT where kuljettaja = ? and pvm <= ? and KERROIN is not null");
+            stmt = conn.prepareStatement("select avg(S_1) from SUBRESULT where kuljettaja = ? and pvm < ? and KERROIN is not null");
 
             stmt.setString(1, subStart.getSubDriver().getName());
             stmt.setDate(2, sqlEndDate);

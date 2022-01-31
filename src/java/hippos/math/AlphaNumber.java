@@ -69,6 +69,8 @@ public class AlphaNumber implements Comparable {
         this.number = number;
         if (alpha != null)
             this.alpha = alpha;
+        else
+            System.out.println("Miksi tämä?");
     }
 
     public AlphaNumber(double newValue) {
@@ -95,11 +97,40 @@ public class AlphaNumber implements Comparable {
 
         if(this.hashCode() == alphaNumber.hashCode())
             return 0;
-        if(number == null) return 1;
-        if(alphaNumber.number == null) return -1;
-        if(number.equals(alphaNumber.number)) return -1;
 
-        return number.compareTo(alphaNumber.number);
+        if(MathHelper.xor(number == null, alphaNumber.number == null)) {
+            // Jompikumpi on null, mutta ei molemmat
+            if (number == null) return 1;
+            if (alphaNumber.number == null) return -1;
+        }
+
+        try {
+            // molemmat ei nulleja
+            int cmp = number.compareTo(alphaNumber.number);
+            if(cmp != 0)
+                return cmp;
+
+            // yhtä suuria, vertailu korjaimilla
+
+        } catch (NullPointerException e) {
+            // molemmat tyhjiä, vertailu kirjaimilla
+        }
+
+        if(MathHelper.xor(alpha != null, alphaNumber.alpha != null)) {
+            // Jompikumpi on null, mutta ei molemmat
+            if (alpha == null) return 1;
+            if (alphaNumber.alpha == null) return -1;
+        }
+
+        try {
+            return alpha.compareTo(alphaNumber.alpha);
+
+        } catch (NullPointerException e) {
+            // Molemmat tyhjiä
+
+        }
+
+        return -1;
     }
 
     /*

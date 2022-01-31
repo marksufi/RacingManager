@@ -128,7 +128,6 @@ public class SubTime extends AlphaNumber implements Comparable, RegressionMapObs
 
             double y = subTimeMapper.get(this);
 
-            // TODO: aktivoi kun mapperi valmis
             subValue.updateValue(y);
 
         } catch (RegressionModelException e) {
@@ -267,11 +266,13 @@ public class SubTime extends AlphaNumber implements Comparable, RegressionMapObs
         return progressMultiplier;
     }
 
+    /*
     public int compareTo(Object o) {
         SubTime aSubTime = (SubTime) o;
 
         if(this.hashCode() == o.hashCode())
             return 0;
+
 
         if (this.getNumber() == null)
             return 1;
@@ -283,7 +284,7 @@ public class SubTime extends AlphaNumber implements Comparable, RegressionMapObs
 
         // Miksi oli näin?
         //return subValue.compareTo(aSubTime.getSubValue());
-    }
+    }*/
 
     public BigDecimal getK() {
         return subStart.getkCode();

@@ -38,7 +38,7 @@ public class GameFactory {
 
     public GameFactory(RaceProgramStart raceProgramStart) {
         //this(raceProgramStart.getValueHorses());
-        selectWinners(raceProgramStart.getSortedHorseList());
+        getTotoHorses(raceProgramStart.getSortedHorseList());
     }
 
     public GameFactory(RaceProgramStart raceProgramStart, Connection conn) {
@@ -180,7 +180,7 @@ public class GameFactory {
         }
     }
 
-    public void selectWinners(List valueHorses) {
+    public void getTotoHorses(List valueHorses) {
         if(valueHorses != null && !valueHorses.isEmpty()) {
             BigDecimal Amin = null;
             BigDecimal Bmin = null;

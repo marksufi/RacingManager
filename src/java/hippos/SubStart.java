@@ -59,7 +59,6 @@ public class SubStart implements Comparable {
     private BigDecimal yearRankTimeAward;
 
     // RaceProgramHorse:n SubStart taulukon tiedot
-    private String trackId;
     private BigDecimal dateDiff;
     private SubTime subTime;
     private SubRank subRank;
@@ -72,47 +71,43 @@ public class SubStart implements Comparable {
     private double season;
     private List weeksKeyList = new ArrayList();
 
-
-
     public SubStart(RaceProgramHorse raceProgramHorse) {
         this.raceProgramHorse = raceProgramHorse;
         shiftList = new ArrayList();
     }
 
     public SubStart(ResultSet set, RaceProgramHorse raceProgramHorse) throws SQLException {
-        this.raceProgramHorse = raceProgramHorse;
+        try {
+            this.raceProgramHorse = raceProgramHorse;
 
-        trackId = set.getString("RATA_TUNNISTE");
-        weather = set.getString("WEATHER");
-        subDriver = new SubDriver(set.getString("KULJETTAJA"));
-        subDriver.setWinRate(set.getBigDecimal("KVP"));
-        coach = new Coach(set.getString("VALMENTAJA"));
-        locality = set.getString("PAIKKA");
-        date = set.getDate("PVM");
-        startNumber = set.getBigDecimal("LAHTONUMERO");
-        raceLength = set.getBigDecimal("MATKA");
-        raceTrack = set.getBigDecimal("RATA");
-        raceType = set.getString("TYYPPI");
+            weather = set.getString("WEATHER");
+            subDriver = new SubDriver(set.getString("KULJETTAJA"));
+            subDriver.setWinRate(set.getBigDecimal("KVP"));
+            coach = new Coach(set.getString("VALMENTAJA"));
+            locality = set.getString("PAIKKA");
+            date = set.getDate("PVM");
+            startNumber = set.getBigDecimal("LAHTONUMERO");
+            raceLength = set.getBigDecimal("MATKA");
+            raceTrack = set.getBigDecimal("RATA");
+            raceType = set.getString("TYYPPI");
+            raceMode = new RaceMode(set.getString("LAHTOTYYPPI"));
+            subTime = new SubTime(set.getBigDecimal("AIKA"), raceMode.toString(), this);
+            subRank = new SubRank(set.getBigDecimal("SIJOITUS"), this);
+            xCode = new AlphaNumber(set.getString("XCODE"));
+            x = set .getBigDecimal("X");
+            if(xCode.getNumber() != null && subRank.getNumber() == null) {
+                // hlo 8, hyl 1...
+                subRank.setNumber(xCode.getNumber());
+            }
 
-        raceMode = new RaceMode(set.getString("LAHTOTYYPPI"));
-        subTime = new SubTime(set.getBigDecimal("AIKA"), raceMode.toString(), this);
-
-        subRank = new SubRank(set.getBigDecimal("SIJOITUS"), this);
-
-        xCode = new AlphaNumber(set.getString("XCODE"));
-        x = set .getBigDecimal("X");
-        if(xCode.getNumber() != null && subRank.getNumber() == null) {
-            // hlo 8, hyl 1...
-            subRank.setNumber(xCode.getNumber());
+            dateDiff = BigDecimal.valueOf(DateUtils.getDayDiff(raceProgramHorse.getRaceDate(), getDate()));
+            rating = set.getBigDecimal("KERROIN");
+            kCode = set.getBigDecimal("KCODE");
+            award = set.getBigDecimal("PALKINTO");
+            subTime.setAlpha(raceMode.toString());
+        } catch (Exception e) {
+            Log.write(e);
         }
-
-        dateDiff = BigDecimal.valueOf(DateUtils.getDayDiff(raceProgramHorse.getRaceDate(), getDate()));
-
-        rating = set.getBigDecimal("KERROIN");
-        kCode = set.getBigDecimal("KCODE");
-        award = set.getBigDecimal("PALKINTO");
-
-        subTime.setAlpha(raceMode.toString());
     }
 
     /**
@@ -125,11 +120,8 @@ public class SubStart implements Comparable {
         try {
             int i = 0;
             if (subStart != null) {
-                String[] tokens = subStart.split(";", 10);
-                trackId = tokens[i++];
-                if(trackId.contains("null"))
-                    trackId = null;
-
+                String[] tokens = subStart.split(";", 14);
+                locality = tokens[i++];
                 weather = tokens[i++];
                 if(weather.contains("null"))
                     weather = null;
@@ -149,17 +141,15 @@ public class SubStart implements Comparable {
 
                 String dateDiffStr = tokens[i++];
                 dateDiff = new BigDecimal(dateDiffStr);
-
                 award = new AlphaNumber(tokens[i++]).getBigDecimal();
-                kCode = new BigDecimal(tokens[i++]);
-
-                String driver = tokens[i++];
-                this.subDriver = new SubDriver(driver);
-
-                this.subDriver.setWinRate(new AlphaNumber(tokens[i++]).getBigDecimal());
-
+                kCode = new AlphaNumber(tokens[i++]).getNumber();
+                subDriver = new SubDriver(tokens[i++]);
+                subDriver.setWinRate(new AlphaNumber(tokens[i++]).getBigDecimal());
+                setRating(new AlphaNumber(tokens[i++]).getBigDecimal());
                 setDate(raceProgramHorse.getRaceProgramStart().getDate(), new BigDecimal(dateDiffStr));
                 setRaceMode(new RaceMode(subTime.getAlpha()));
+                setRaceLength(new BigDecimal(tokens[i++]));
+                setRaceTrack(new BigDecimal(tokens[i++]));
 
                 if(xCode.getNumber() != null && subRank.getNumber() == null)
                     subRank.setNumber(xCode.getNumber());
@@ -247,6 +237,13 @@ public class SubStart implements Comparable {
 
             stmt = getInsertStatement(conn);
 
+            if(this.rating == null) {
+                // Koe- ja nuorten lähdöissä sijoitus, palkintorahat ja paalupaikat poistetaan, koska ne vääristää tilastoja
+                subRank = null;
+                award = null;
+                kCode = null;
+            }
+
             stmt.setString(i++, name);
             stmt.setString(i++, this.raceLiteral);
             stmt.setString(i++, this.subDriver.getName());
@@ -262,9 +259,9 @@ public class SubStart implements Comparable {
             stmt.setBigDecimal(i++, this.getkCode());
             stmt.setString(i++, raceMode.toString());
             stmt.setBigDecimal(i++, this.subRank != null ? this.subRank.getBigDecimal() : null);
-            stmt.setBigDecimal(i++, (subRank != null && subRank.getNumber() != null) ? subRank.getNumber().intValue() == 1 ? BigDecimal.ONE : BigDecimal.ZERO : null);
-            stmt.setBigDecimal(i++, (subRank != null && subRank.getNumber() != null) ? subRank.getNumber().intValue() == 2 ? BigDecimal.ONE : BigDecimal.ZERO : null);
-            stmt.setBigDecimal(i++, (subRank != null && subRank.getNumber() != null) ? subRank.getNumber().intValue() == 3 ? BigDecimal.ONE : BigDecimal.ZERO : null);
+            stmt.setBigDecimal(i++, subRank != null ? (subRank.getNumber() != null ? (subRank.getNumber().intValue() == 1 ? BigDecimal.ONE : BigDecimal.ZERO) : BigDecimal.ZERO) : null);
+            stmt.setBigDecimal(i++, subRank != null ? (subRank.getNumber() != null ? (subRank.getNumber().intValue() == 2 ? BigDecimal.ONE : BigDecimal.ZERO) : BigDecimal.ZERO) : null);
+            stmt.setBigDecimal(i++, subRank != null ? (subRank.getNumber() != null ? (subRank.getNumber().intValue() == 3 ? BigDecimal.ONE : BigDecimal.ZERO) : BigDecimal.ZERO) : null);
             stmt.setString(i++, this.getxCode() != null ? this.getxCode() : null);
             stmt.setBigDecimal(i++, this.x);
             stmt.setBigDecimal(i++, this.rating != null ? this.rating : null);
@@ -339,72 +336,6 @@ public class SubStart implements Comparable {
         }
         return stmt;
     }
-
-    /*
-    public void insert(Connection conn, String hid, RaceResultHorse raceResultHorse) throws ExistsInDatabaseException {
-        PreparedStatement stmt = null;
-        String name = raceResultHorse.getRaceHorseName().toString();
-        int i = 1;
-
-        //if(valueHorse.getRaceHorseName().equals("Solea Rivelliere"))
-        //    System.out.print("");
-        try {
-            if(existsInDatabase(conn))
-                throw new ExistsInDatabaseException();
-
-            if(this.rating != null ) {
-                if(this.rating.doubleValue() < 1.0) {
-                    Log.write("SubStart.insert:[" + hid + ":" + this + "] voittokerroin pienempi kuin 1 = " + this.rating);
-                }
-            }
-
-            StringBuffer sb = new StringBuffer();
-            sb.append("insert into SUBRESULT ");
-            sb.append("(NIMI, LAJI, OHJELMAKULJETTAJA, VALMENTAJA, PAIKKA, PVM, EXPVM, LAHTONUMERO, MATKA, RATA, TYYPPI, AIKA, KCODE, LAHTOTYYPPI, SIJOITUS, S_1, S_2, S_3, XCODE, X, KERROIN, PALKINTO, TAUKOVIIKOT) ");
-            sb.append("values(?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?)");
-
-            stmt = conn.prepareStatement(sb.toString());
-            stmt.setString(i++, name);
-            stmt.setString(i++, this.raceLiteral);
-            stmt.setString(i++, this.subDriver.toString());
-            stmt.setString(i++, this.coach.toString());
-            stmt.setString(i++, this.locality);
-            stmt.setDate(i++, getSQLDate());
-            stmt.setDate(i++, DateUtils.toSQLDate(exDate));
-            stmt.setBigDecimal(i++, this.startNumber);
-            stmt.setBigDecimal(i++, this.raceLength);
-            stmt.setBigDecimal(i++, this.raceTrack);
-            stmt.setString(i++, this.raceType);
-            stmt.setBigDecimal(i++, this.subTime != null ? this.subTime.getBigDecimal() : null);
-            stmt.setBigDecimal(i++, this.getkCode());
-            stmt.setString(i++, raceMode.toString());
-            stmt.setBigDecimal(i++, this.subRank != null ? this.subRank.getBigDecimal() : null);
-
-            stmt.setBigDecimal(i++, (subRank != null && subRank.getNumber() != null) ? subRank.getNumber().intValue() == 1 ? BigDecimal.ONE : BigDecimal.ZERO : null);
-            stmt.setBigDecimal(i++, (subRank != null && subRank.getNumber() != null) ? subRank.getNumber().intValue() == 2 ? BigDecimal.ONE : BigDecimal.ZERO : null);
-            stmt.setBigDecimal(i++, (subRank != null && subRank.getNumber() != null) ? subRank.getNumber().intValue() == 3 ? BigDecimal.ONE : BigDecimal.ZERO : null);
-
-            stmt.setString(i++, this.getxCode() != null ? this.getxCode() : null);
-            stmt.setBigDecimal(i++, this.x);
-
-            stmt.setBigDecimal(i++, this.rating != null ? this.rating : null);
-            stmt.setBigDecimal(i++, this.award != null ? this.award : null);
-            stmt.setString(i++, gapString);
-
-            stmt.executeUpdate();
-            conn.commit();
-        } catch (SQLException e) {
-            if(e.getErrorCode() == 1)
-                throw new ExistsInDatabaseException();
-            else
-                Log.write(e);
-        } catch (Exception e) {
-            System.out.println("SubStart.insert: " + hid);
-            Log.write(e);
-        } finally {
-            try { if(stmt != null) stmt.close(); } catch (SQLException e) { e.printStackTrace();}
-        }
-    }*/
 
     public boolean existsInDatabase(Connection conn) {
         PreparedStatement statement = null;
@@ -668,12 +599,43 @@ public class SubStart implements Comparable {
         return p.toString();
     }
 
+    public String toDatabaseString() {
+
+        StringBuilder sb = null;
+        try {
+            sb = new StringBuilder();
+
+            sb.append(getLocality() + ";");
+            sb.append(getWeather() + ";");
+            sb.append(getSubTime() + ";");
+            sb.append(getSubRank() + ";");
+            sb.append(getxCode() + ";");
+
+            int dateDiff = DateUtils.getDayDiff(raceProgramHorse.getRaceDate(), getDate());
+            sb.append(dateDiff + ";");
+            sb.append((getAward() != null ? getAward() : "") + ";");
+            sb.append((getkCode() != null ? getkCode() : "") + ";");
+            sb.append(getSubDriver().getName() + ";");
+            sb.append(getSubDriver().getWinRate() + ";");
+
+            sb.append((getRating() != null ? getRating() : "") + ";");
+            sb.append(this.raceLength + ";");
+            sb.append(this.raceTrack + ";");
+
+
+        } catch (Exception e) {
+            Log.write(e);
+        }
+
+        return sb.toString();
+
+    }
+
     public String toValueString() {
         SimpleDateFormat df = new SimpleDateFormat("dd.MM.yy");
 
         StringBuffer p = new StringBuffer();
         try {
-            p.append(StringUtils.parse(String.valueOf(trackId != null ? trackId : " "), ' ', 7, StringUtils.ALIGN_LEFT));
             p.append(StringUtils.parse(String.valueOf(weather != null ? weather : " "), ' ', 3, StringUtils.ALIGN_LEFT));
             p.append(StringUtils.parse(String.valueOf(driverRaceTypeClass), ' ', 5, StringUtils.ALIGN_LEFT));
             p.append(StringUtils.parse(date != null ? df.format(date) : "", ' ', 10, StringUtils.ALIGN_LEFT));
@@ -860,12 +822,5 @@ public class SubStart implements Comparable {
         return driverRaceTypeClass;
     }
 
-    public String getTrackId() {
-        return trackId;
-    }
-
-    public void setTrackId(String trackId) {
-        this.trackId = trackId;
-    }
 }
 

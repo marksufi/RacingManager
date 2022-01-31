@@ -159,7 +159,7 @@ public class RaceProgramHorse extends Horse {
             stmt.setBigDecimal( i++, getTasoitus());
 
             Form driverStats = getRaceProgramDriver().getDriverForm().raceTypeForm;
-            stmt.setBigDecimal( i++, driverStats.getStarts());
+            stmt.setBigDecimal( i++, driverStats.getKertoimet());
             stmt.setBigDecimal( i++, driverStats.getFirsts());
             stmt.setBigDecimal( i++, driverStats.getSeconds());
             stmt.setBigDecimal( i++, driverStats.getThirds());
@@ -175,34 +175,11 @@ public class RaceProgramHorse extends Horse {
                         SubStart subStart = (SubStart) subStartList.get(is);
 
                         if (subStart.getSubTime() != null && subStart.getSubTime().getAlpha() != null && subStart.getSubTime().getAlpha().contains("x")) {
-                            System.out.println("RaceProgramHorse.insert: +  tietokantaan ei saa yhdistää aikaa ja xcodea");
+                            Log.write("RaceProgramHorse.insert: +  tietokantaan ei saa yhdistää aikaa ja xcodea");
                         }
-                        sb.append(subStart.getTrackId() + ";");
-                        sb.append(subStart.getWeather() + ";");
 
-                        sb.append(subStart.getSubTime());
-
-                        sb.append(";");
-                        sb.append(subStart.getSubRank());
-
-                        sb.append(";");
-                        sb.append(subStart.getxCode());
-
-                        sb.append(";");
-                        int dateDiff = DateUtils.getDayDiff(this.getRaceDate(), subStart.getDate());
-                        sb.append(dateDiff);
-
-                        sb.append(";");
-                        sb.append(subStart.getAward());
-
-                        sb.append(";");
-                        sb.append(subStart.getkCode());
-
-                        sb.append(";");
-                        sb.append(subStart.getSubDriver().getName());
-                        sb.append(";");
-                        sb.append(subStart.getSubDriver().getWinRate());
-                        sb.append(";");
+                        String inputString = subStart.toDatabaseString();
+                        sb.append(inputString);
 
                     } catch (Exception e) {
                         e.printStackTrace();
@@ -852,14 +829,82 @@ public class RaceProgramHorse extends Horse {
             BigDecimal driverChange = newDriver.subtract(exDrivers);
             observableList.add(new AlphaNumber(driverChange.setScale(2)));
 
-            // Ennätykset
-            Set<AlphaNumber> recordTimes = yearStatistics.getRecordTimes();
-            int size = 0;
-            for(AlphaNumber recordTime : recordTimes) {
-                observableList.add(new AlphaNumber(recordTime));
-                if(size++ > 0)
-                    break;
+            try { // Kokonaisennätys
+                observableList.add(new AlphaNumber(fullStatistics.getRecordTimes().first()));
+            } catch (Exception e) {
+                observableList.add(new AlphaNumber());
             }
+
+            try {   // Vuoden ennätys
+                observableList.add(new AlphaNumber(yearStatistics.getRecordTimes().first()));
+            } catch (Exception e) {
+                observableList.add(new AlphaNumber());
+            }
+
+            // Viime startit
+            Iterator <SubStart> itr = getSubStartSet().iterator();
+            for(int s = 0; itr.hasNext() && s < 3; s++) {
+                SubStart subStart = itr.next();
+                String x = subStart.getxCode();
+
+                // Aika
+                try {
+                    AlphaNumber observableSubTime = new AlphaNumber(subStart.getSubTime().getNumber(), subStart.getSubTime().getAlpha());
+                    if(fullStatistics.getRecordTimes().contains(observableSubTime)) {
+                        // Ennätysajalle R perään
+                        observableSubTime.setAlpha(observableSubTime.getAlpha() + "R");
+                    }
+                    if(x != null && !x.isEmpty()) {
+                        // Laukka-aika, joten x perään
+                        observableSubTime.setAlpha(observableSubTime.getAlpha() + "x");
+                    }
+
+                    observableList.add(observableSubTime);
+
+                } catch (Exception e) {
+                    observableList.add(new AlphaNumber());
+
+                }
+
+                // Ajajamuutos
+                try {
+                    BigDecimal subDriverWinRate = subStart.getSubDriver().getWinRate();
+                    BigDecimal programDriverWinRate = this.getRaceProgramDriver().getDriverForm().raceTypeForm.firstRateProcents(2);
+                    BigDecimal driverWinRateDiff = programDriverWinRate.subtract(subDriverWinRate);
+                    AlphaNumber driverDiff = new AlphaNumber(driverWinRateDiff);
+                    observableList.add(driverDiff);
+
+                } catch (Exception e) {
+                    observableList.add(new AlphaNumber());
+
+                }
+
+                // Sijoitus
+                try {
+                    AlphaNumber subRank = new AlphaNumber(subStart.getSubRank());
+
+                    BigDecimal rating = subStart.getRating();
+                    if(rating == null) {
+                        subRank.setNumber(null);
+                    }
+
+                    if(x != null) {
+                        subRank.setAlpha(subRank.getAlpha() != null ? subRank.getAlpha() + x : x);
+                    }
+                    BigDecimal award = subStart.getAward();
+
+                    if(award == null || award.compareTo(BigDecimal.ZERO) == 0)
+                        subRank.setNumber(BigDecimal.ZERO);
+
+                    AlphaNumber observerRank = new AlphaNumber(award, subRank.toString());
+                    observableList.add(observerRank);
+
+                } catch (Exception e) {
+                    observableList.add(new AlphaNumber());
+
+                }
+            }
+
         } catch (Exception e) {
             Log.write(e);
         }
@@ -959,9 +1004,6 @@ public class RaceProgramHorse extends Horse {
 
                 str.append("\n[" + trackSecondQuarterPropability + "%]");
                 str.append("\t1000m: " + timeStatistics.getSecondQuarter().toString());
-
-                //str.append("\n");
-                //str.append("\tV500m: " + timeStatistics.getLastQuarter().toString());
             }
 
             str.append("\n\n\t" + fullStatistics + "\n");
@@ -970,10 +1012,10 @@ public class RaceProgramHorse extends Horse {
                 str.append("\t\t" + fullStatistics.getForms().get(key) + "\n");
             }
 
-            str.append("\t" + yearStatistics + "\n");
+            str.append("\t" + yearStatistics);
 
             if(fullStatistics.getSubForms().get(this.getRaceMode()) != null) {
-                str.append("\t" + fullStatistics.getSubForms().get(this.getRaceMode()) + "\n");
+                str.append("\n\t" + fullStatistics.getSubForms().get(this.getRaceMode()));
             }
 
             for(SubStart subStart : subStartList) {
@@ -993,7 +1035,10 @@ public class RaceProgramHorse extends Horse {
             //str.append("\n\t" + coach);
             if(this.raceProgramDriver != null) {
                 str.append("\n\t" + getRaceProgramDriver().toString());
-                str.append("\n\t" + raceProgramDriver.getDriverForm().getForm().toString());
+                if(getRaceProgramDriver().getDriverForm().getJockeyClass() != null) {
+                    str.append("(" + getRaceProgramDriver().getDriverForm().getJockeyClass() + ")");
+                }
+                str.append("\n\t" + raceProgramDriver.getDriverForm().getForm().toString().replace("Jockey", "Yht"));
             }
 
             /*
