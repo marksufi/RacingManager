@@ -2,7 +2,6 @@ package hippos;
 
 import hippos.lang.stats.Form;
 import hippos.utils.DateUtils;
-import oracle.jdbc.proxy.annotation.Pre;
 import utils.Log;
 
 import java.math.BigDecimal;
@@ -11,7 +10,6 @@ import java.sql.Connection;
 import java.sql.PreparedStatement;
 import java.sql.ResultSet;
 import java.sql.SQLException;
-import java.util.Date;
 
 /**
  * Created by IntelliJ IDEA.
@@ -41,7 +39,7 @@ public class DriverForm extends Person implements Comparable {
     public DriverForm(String name, ResultSet raceSet) throws SQLException {
         this(name);
         raceTypeForm.setStarts(raceSet.getBigDecimal("K_S"));
-        raceTypeForm.setKertoimet(raceTypeForm.getStarts());
+        raceTypeForm.setSijoitukset(raceTypeForm.getStarts());
         raceTypeForm.setFirsts(raceSet.getBigDecimal("K_1"));
         raceTypeForm.setSeconds(raceSet.getBigDecimal("K_2"));
         raceTypeForm.setThirds(raceSet.getBigDecimal("K_3"));

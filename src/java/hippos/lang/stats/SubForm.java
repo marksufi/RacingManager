@@ -17,7 +17,6 @@ import java.util.*;
 public class SubForm extends Form {
 
     private final String raceMode;
-    private final BigDecimal lastAward;
     private BigDecimal recordTime;
 
     private double y = Double.NaN;
@@ -36,7 +35,6 @@ public class SubForm extends Form {
 
         setLabel(label.toString());
 
-        this.lastAward = set.getBigDecimal("VPALKINTO");
         this.recordTime = set.getBigDecimal("AIKA");
     }
 
@@ -155,7 +153,6 @@ public class SubForm extends Form {
 
         sb.append(super.toString());
         sb.append(" " + recordTime + getLabel());
-        sb.append(" " + lastAward);
 
         sb.append(" ==> " + y);
         return sb.toString();

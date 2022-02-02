@@ -170,26 +170,22 @@ public class ValueHorse implements Comparable {
         this.observaleList = observaleList;
     }
 
-    public String toString() {
-
+    public String toPresentationValueString() {
         BigDecimal observerValue = null;
         AlphaNumber presentationValue = new AlphaNumber("N/A");
         try {
             observerValue = this.value.average(4, BigDecimal.ZERO);
-            observerValue = BigDecimal.ONE.divide(observerValue, 4, RoundingMode.HALF_UP);
+            observerValue = BigDecimal.ONE.divide(observerValue, 3, RoundingMode.HALF_UP);
             presentationValue = HorsesHelper.toProcents(observerValue);
         } catch (Exception e) {
             //e.printStackTrace();
         }
+        return presentationValue.toString();
+    }
 
-        StringBuffer sb = new StringBuffer();
-        sb.append("\n\nValue:\t" + presentationValue);
-        sb.append(" " + raceProgramHorse.getObservableList());
+    public String toString() {
 
-        sb.append("\n");
-        sb.append(raceProgramHorse.toString());
-
-        return sb.toString();
+        return raceProgramHorse.toString(this);
     }
 
 }

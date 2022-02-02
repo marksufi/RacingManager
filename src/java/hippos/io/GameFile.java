@@ -85,7 +85,7 @@ public class GameFile extends File {
         try {
             PrintWriter out = new PrintWriter(new FileOutputStream(getAbsolutePath(), true));
 
-            out.println(raceProgramStart.toString() + "\n");
+            out.println(raceProgramStart.toString());
 
             List totoHorses = new ArrayList();
             for(ValueHorse valueHorse : raceProgramStart.getValueHorseSet()) {
@@ -95,7 +95,7 @@ public class GameFile extends File {
                     break;
                 }
             }
-            out.println("Toto:\t" + totoHorses);
+            out.println("\nToto:\t" + totoHorses);
 
             out.println(raceProgramStart.getValueHorseSet());
             out.println("\n");

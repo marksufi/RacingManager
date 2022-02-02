@@ -1,16 +1,11 @@
 package hippos.lang.stats;
 
-import hippos.DriverForm;
 import hippos.SubStart;
-import hippos.math.AlphaNumber;
-import org.apache.commons.math3.dfp.DfpField;
 import utils.Log;
 
 import java.math.BigDecimal;
 import java.math.RoundingMode;
 import java.sql.*;
-import java.util.SortedSet;
-import java.util.TreeSet;
 
 /**
  * Created by IntelliJ IDEA.
@@ -20,9 +15,12 @@ import java.util.TreeSet;
  * To change this template use Options | File Templates.
  */
 public class Form {
+    /**
+     * TODO: ratkaise miten paalupaikkaprosentti lasketaan tarkasti, eli ruotsin ravit
+     */
     private String label;
-    private BigDecimal starts = BigDecimal.ZERO;
-    private BigDecimal kertoimet = BigDecimal.ZERO;
+    private BigDecimal starts = BigDecimal.ZERO;        // laukkaprosentin laskemiseen
+    private BigDecimal sijoitukset = BigDecimal.ZERO;   // muiden prosettien laskemiseen, ruotsin stateista puuttuu paalupaikka
     private BigDecimal firsts = BigDecimal.ZERO;
     private BigDecimal seconds = BigDecimal.ZERO;
     private BigDecimal thirds = BigDecimal.ZERO;
@@ -49,7 +47,7 @@ public class Form {
         try {
             int i = 1;
             setStarts(set.getBigDecimal(i++));
-            setKertoimet(set.getBigDecimal(i++));
+            setSijoitukset(set.getBigDecimal(i++));
             setFirsts(set.getBigDecimal(i++));
             setSeconds(set.getBigDecimal(i++));
             setThirds(set.getBigDecimal(i++));
@@ -66,7 +64,7 @@ public class Form {
         if(set.next()) {
             int i = 1;
             setStarts(set.getBigDecimal(i++));
-            setKertoimet(set.getBigDecimal(i++));
+            setSijoitukset(set.getBigDecimal(i++));
             setFirsts(set.getBigDecimal(i++));
             setSeconds(set.getBigDecimal(i++));
             setThirds(set.getBigDecimal(i++));
@@ -80,7 +78,7 @@ public class Form {
 
     public BigDecimal firstRate() {
         try {
-            return firsts.divide(kertoimet, 4, RoundingMode.HALF_UP);
+            return firsts.divide(sijoitukset, 4, RoundingMode.HALF_UP);
         } catch (ArithmeticException e) {
             // ei yhtään starttia
         } catch (Exception e) {
@@ -96,36 +94,46 @@ public class Form {
     }
 
     public BigDecimal secondRate() {
-        if(kertoimet != null && kertoimet.intValue() != 0) {
-            return seconds.divide(kertoimet, 4, RoundingMode.HALF_UP);
+        if(sijoitukset != null && sijoitukset.intValue() != 0) {
+            return seconds.divide(sijoitukset, 4, RoundingMode.HALF_UP);
         }
         return new BigDecimal(0);
     }
 
     public BigDecimal thirdRate() {
-        if(kertoimet != null && kertoimet.intValue() != 0) {
-            return thirds.divide(kertoimet, 4, RoundingMode.HALF_UP);
+        if(sijoitukset != null && sijoitukset.intValue() != 0) {
+            return thirds.divide(sijoitukset, 4, RoundingMode.HALF_UP);
         }
         return new BigDecimal(0);
     }
 
     public BigDecimal awardRate() {
         BigDecimal awardRate = BigDecimal.ZERO;
-        if(awards != null && starts != null && kertoimet.intValue() != 0) {
-            awardRate = awards.divide(kertoimet, 0, RoundingMode.HALF_UP);
+        try {
+            if(awards != null && sijoitukset.intValue() != 0) {
+                awardRate = awards.divide(sijoitukset, 0, RoundingMode.HALF_UP);
+            }
+        } catch (ArithmeticException e) {
+            // jako nollalla
+        } catch (Exception e) {
+            Log.write(e);
         }
         return awardRate;
     }
 
     public BigDecimal awardRate(BigDecimal ifZero) {
-        if(kertoimet.intValue() > 0) {
+        if(sijoitukset.intValue() > 0) {
             BigDecimal awardRate = BigDecimal.ZERO;
-            if (awards != null && kertoimet != null && kertoimet.intValue() != 0) {
-                awardRate = awards.divide(kertoimet, 0, RoundingMode.HALF_UP);
+            if (awards != null && sijoitukset != null && sijoitukset.intValue() != 0) {
+                awardRate = awards.divide(sijoitukset, 0, RoundingMode.HALF_UP);
             }
             return awardRate;
         }
         return ifZero;
+    }
+
+    public BigDecimal getAwardRate() {
+        return (sijoitukset.intValue() > 0 ? awards.divide(sijoitukset, 0, RoundingMode.HALF_UP) : BigDecimal.ZERO);
     }
 
     public BigDecimal sijaRate() {
@@ -135,12 +143,12 @@ public class Form {
             sijat = sijat.add(seconds);
             sijat = sijat.add(thirds);
 
-            return sijat.divide(kertoimet, 4, RoundingMode.HALF_UP);
+            return sijat.divide(sijoitukset, 4, RoundingMode.HALF_UP);
 
         } catch (ArithmeticException e) {
             // ei startteja
         } catch (Exception e) {
-            e.printStackTrace();
+            Log.write(e);
         }
 
         return BigDecimal.ZERO;
@@ -148,7 +156,7 @@ public class Form {
 
     public void add(Form hv) {
         try { starts = starts.add(hv.starts); } catch (NullPointerException e) {}
-        try { kertoimet = kertoimet.add(hv.kertoimet); } catch (NullPointerException e) {}
+        try { sijoitukset = sijoitukset.add(hv.sijoitukset); } catch (NullPointerException e) {}
         try { firsts = firsts.add(hv.firsts); } catch (NullPointerException e) {}
         try { seconds = seconds.add(hv.seconds); } catch (NullPointerException e) {}
         try { thirds = thirds.add(hv.thirds); } catch (NullPointerException e) {}
@@ -180,10 +188,6 @@ public class Form {
 
     public BigDecimal getAwards() {
         return (awards);
-    }
-
-    public BigDecimal getAwardRate() {
-        return (kertoimet.intValue() > 0 ? awards.divide(kertoimet, 0, RoundingMode.HALF_UP) : BigDecimal.ZERO);
     }
 
     public void setLabel(String label) {
@@ -229,7 +233,7 @@ public class Form {
             this.starts = this.starts.add(BigDecimal.ONE);
 
             if(subStart.getRating() != null)
-                this.kertoimet = this.kertoimet.add(BigDecimal.ONE);
+                this.sijoitukset = this.sijoitukset.add(BigDecimal.ONE);
 
             if(raceRanking != null) {
                 switch(raceRanking.intValue()) {
@@ -268,7 +272,7 @@ public class Form {
     public BigDecimal getKcodeProcents(BigDecimal ifZero) {
         try {
             BigDecimal kcoderate = this.kcode.multiply(BigDecimal.valueOf(100.00));
-            kcoderate = kcoderate.divide(kertoimet, 0, RoundingMode.HALF_UP);
+            kcoderate = kcoderate.divide(sijoitukset, 0, RoundingMode.HALF_UP);
 
             return kcoderate;
         } catch (ArithmeticException e) {
@@ -299,7 +303,7 @@ public class Form {
 
     public void setProbability(BigDecimal allStartCount) {
         try {
-            probability = kertoimet.divide(allStartCount, 2, RoundingMode.HALF_UP).multiply(BigDecimal.valueOf(100));
+            probability = sijoitukset.divide(allStartCount, 2, RoundingMode.HALF_UP).multiply(BigDecimal.valueOf(100));
         } catch (ArithmeticException e) {
             //divide by zero
             probability = BigDecimal.ZERO;
@@ -313,7 +317,7 @@ public class Form {
     }
 
     public static String getSelect() {
-        return "select count(*), count(kerroin), sum(S_1), sum(S_2), sum(S_3), sum(palkinto), sum(KCODE), count(XCODE), SUM(KVP)";
+        return "select count(*), count(S_1), sum(S_1), sum(S_2), sum(S_3), sum(palkinto), sum(KCODE), count(XCODE), SUM(KVP)";
     }
 
     public static PreparedStatement getStatement(Connection conn, String name, String race, Date startDate, Date endDate) {
@@ -348,7 +352,7 @@ public class Form {
         StringBuffer sb = new StringBuffer();
 
         sb.append(starts + ":");
-        sb.append(kertoimet + ":");
+        sb.append(sijoitukset + ":");
         sb.append(firsts + ":");
         sb.append(seconds + ":");
         sb.append(thirds + ":");
@@ -445,22 +449,22 @@ public class Form {
         }
     }
 
-    public BigDecimal getKertoimet() {
-        return kertoimet;
+    public BigDecimal getSijoitukset() {
+        return sijoitukset;
     }
 
-    public void setKertoimet(BigDecimal kertoimet) {
-        this.kertoimet = kertoimet;
+    public void setSijoitukset(BigDecimal sijoitukset) {
+        this.sijoitukset = sijoitukset;
     }
 
     public String toTinyString() {
 
-        return (starts + " " + kertoimet + " " + firsts + "-" + seconds + "-" + thirds + " (" + getAwardRate()+ "€/s)");
+        return (starts + " " + sijoitukset + " " + firsts + "-" + seconds + "-" + thirds + " (" + getAwardRate()+ "€/s)");
     }
 
     public String toString() {
         StringBuffer str = new StringBuffer();
-        str.append(label + ": " + starts + " " + kertoimet + " " + firsts + "-" + seconds + "-" + thirds + " (" + getAwardRate()+ "€/s)");
+        str.append(label + ": " + starts + " " + sijoitukset + " " + firsts + "-" + seconds + "-" + thirds + " (" + getAwardRate()+ "€/s)");
 
         if(kcode != null) {
             str.append("->" + kcode + " ");

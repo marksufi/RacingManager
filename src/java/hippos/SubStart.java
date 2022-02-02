@@ -237,11 +237,16 @@ public class SubStart implements Comparable {
 
             stmt = getInsertStatement(conn);
 
-            if(this.rating == null) {
-                // Koe- ja nuorten lähdöissä sijoitus, palkintorahat ja paalupaikat poistetaan, koska ne vääristää tilastoja
-                subRank = null;
-                award = null;
-                kCode = null;
+            try {
+                if(this.startNumber.intValue() >= 20) {
+                    // Koe- ja nuorten lähdöissä sijoitus, palkintorahat ja paalupaikat poistetaan, koska ne vääristää tilastoja.
+                    // Kertoimet puuttuvat monista ruotsin raveista ja paikallisraveista, joten sitä ei voi käyttää ehtona.
+                    subRank = null;
+                    award = null;
+                    kCode = null;
+                }
+            } catch (Exception e) {
+                Log.write(e, "SubStartilta puuttuu lähtönumero");
             }
 
             stmt.setString(i++, name);

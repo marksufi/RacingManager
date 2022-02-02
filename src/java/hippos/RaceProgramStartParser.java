@@ -211,9 +211,10 @@ public class RaceProgramStartParser implements FileParser {
                      */
                     raceProgramHorse = (RaceProgramHorse) raceProgramHorseParser.parse(conn);
 
-                    raceProgramHorse.setStatistics(conn);
+                    //raceProgramHorse.setStatistics(conn);
+                    raceProgramHorse.fetchSubStarts(conn, 5);
 
-                    System.out.println(raceProgramHorse.toString());
+                    //System.out.println(raceProgramHorse.toString());
                     raceProgramStart.add(raceProgramHorse);
                 } catch (DataObjectException e) {
                     // Jotain meni parsimisessa pieleen, ei lisää hevosta lähtöön

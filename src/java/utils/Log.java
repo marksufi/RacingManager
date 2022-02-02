@@ -57,6 +57,7 @@ public class Log {
     public static void write(Throwable t, String str) {
         try {
             write(new Exception( str, t));
+            t.printStackTrace();
         } catch (Exception de) {
             de.printStackTrace();
         }
