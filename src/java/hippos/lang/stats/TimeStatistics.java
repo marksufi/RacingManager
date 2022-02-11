@@ -128,12 +128,14 @@ public class TimeStatistics {
             StringBuilder sb = new StringBuilder();
             sb.append("select lahtotyyppi, tasoitus, min(VA_1), count(va_1), min(VA_2), count(VA_2), min(V500), count(V500), min(aika), count(*), avg(PALKINTO) ");
             sb.append("from RESULTHORSE ");
-            sb.append("where NIMI=? and PVM<? ");
+            sb.append("where NIMI=? and LAJI=? and PVM<? ");
             sb.append("group by lahtotyyppi, tasoitus");
 
             statement = conn.prepareStatement(sb.toString());
             statement.setString(1, raceProgramHorse.getRaceHorseName());
-            statement.setDate(2, raceProgramHorse.getRaceProgramStart().getSQLDate());
+            statement.setString(2, raceProgramHorse.getRaceMode().substring(0, 1));
+            statement.setDate(3, raceProgramHorse.getRaceProgramStart().getSQLDate());
+
             set = statement.executeQuery();
             while(set.next()) {
                 int i = 1;

@@ -30,7 +30,7 @@ CREATE TABLE SUBRESULT (
 	CONSTRAINT PK_SUBRESULT PRIMARY KEY (NIMI, LAJI, PVM, LAHTONUMERO)
 	);
 CREATE INDEX subresult_nimi_idx on subresult(nimi);
-CREATE INDEX subresult_kuljettaja_idx on subresult(kuljettaja, pvm, kerroin);
+CREATE INDEX subresult_kuljettaja_idx on subresult(kuljettaja, pvm, s_1);
 CREATE INDEX subresult_lahtotyyppi_idx on subresult(lahtotyyppi, kcode, x);
 
 commit;

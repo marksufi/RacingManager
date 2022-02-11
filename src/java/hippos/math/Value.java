@@ -65,6 +65,9 @@ public class Value implements Comparable {
     public void add(double v) {
         try {
             add(BigDecimal.valueOf(v));
+
+        } catch (NumberFormatException e) {
+
         } catch (Exception e) {
             Log.write(e);
         }
@@ -268,6 +271,19 @@ public class Value implements Comparable {
         } catch (Exception e) {
             throw e;
         }
+    }
+
+    public static void main(String [] args) {
+        Value value = new Value();
+
+        value.add(1, 0.01);
+        value.add(2, 0.01);
+        value.add(3, 0.01);
+        value.add(4, 0.01);
+        value.add(5, 0.000000001);
+
+        System.out.println(value.average());
+
     }
 
 }

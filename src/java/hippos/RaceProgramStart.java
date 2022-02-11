@@ -41,7 +41,8 @@ public class RaceProgramStart extends RaceStart {
     private HashMap<String, ValueHorse> valueHorseHashMap = new HashMap<>();
 
     private Mapper<SortedSet<QuarterTime>> quarterMap = new Mapper<>();
-    private HOpserverMapper<SortedSet<HObservable>> observerMap = new HOpserverMapper<>();
+    //private HOpserverMapper<SortedSet<HObservable>> observerMap = new HOpserverMapper<>();
+    private HOpserverMapper<SortedSet<HObservable>> observerMap = null;
 
     public static TreeMap <String, HipposUpdatingRegression> featuredReg = new TreeMap<>();
 
@@ -175,9 +176,11 @@ public class RaceProgramStart extends RaceStart {
 
             TreeSet valueHorseSet = getValueHorseSet();
             //System.out.println(getId());
-            System.out.println(this.toString());
-            System.out.println(valueHorseSet);
-            System.out.println("");
+            if(debugMode == true) {
+                System.out.println(this.toString());
+                System.out.println(valueHorseSet);
+                System.out.println("");
+            }
         } catch (Exception e) {
             e.printStackTrace();
         }

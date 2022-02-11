@@ -212,7 +212,7 @@ public class RaceProgramStartParser implements FileParser {
                     raceProgramHorse = (RaceProgramHorse) raceProgramHorseParser.parse(conn);
 
                     //raceProgramHorse.setStatistics(conn);
-                    raceProgramHorse.fetchSubStarts(conn, 5);
+                    //raceProgramHorse.fetchSubStarts(conn, 5);
 
                     //System.out.println(raceProgramHorse.toString());
                     raceProgramStart.add(raceProgramHorse);

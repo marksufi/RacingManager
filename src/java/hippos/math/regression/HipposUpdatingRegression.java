@@ -3,7 +3,6 @@ package hippos.math.regression;
 import org.apache.commons.math3.exception.util.ExceptionContextProvider;
 import org.apache.commons.math3.stat.regression.MillerUpdatingRegression;
 import org.apache.commons.math3.stat.regression.ModelSpecificationException;
-import utils.Log;
 
 import java.lang.reflect.Array;
 import java.util.Arrays;
@@ -15,17 +14,21 @@ public class HipposUpdatingRegression extends MillerUpdatingRegression {
 
     public HipposUpdatingRegression(int numberOfVariables, boolean includeConstant) throws ModelSpecificationException {
         super(numberOfVariables, includeConstant);
+        //System.out.println("HipposUpdatingRegression.HipposUpdatingRegression(" + numberOfVariables + ", " + includeConstant + ")");
     }
 
     public HipposUpdatingRegression(int numberOfVariables) {
+
         this(numberOfVariables, false);
     }
 
     public void add(double[] x, double y) {
         try {
             addObservation(x, y);
+
         } catch (Exception e) {
-            Log.write(e, "(" + Arrays.toString(x) + ", " + y + ")");
+            e.printStackTrace();
+            //Log.write(e, "(" + Arrays.toString(x) + ", " + y + ")");
         }
     }
 
@@ -33,7 +36,8 @@ public class HipposUpdatingRegression extends MillerUpdatingRegression {
         try {
             addObservation(new double[]{x}, y);
         } catch (Exception e) {
-            Log.write(e, "(" + x + ", " + y + ")");
+            e.printStackTrace();
+            //Log.write(e, "(" + x + ", " + y + ")");
         }
     }
 
@@ -89,14 +93,16 @@ public class HipposUpdatingRegression extends MillerUpdatingRegression {
             System.out.println();
             System.out.println("getPartialCorrelations(X): " + Arrays.toString(x));
             System.out.println("getPartialCorrelations(B): " + Arrays.toString(B));
-            System.out.println("getPartialCorrelations(0): " + Arrays.toString(this.getPartialCorrelations(0)));
-            System.out.println("getPartialCorrelations(1): " + Arrays.toString(this.getPartialCorrelations(1)));
-            System.out.println("getPartialCorrelations(2): " + Arrays.toString(this.getPartialCorrelations(2)));
-            System.out.println("getPartialCorrelations(3): " + Arrays.toString(this.getPartialCorrelations(3)));
+            for(int i : super.getOrderOfRegressors()) {
+                System.out.println("getPartialCorrelations(" + i + "): " + Arrays.toString(this.getPartialCorrelations(i)));
+            }
             System.out.println("getDiagonalOfHatMatrix(x): " + this.getDiagonalOfHatMatrix(x));
             System.out.println("getOrderOfRegressors(): " + Arrays.toString(this.getOrderOfRegressors()));
             System.out.println("getParameterEstimates(): " + Arrays.toString(regress().getParameterEstimates()));
-
+            System.out.println("regress():" + regress().getRSquared());
+            System.out.println("regress(1):" + regress(1).getRSquared());
+            System.out.println("regress(2):" + regress(2).getRSquared());
+            /*
             System.out.println("getCovarianceOfParameters(1, 0): " + regress().getCovarianceOfParameters(1, 0));
             System.out.println("getCovarianceOfParameters(0, 1): " + regress().getCovarianceOfParameters(0, 1));
             System.out.println("getCovarianceOfParameters(0, 2): " + regress().getCovarianceOfParameters(0, 2));
@@ -107,7 +113,8 @@ public class HipposUpdatingRegression extends MillerUpdatingRegression {
             */
 
             value[0] = b;
-            value[1] = super.getDiagonalOfHatMatrix(x);
+            value[1] = 1.0;
+            //value[1] = regress().getRSquared();
         } catch (ModelSpecificationException me) {
             throw me;
         } catch (Exception e) {
@@ -161,35 +168,33 @@ public class HipposUpdatingRegression extends MillerUpdatingRegression {
         boolean includeConstant = true;
         HipposUpdatingRegression reg = new HipposUpdatingRegression(2, includeConstant);
 
-        double [] x1 = new double[] {12.3,-2};
-        double [] x2 = new double[] {12.3, -1};
-        double [] x3 = new double[] {15.0, 0};
-        double [] x4 = new double[] {15.0, 1};
-        double [] x5 = new double[] {15.0, -2};
-        double [] x6 = new double[] {18.0,0};
-        double [] x7 = new double[] {18.0, 2};
-
-        double [] x8 = new double[] {1800, 1};
-        double [] x9 = new double[] {-20, -1};
+        double [] x1 = new double[] {12.0, 7};
+        double [] x2 = new double[] {13.0, 6};
+        double [] x3 = new double[] {14.0, 5};
+        double [] x4 = new double[] {15.0, 4};
+        double [] x5 = new double[] {16.0, 3};
+        double [] x6 = new double[] {17.0, 2};
+        double [] x7 = new double[] {18.0, 1};
 
         try {
 
-            reg.add(x1, 14.3);
-            reg.add(x2, 13.3);
-            reg.add(x3, 15);
-            reg.add(x4, 16);
-            reg.add(x5, 17);
-            reg.add(x6, 18);
-            reg.add(x7, 16);
+            reg.add(x1, 1);
+            reg.add(x2, 2);
+            reg.add(x3, 3);
+            reg.add(x4, 4);
+            reg.add(x5, 5);
+            reg.add(x6, 6);
+            reg.add(x7, 7);
 
-            System.out.println(Arrays.toString(x1) + "=>" + reg.get(x1));
-            System.out.println(Arrays.toString(x2) + "=>" + reg.get(x2));
-            System.out.println(Arrays.toString(x3) + "=>" + reg.get(x3));
-            System.out.println(Arrays.toString(x4) + "=>" + reg.get(x4));
-            System.out.println(Arrays.toString(x5) + "=>" + reg.get(x5));
-            System.out.println(Arrays.toString(x6) + "=>" + reg.get(x6));
-            System.out.println(Arrays.toString(x7) + "=>" + reg.get(x7));
+            System.out.println(Arrays.toString(x1) + "=>" + Arrays.toString(reg.getWithR(x1)));
+            System.out.println(Arrays.toString(x2) + "=>" + Arrays.toString(reg.getWithR(x2)));
+            System.out.println(Arrays.toString(x3) + "=>" + Arrays.toString(reg.getWithR(x3)));
+            System.out.println(Arrays.toString(x4) + "=>" + Arrays.toString(reg.getWithR(x4)));
+            System.out.println(Arrays.toString(x5) + "=>" + Arrays.toString(reg.getWithR(x5)));
+            System.out.println(Arrays.toString(x6) + "=>" + Arrays.toString(reg.getWithR(x6)));
+            System.out.println(Arrays.toString(x7) + "=>" + Arrays.toString(reg.getWithR(x7)));
 
+            /*
             reg.add(x8, 1801);
             reg.add(x9, -19);
 
@@ -203,10 +208,22 @@ public class HipposUpdatingRegression extends MillerUpdatingRegression {
             System.out.println(Arrays.toString(x7) + "=>" + reg.get(x7));
             System.out.println(Arrays.toString(x8) + "=>" + reg.get(x8));
             System.out.println(Arrays.toString(x9) + "=>" + reg.get(x9));
-
+            */
         } catch (Exception e) {
             e.printStackTrace();
         }
+    }
+
+    public String toString() {
+        StringBuilder sb = new StringBuilder();
+        try {
+            sb.append("HipposUpdatingRegression: ");
+            sb.append(super.getN());
+            sb.append(Arrays.toString(super.getOrderOfRegressors()));
+        } catch (Exception e) {
+            e.printStackTrace();
+        }
+        return sb.toString();
     }
 
 }

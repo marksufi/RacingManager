@@ -64,7 +64,7 @@ public class Statements {
 
         try {
             StringBuilder stmt = new StringBuilder();
-            stmt.append("select count(*), count(KERROIN), sum(S_1), sum(S_2), sum(S_3), sum(PALKINTO), sum(KCODE), sum(X), sum(KVP), min(AIKA) Aika, LAHTOTYYPPI, MAX( PALKINTO ) ");
+            stmt.append("select count(*), count(S_1), sum(S_1), sum(S_2), sum(S_3), sum(PALKINTO), sum(KCODE), sum(X), sum(KVP), min(AIKA) Aika, LAHTOTYYPPI, MAX( PALKINTO ) ");
             stmt.append("from SUBRESULT ");
             stmt.append("where NIMI=? and laji=? and PVM < ? ");
             if(startDate != null) {
@@ -96,21 +96,11 @@ public class Statements {
             sb.append("insert into PROGRAMHORSE(");
             sb.append("LID, TRACKID, NUMERO, NIMI, KULJETTAJA, VALMENTAJA, ");
             sb.append("MATKA, RATA, TASOITUS, ");
-            sb.append("K_S, K_1, K_2, K_3, K_R, K_PAALU, K_X, ");
-            sb.append("SUBSTART_1, ");
-            sb.append("SUBSTART_2, ");
-            sb.append("SUBSTART_3, ");
-            sb.append("SUBSTART_4, ");
-            sb.append("SUBSTART_5) ");
-            //sb.append("SUBSTART_6, ");
-            //sb.append("SUBSTART_7, ");
-            //sb.append("SUBSTART_8) ");
+            sb.append("K_S, K_1, K_2, K_3, K_R, K_PAALU, K_X)");
 
             sb.append("values(?, ?, ?, ?, ?, ?, ");
             sb.append("?, ?, ?, ");
-            sb.append("?, ?, ?, ?, ?, ?, ?, ");
-            //sb.append("?, ?, ?, ?, ?, ?, ?, ?)");
-            sb.append("?, ?, ?, ?, ?)");
+            sb.append("?, ?, ?, ?, ?, ?, ?)");
 
             return conn.prepareStatement(sb.toString());
 
@@ -129,8 +119,8 @@ public class Statements {
 
             sb.append("select TRACKID, NUMERO, NIMI, KULJETTAJA, VALMENTAJA, ");
             sb.append("MATKA, RATA, TASOITUS, ");
-            sb.append("K_S, K_1, K_2, K_3, K_R, K_PAALU, K_X, ");
-            sb.append("SUBSTART_1, SUBSTART_2, SUBSTART_3, SUBSTART_4, SUBSTART_5 ");
+            sb.append("K_S, K_1, K_2, K_3, K_R, K_PAALU, K_X ");
+            //sb.append("SUBSTART_1, SUBSTART_2, SUBSTART_3, SUBSTART_4, SUBSTART_5 ");
             //sb.append(", SUBSTART_6, SUBSTART_7, SUBSTART_8 ");
             sb.append("from PROGRAMHORSE ");
             sb.append("where LID = ? ");

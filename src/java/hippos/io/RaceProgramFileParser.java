@@ -20,7 +20,6 @@ import java.util.Iterator;
 import java.util.List;
 import java.util.StringTokenizer;
 
-import static hippos.HarnessApp.debugMode;
 import static hippos.HarnessApp.raceProgramDirectory;
 
 /**

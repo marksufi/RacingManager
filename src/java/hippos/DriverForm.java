@@ -106,7 +106,7 @@ public class DriverForm extends Person implements Comparable {
             sb.append("where kuljettaja like ? ");
             sb.append("and pvm < ? ");
             //sb.append("and lahtotyyppi = ? ");
-            sb.append("and KERROIN is not null");
+            sb.append("and S_1 is not null");
 
             stmt = conn.prepareStatement(sb.toString());
             stmt.setString(1, sqlSearchName);

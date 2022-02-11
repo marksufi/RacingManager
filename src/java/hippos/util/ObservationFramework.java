@@ -1,8 +1,10 @@
 package hippos.util;
 
 import hippos.math.AlphaNumber;
+import hippos.math.MathHelper;
 import hippos.math.Value;
 import hippos.math.regression.HipposUpdatingRegression;
+import hippos.utils.HorsesHelper;
 import org.apache.commons.math3.stat.regression.ModelSpecificationException;
 import utils.Log;
 
@@ -13,7 +15,7 @@ import java.util.List;
 import java.util.TreeMap;
 
 public class ObservationFramework {
-    Observation observerMap = new Observation();
+    Observation observerMap = new Observation(new ArrayList());
     private int level;
 
     public ObservationFramework(int level) {
@@ -21,29 +23,36 @@ public class ObservationFramework {
     }
 
     public void addObservations(List <AlphaNumber> observerList, BigDecimal observerValue) {
+        //System.out.println("\nObservationFramework.addObservations(" + observerList + ", " + observerValue + ")");
         List regX = new ArrayList();
+        List keyList = new ArrayList();
         int startIndex = 0;
 
-        observerMap = mapLevel(observerMap, observerList, observerValue, regX, startIndex, 1);
+        observerMap = mapLevel(observerMap, observerList, observerValue, regX, keyList, startIndex, 1);
 
     }
 
     public Value getObservations(List <AlphaNumber> observerList) {
         List regX = new ArrayList();
+        List keyList = new ArrayList();
+
         int startIndex = 0;
         Value observerValue = new Value();
 
-        return getLevel(observerMap, observerList, observerValue, regX, startIndex, 1);
+        return getLevel(observerMap, observerList, observerValue, regX, keyList, startIndex, 1);
 
     }
 
     private Value
-        getLevel(Observation map, List<AlphaNumber> observerList, Value observerValue, List baseRegX, int aStartIndex, int iLevel) {
+        getLevel(Observation map, List<AlphaNumber> observerList, Value observerValue, List baseRegX, List aKeyList, int aStartIndex, int iLevel) {
+        //System.out.println("ObservationFramework.getLevel(" + map + ", " + observerList + ", " + observerValue + ", " + baseRegX + ", " + aKeyList + ", " + aStartIndex + ", " + iLevel + ")");
 
         for(int i = aStartIndex; i < observerList.size(); i++) {
 
             try {
                 BigDecimal key = BigDecimal.valueOf(i);
+                List keyList = new ArrayList(aKeyList);
+                keyList.add(key);
 
                 List regX = new ArrayList(baseRegX);
                 regX.add(observerList.get(i));
@@ -52,11 +61,12 @@ public class ObservationFramework {
                     continue;
 
                 if(iLevel < level) {
-                    Value yValue = getLevel(map.get(key), observerList, observerValue, regX, i, iLevel + 1);
+                    Value yValue = getLevel(map.get(key), observerList, observerValue, regX, keyList, i, iLevel + 1);
                 }
 
                 double [] doubleValue = map.get(key).get(regX);
-                observerValue.add(doubleValue[0], doubleValue[0]);
+                //observerValue.add(doubleValue[0], doubleValue[0]);
+                observerValue.add(doubleValue[0], doubleValue[1]);
 
             } catch (ModelSpecificationException e) {
             } catch (NullPointerException e) {
@@ -70,29 +80,35 @@ public class ObservationFramework {
 
 
     private Observation
-        mapLevel(Observation map, List<AlphaNumber> observerList, BigDecimal observerValue, List baseRegX, int aStartIndex, int iLevel) {
+        mapLevel(Observation map, List<AlphaNumber> observerList, BigDecimal observerValue, List baseRegX, List aKeyList, int aStartIndex, int iLevel) {
+        //System.out.println("ObservationFramework.mapLevel(" + map + ", " + observerList + ", " + observerValue + ", " + baseRegX + ", " + aKeyList + ", " + aStartIndex + ", " + iLevel + ")");
 
         try {
             for(int i = aStartIndex; i < observerList.size(); i++) {
 
                 BigDecimal key = BigDecimal.valueOf(i);
+                List keyList = new ArrayList(aKeyList);
+                keyList.add(key);
 
                 List regX = new ArrayList(baseRegX);
                 regX.add(observerList.get(i));
 
                 if(!map.containsKey(key))
-                    map.put(key, new Observation());
+                    map.put(key, new Observation(keyList));
 
                 if(iLevel < level) {
-                    map.put(key, mapLevel(map.get(key), observerList, observerValue, regX, i, iLevel + 1));
+                    map.put(key, mapLevel(map.get(key), observerList, observerValue, regX, keyList, i, iLevel + 1));
                 }
 
                 map.get(key).add(regX, observerValue);
+
             }
         } catch (ModelSpecificationException e) {
             e.printStackTrace();
+
         } catch (Exception e) {
             e.printStackTrace();
+
         }
         return map;
     }
@@ -177,25 +193,50 @@ public class ObservationFramework {
 
     public class Observation extends TreeMap <BigDecimal, Observation> {
         Mapper <HipposUpdatingRegression> observationMap;
+        List keyList;
 
-        public void add(List <AlphaNumber> regX, BigDecimal observerValue) {
+        public Observation(List keyList) {
+            //System.out.println("Observation.Observation(" + keyList + ")");
+            this.keyList = keyList;
+        }
+
+        public void add(List <AlphaNumber> regX, BigDecimal observerValue) throws ModelSpecificationException {
+            //System.out.println("Observation.add(" + regX.toString()+ "," + observerValue + ") to " + keyList);
 
             try {
-                List alphas = new ArrayList();
-                double [] numbers = new double[regX.size()];
+                List <String> alphas = new ArrayList();
+                List <BigDecimal> numbers = new ArrayList();
+                //double [] numbers = new double[regX.size()];
 
                 int i = 0;
                 for(AlphaNumber alphaNumber : regX) {
                     if(alphaNumber.getAlpha() != null) {
                         alphas.add(alphaNumber.getAlpha());
                     }
-                    numbers[i++] = alphaNumber.getNumber().doubleValue();
+
+                    if(alphaNumber.getNumber() != null) {
+                        numbers.add(alphaNumber.getNumber());
+                    }
+                    //numbers[i++] = alphaNumber.getNumber().doubleValue();
                 }
 
-                if(observationMap == null)
-                    observationMap = new Mapper<>();
+                if(numbers.size() > 0) {
+                    double[] dn = HorsesHelper.mapToDouble(numbers);
 
-                observationMap.getOrCreate(alphas, new HipposUpdatingRegression(regX.size(), true)).add(numbers, observerValue.doubleValue());
+                    if (observationMap == null)
+                        observationMap = new Mapper<>();
+
+
+                    //observationMap.getOrCreate(alphas, new HipposUpdatingRegression(regX.size(), true)).add(numbers, observerValue.doubleValue());
+
+                    //alphas.add(String.valueOf(dn.length));
+                    //System.out.println("Observation.add: " + alphas + Arrays.toString(dn) + " to " + observationMap.get(alphas));
+                    observationMap.getOrCreate(alphas, new HipposUpdatingRegression(dn.length, true)).add(dn, observerValue.doubleValue());
+
+                }
+            } catch (ModelSpecificationException e) {
+                Log.write(e);
+
             } catch (NullPointerException e) {
 
             } catch (Exception e) {
@@ -204,19 +245,32 @@ public class ObservationFramework {
         }
 
         public double [] get(List <AlphaNumber> regX) throws ModelSpecificationException {
+            //System.out.println("Observation.get(" + regX.toString() + ") from " + keyList);
             try {
-                List alphas = new ArrayList();
-                double [] numbers = new double[regX.size()];
+                List <String> alphas = new ArrayList();
+                List <BigDecimal> numbers = new ArrayList();
+                //double [] numbers = new double[regX.size()];
 
                 int i = 0;
                 for(AlphaNumber alphaNumber : regX) {
                     if(alphaNumber.getAlpha() != null) {
                         alphas.add(alphaNumber.getAlpha());
                     }
-                    numbers[i++] = alphaNumber.getNumber().doubleValue();
+                    if(alphaNumber.getNumber() != null) {
+                        numbers.add(alphaNumber.getNumber());
+                    }
+                    //numbers[i++] = alphaNumber.getNumber().doubleValue();
                 }
 
-                double [] regress = observationMap.get(alphas).getWithR(numbers);
+                double [] dn = HorsesHelper.mapToDouble(numbers);
+
+                //double [] regress = observationMap.get(alphas).getWithR(numbers);
+
+                /**
+                 * lisää avainlistaan lukujen määrän
+                 */
+                //alphas.add(String.valueOf(dn.length));
+                double [] regress = observationMap.get(alphas).getWithR(dn);
                 //System.out.println(Arrays.toString(numbers) + "=>"+ Arrays.toString(regress));
 
                 return regress;
@@ -236,7 +290,11 @@ public class ObservationFramework {
         }
 
         public String toString() {
-            return observationMap.toString();
+            try {
+                return keyList.toString() + observationMap.toString();
+            } catch (Exception e) {
+                return keyList + new String("[null]");
+            }
         }
     }
 

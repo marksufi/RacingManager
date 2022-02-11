@@ -64,7 +64,7 @@ public class HarnessApp {
     /**
      * Parsitaanko myös lähtölistan taulu? jos true, niin parsitaan
      */
-    public static boolean debugMode = false;
+    public static boolean debugMode = true;
 
     /**
      * Määrittää kumpaa hakemistoa käytetään, Filebase vai TestBase
@@ -136,6 +136,8 @@ public class HarnessApp {
                 raceProgramStart = new RaceProgramStart(conn, lid, date, raceResultStart);
 
                 raceProgramStart.getObservations();
+
+                System.out.println("Initializing start..." + raceProgramStart.getId());
 
                 raceProgramStart.initValueHorses(linregMap);
 

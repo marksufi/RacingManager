@@ -83,7 +83,7 @@ public class RaceProgramHorseParser implements FileParser {
                 parseJockeyLine(conn);
 
                 if(HarnessApp.useHorseRaceHistoryLink) {
-                    if(!raceProgramHorse.existsInDatabase() || HarnessApp.debugMode == true) {
+                    if(!raceProgramHorse.existsInDatabase()) {
                         try {
                             RaceHorseHistoryParser raceHorseHistoryParser = new RaceHorseHistoryParser(raceProgramHorse);
 
@@ -386,7 +386,7 @@ public class RaceProgramHorseParser implements FileParser {
 
     public void parseSubStart(String line) throws DataObjectException, AbsentException {
         try {
-            if(!HarnessApp.useHorseRaceHistoryLink || HarnessApp.debugMode) {
+            if(!HarnessApp.useHorseRaceHistoryLink) {
                 SubStartParser subStartParser = new SubStartParser(lines, raceDate, raceProgramHorse);
                 SubStart subStart = (SubStart)subStartParser.parse();
 

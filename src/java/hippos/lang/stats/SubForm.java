@@ -154,7 +154,7 @@ public class SubForm extends Form {
         sb.append(super.toString());
         sb.append(" " + recordTime + getLabel());
 
-        sb.append(" ==> " + y);
+        sb.append(y != Double.NaN ? (" ==> " + y) : "");
         return sb.toString();
 
     }

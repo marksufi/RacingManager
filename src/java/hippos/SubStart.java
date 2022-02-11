@@ -745,25 +745,18 @@ public class SubStart implements Comparable {
         try {
             SubStart oSubStart = (SubStart) o;
 
-            if (getDate().equals(oSubStart.getDate()))
+            if (hashCode() == o.hashCode())
                 return 0;
 
-            Value timeValue = getSubTime().getSubValue().getValue();
-            Value oTimeValue = oSubStart.getSubTime().getSubValue().getValue();
+            if(getDate().equals(oSubStart.getDate()))
+                return startNumber.compareTo(oSubStart.startNumber)*-1;
 
-            Value rankValue = getSubRank().getSubValue().getValue();
-            Value oRankValue = oSubStart.getSubRank().getSubValue().getValue();
+            return getDate().compareTo(oSubStart.getDate())*-1;
 
-            Value maxValue = timeValue.compareTo(rankValue) > 0 ? timeValue : rankValue;
-            Value oMaxValue = oTimeValue.compareTo(oRankValue) > 0 ? oTimeValue : oRankValue;
-
-            int c = oMaxValue.compareTo(maxValue);
-
-            return c;
         } catch (Exception e) {
             Log.write(e);
         }
-        return 0;
+        return -1;
     }
 
     public String getRacePlace() {

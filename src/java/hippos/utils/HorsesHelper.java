@@ -37,19 +37,19 @@ public class HorsesHelper {
 
     public static String raceLengthId(BigDecimal length, String timealpha) {
         //System.out.print("HorsesHelper.LengthAcronym( " + length + ", " + timealpha + " )");
-        StringBuffer lengthAcronym = new StringBuffer();
+        StringBuilder lengthAcronym = new StringBuilder();
         if(timealpha != null) {
             timealpha = timealpha.toLowerCase().trim();
             if(timealpha.indexOf("monte") >= 0) {
                 // liian suuri erotus ~2,3s
                 //lengthAcronym.append("m");
             }
-            if(timealpha.indexOf("tasoitus") >= 0) {
+            if(timealpha.contains("tasoitus")) {
 
-            } else if(timealpha.indexOf("linja") >= 0 || timealpha.indexOf("l") >= 0) {
+            } else if(timealpha.contains("linja") || timealpha.contains("l")) {
                 lengthAcronym.append("a");
             }
-            else if(timealpha.indexOf("ryhmä") >= 0 || timealpha.indexOf("a") >= 0) {
+            else if(timealpha.contains("ryhmä") || timealpha.contains("a")) {
                 lengthAcronym.append("a");
             }
         }
@@ -60,13 +60,13 @@ public class HorsesHelper {
 
     public static String SubLengthAcronym(BigDecimal length, String timealpha) {
         //System.out.print("HorsesHelper.LengthAcronym( " + length + ", " + timealpha + " )");
-        StringBuffer lengthAcronym = new StringBuffer();
+        StringBuilder lengthAcronym = new StringBuilder();
         if(timealpha != null) {
             timealpha = timealpha.toLowerCase().trim();
-            if(timealpha.indexOf("m") >= 0) {
+            if(timealpha.contains("m")) {
                 lengthAcronym.append("m");
             }
-            if(timealpha.indexOf("a") >= 0 || timealpha.indexOf("l") >= 0) {
+            if(timealpha.contains("a") || timealpha.contains("l")) {
                 lengthAcronym.append("a");
             }
         }
@@ -91,8 +91,6 @@ public class HorsesHelper {
      *
      * @param distance      Hevoset matka
      * @param raceDistance  Lähdön perusmatka
-     * @param time          Hevosen aika
-     *
      * @return Hevosen ajan lisättynä tasoituksiin kuluneeseen aikaan
      */
     public static BigDecimal getEqualizerEffect(BigDecimal distance, BigDecimal raceDistance, BigDecimal startnumber, BigDecimal track) {
@@ -217,11 +215,11 @@ public class HorsesHelper {
                 BigDecimal gapMonths = gap.divide(new BigDecimal(30), 0, RoundingMode.HALF_UP);
                 if(gapMonths.intValue() > 12) {
                     BigDecimal gapYears = gap.divide(new BigDecimal(365), 0, RoundingMode.HALF_UP);
-                    return gapYears.toString() + "y";
+                    return gapYears + "y";
                 }
-                return gapMonths.toString() + "m";
+                return gapMonths + "m";
             }
-            return gapWeeks.toString() + "w";
+            return gapWeeks + "w";
     }
 
     public static int getMonthDiff(Date racedate, Date date) {
@@ -233,7 +231,7 @@ public class HorsesHelper {
     public static int getWeekDiff(Date racedate, Date date) {
         int dayDiff = DateUtils.getDayDiff(racedate, date);
 
-        return (int) (dayDiff / 7);
+        return dayDiff / 7;
     }
 
     public static boolean equals(Object str1, Object str2) {
@@ -242,16 +240,12 @@ public class HorsesHelper {
                 return str1.equals(str2);
             }
             return false;
-        } else if(str2 == null) {
-            return true;
-        }
-        return false;
+        } else return str2 == null;
     }
 
     /**
      * Palauttaa parametreistä suureman
      *
-     * @param c1
      * @param c2
      *
      * @return suurempi parametri
@@ -361,8 +355,6 @@ public class HorsesHelper {
     /**
      * Laskee keskiarvon listan SetValue tyyppisille arvoille, jotka eivät ole null tai tyhjiä
      *
-     * @param valueList Lista SetValue tyyppisistä arvoista, joista keskiarvo lasketaan
-     *
      * @return  Listan arvojen keskiarvo tai null, jos lista on tyhjä
      *
     public static BigDecimal getAverage(List valueList) {
@@ -465,7 +457,7 @@ public class HorsesHelper {
         BigDecimal raceHandicap = raceResultHorse.getTasoitus();
 
         if(raceHandicap != null) {
-            if(raceMode.indexOf("a") < 0 && raceTrack.intValue() > 7) {
+            if(!raceMode.contains("a") && raceTrack.intValue() > 7) {
                 raceHandicap = raceHandicap.add(BigDecimal.TEN);
             }
         }
@@ -474,7 +466,7 @@ public class HorsesHelper {
 
 
     public static String getRaceMode(SubStart subStart) {
-        StringBuffer racemode = new StringBuffer();
+        StringBuilder racemode = new StringBuilder();
 
         String raceLiteral = subStart.getRaceProgramHorse().getRaceProgramStart().getRaceLiteral();
         String length = SubLengthAcronym(subStart.getRaceLength(), subStart.getSubTime().getAlpha());
@@ -607,7 +599,7 @@ public class HorsesHelper {
     public static AlphaNumber toProcents(BigDecimal number) {
         number = number.multiply(BigDecimal.valueOf(100.00));
 
-        return new AlphaNumber(number.setScale(2), "%");
+        return new AlphaNumber(number.setScale(2, RoundingMode.HALF_UP), "%");
     }
 
     public static String getShortLocalityFromId(String id) {
@@ -630,11 +622,23 @@ public class HorsesHelper {
 
     }
 
+    /*
     public static double [] mapToDouble(List <Double> list) {
         try {
             double[] arr = list.stream().mapToDouble(Double::doubleValue).toArray();
 
             return arr;
+        } catch (Exception e) {
+            e.printStackTrace();
+        }
+
+        return null;
+    }*/
+
+    public static double [] mapToDouble(List <BigDecimal> list) {
+        try {
+            return list.stream().mapToDouble(BigDecimal::doubleValue).toArray();
+
         } catch (Exception e) {
             e.printStackTrace();
         }

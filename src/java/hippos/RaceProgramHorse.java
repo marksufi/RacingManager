@@ -114,18 +114,22 @@ public class RaceProgramHorse extends Horse {
 
             setRaceResultHorse(raceProgramStart.getRaceResultStart());
 
+            fetchSubStarts(conn, 5);
+
+            /*
             initSubStart(raceSet.getString("SUBSTART_1"));
             initSubStart(raceSet.getString("SUBSTART_2"));
             initSubStart(raceSet.getString("SUBSTART_3"));
             initSubStart(raceSet.getString("SUBSTART_4"));
             initSubStart(raceSet.getString("SUBSTART_5"));
+            */
             //initSubStart(raceSet.getString("SUBSTART_6"));
             //initSubStart(raceSet.getString("SUBSTART_7"));
             //initSubStart(raceSet.getString("SUBSTART_8"));
 
             //this.timeStatistics = new TimeStatistics(this);
 
-            addWeeksKey();
+            //addWeeksKey();
 
             fetchQuarterTimes(conn);
 
@@ -167,6 +171,7 @@ public class RaceProgramHorse extends Horse {
             stmt.setBigDecimal( i++, driverStats.getKcode());
             stmt.setBigDecimal( i++, driverStats.getXcode());
 
+            /*
             for(int is = 0; is < 5; is++) {
                 StringBuffer sb = new StringBuffer();
 
@@ -187,7 +192,7 @@ public class RaceProgramHorse extends Horse {
                     }
                 }
                 stmt.setString( i++, sb.toString());
-            }
+            }*/
 
             stmt.executeUpdate();
             stmt.close();
@@ -333,7 +338,7 @@ public class RaceProgramHorse extends Horse {
         //    init();
 
         //subStartList.add(0, subStart);
-        subStartList.add(subStart);
+        subStartList.add(0, subStart);
         subStartSet.add(subStart);
 
         //fullStatistics.getTimeStatistics().add(subStart.getSubTime());
@@ -366,7 +371,7 @@ public class RaceProgramHorse extends Horse {
                 }
             }
 
-            Collections.reverse(subStartList);
+            //Collections.reverse(subStartList);
         } catch (Exception e) {
             Log.write(e, "Error in RaceProgramHorse.fetchSubStarts");
         } finally {
@@ -848,7 +853,7 @@ public class RaceProgramHorse extends Horse {
             try {   // Vuoden ennätys
                 observableList.add(new AlphaNumber(yearStatistics.getRecordTimes().first()));
             } catch (Exception e) {
-                observableList.add(new AlphaNumber());
+                observableList.add(new AlphaNumber("-"));
             }
 
             // Viime startit
@@ -860,13 +865,18 @@ public class RaceProgramHorse extends Horse {
                 // Aika
                 try {
                     AlphaNumber observableSubTime = new AlphaNumber(subStart.getSubTime().getNumber(), subStart.getSubTime().getAlpha());
+                    if(subStart.getSubTime().getNumber() == null) {
+                        // jos aika puuttuu, niin '- ' merkki perään
+                        observableSubTime.setAlpha(observableSubTime.getAlpha() + "-");
+                    }
+
                     if(fullStatistics.getRecordTimes().contains(observableSubTime)) {
                         // Ennätysajalle R perään
                         observableSubTime.setAlpha(observableSubTime.getAlpha() + "R");
                     }
                     if(x != null && !x.isEmpty()) {
                         // Laukka-aika, joten x perään
-                        observableSubTime.setAlpha(observableSubTime.getAlpha() + "x");
+                        observableSubTime.setAlpha(observableSubTime.getAlpha() + x);
                     }
 
                     observableList.add(observableSubTime);
@@ -908,8 +918,10 @@ public class RaceProgramHorse extends Horse {
                     }
                     BigDecimal award = subStart.getAward();
 
-                    if(award == null || award.compareTo(BigDecimal.ZERO) == 0)
+                    if(award == null || award.compareTo(BigDecimal.ZERO) == 0) {
                         subRank.setNumber(BigDecimal.ZERO);
+                        award = null;
+                    }
 
                     AlphaNumber observerRank = new AlphaNumber(award, subRank.toString());
                     observableList.add(observerRank);
@@ -967,7 +979,7 @@ public class RaceProgramHorse extends Horse {
                 e.printStackTrace();
 
         } catch (Exception e) {
-            Log.write(e);
+            Log.write(e, getLid() + "_" + getHorseProgNumber());
 
         }
     }
