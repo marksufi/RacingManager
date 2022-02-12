@@ -21,6 +21,7 @@ import java.sql.Connection;
 import java.sql.PreparedStatement;
 import java.sql.ResultSet;
 import java.sql.SQLException;
+import hippos.util.Observable;
 import java.util.*;
 
 import static hippos.math.Progress.getWeeksKey;
@@ -71,7 +72,7 @@ public class RaceProgramHorse extends Horse {
     private BigDecimal trackFirstQuarterPropability;
     private BigDecimal trackSecondQuarterPropability;
     private QuarterTime quarterTime2;
-    private List<AlphaNumber> observableList;
+    private List<Observable> observableList;
 
     public RaceProgramHorse(RaceProgramStart raceProgramStart) {
         super(raceProgramStart);
@@ -790,8 +791,8 @@ public class RaceProgramHorse extends Horse {
         return null;
     }
 
-    public List<AlphaNumber> getObservableList() {
-        List <AlphaNumber> observableList = new ArrayList();
+    public List<Observable> getObservableList() {
+        List <hippos.util.Observable> observableList = new ArrayList();
 
         try {
 
@@ -805,26 +806,26 @@ public class RaceProgramHorse extends Horse {
 
             // Startit ja sijoitukset
             try {
-                observableList.add(new AlphaNumber(fullStatistics.getSijoitukset()));
-                observableList.add(new AlphaNumber(fullStatistics.getFirsts()));
-                observableList.add(new AlphaNumber(fullStatistics.getSeconds()));
-                observableList.add(new AlphaNumber(fullStatistics.getThirds()));
+                observableList.add(new Observable(fullStatistics.getSijoitukset()));
+                observableList.add(new Observable(fullStatistics.getFirsts()));
+                observableList.add(new Observable(fullStatistics.getSeconds()));
+                observableList.add(new Observable(fullStatistics.getThirds()));
             } catch (Exception e) {
                 Log.write(e);
             }
 
             // Luokat
             try {
-                observableList.add(new AlphaNumber(fullStatistics.awardRate()));
-                observableList.add(new AlphaNumber(yearStatistics.awardRate()));
+                observableList.add(new Observable(fullStatistics.awardRate()));
+                observableList.add(new Observable(yearStatistics.awardRate()));
             } catch (Exception e) {
                 Log.write(e);
             }
 
             // Paalupaikat
             try {
-                observableList.add(new AlphaNumber(trackSecondQuarterPropability));
-                observableList.add(new AlphaNumber(fullStatistics.getKcodeProcents(BigDecimal.ZERO)));
+                observableList.add(new Observable(trackSecondQuarterPropability));
+                observableList.add(new Observable(fullStatistics.getKcodeProcents(BigDecimal.ZERO)));
                 /* parhaat väliajat, kun olet keksinyt ratkaisun puuttuville tiedoille
                     timeStatistics.getSecondQuarter().getaRecordSet().first();
                     timeStatistics.getSecondQuarter().gettRecordSet().first();
@@ -838,22 +839,22 @@ public class RaceProgramHorse extends Horse {
                 BigDecimal exDrivers = fullStatistics.getDriverWinratesAverage(2);
                 BigDecimal newDriver = this.getRaceProgramDriver().getDriverForm().getForm().firstRateProcents(2);
                 BigDecimal driverChange = newDriver.subtract(exDrivers);
-                observableList.add(new AlphaNumber(driverChange.setScale(2)));
+                observableList.add(new Observable(driverChange.setScale(2)));
             } catch (Exception e) {
                 Log.write(e);
-                observableList.add(new AlphaNumber());
+                observableList.add(new Observable());
             }
 
             try { // Kokonaisennätys
-                observableList.add(new AlphaNumber(fullStatistics.getRecordTimes().first()));
+                observableList.add(new Observable(fullStatistics.getRecordTimes().first()));
             } catch (Exception e) {
-                observableList.add(new AlphaNumber());
+                observableList.add(new Observable());
             }
 
             try {   // Vuoden ennätys
-                observableList.add(new AlphaNumber(yearStatistics.getRecordTimes().first()));
+                observableList.add(new Observable(yearStatistics.getRecordTimes().first()));
             } catch (Exception e) {
-                observableList.add(new AlphaNumber("-"));
+                observableList.add(new Observable("-"));
             }
 
             // Viime startit
@@ -864,7 +865,7 @@ public class RaceProgramHorse extends Horse {
 
                 // Aika
                 try {
-                    AlphaNumber observableSubTime = new AlphaNumber(subStart.getSubTime().getNumber(), subStart.getSubTime().getAlpha());
+                    Observable observableSubTime = new Observable(subStart.getSubTime().getNumber(), subStart.getSubTime().getAlpha());
                     if(subStart.getSubTime().getNumber() == null) {
                         // jos aika puuttuu, niin '- ' merkki perään
                         observableSubTime.setAlpha(observableSubTime.getAlpha() + "-");
@@ -882,7 +883,7 @@ public class RaceProgramHorse extends Horse {
                     observableList.add(observableSubTime);
 
                 } catch (Exception e) {
-                    observableList.add(new AlphaNumber());
+                    observableList.add(new Observable());
 
                 }
 
@@ -891,11 +892,11 @@ public class RaceProgramHorse extends Horse {
                     BigDecimal subDriverWinRate = subStart.getSubDriver().getWinRate();
                     BigDecimal programDriverWinRate = this.getRaceProgramDriver().getDriverForm().raceTypeForm.firstRateProcents(2);
                     BigDecimal driverWinRateDiff = programDriverWinRate.subtract(subDriverWinRate);
-                    AlphaNumber driverDiff = new AlphaNumber(driverWinRateDiff);
+                    Observable driverDiff = new Observable(driverWinRateDiff);
                     observableList.add(driverDiff);
 
                 } catch (Exception e) {
-                    observableList.add(new AlphaNumber());
+                    observableList.add(new Observable());
 
                 }
 
@@ -923,11 +924,11 @@ public class RaceProgramHorse extends Horse {
                         award = null;
                     }
 
-                    AlphaNumber observerRank = new AlphaNumber(award, subRank.toString());
+                    Observable observerRank = new Observable(award, subRank.toString());
                     observableList.add(observerRank);
 
                 } catch (Exception e) {
-                    observableList.add(new AlphaNumber());
+                    observableList.add(new Observable());
 
                 }
             }
@@ -1092,7 +1093,7 @@ public class RaceProgramHorse extends Horse {
         try {
             sb.append("\n\n" + toNameString());
             sb.append("\n[" + valueHorse.toPresentationValueString() + "]");
-            sb.append("\t" + getObservableList());
+            sb.append("\t" + observableList);
 
             sb.append("\n" + toPaaluTilastoString());
 

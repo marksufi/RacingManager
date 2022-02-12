@@ -22,7 +22,7 @@ public class ObservationFramework {
         this.level = level;
     }
 
-    public void addObservations(List <AlphaNumber> observerList, BigDecimal observerValue) {
+    public void addObservations(List <Observable> observerList, BigDecimal observerValue) {
         //System.out.println("\nObservationFramework.addObservations(" + observerList + ", " + observerValue + ")");
         List regX = new ArrayList();
         List keyList = new ArrayList();
@@ -32,46 +32,52 @@ public class ObservationFramework {
 
     }
 
-    public Value getObservations(List <AlphaNumber> observerList) {
+    public Value getObservations(List <Observable> observerList) {
         List regX = new ArrayList();
         List keyList = new ArrayList();
 
         int startIndex = 0;
         Value observerValue = new Value();
 
-        return getLevel(observerMap, observerList, observerValue, regX, keyList, startIndex, 1);
+        Value value = getLevel(observerMap, observerList, observerValue, regX, keyList, startIndex, 1);
+
+        return value;
 
     }
 
     private Value
-        getLevel(Observation map, List<AlphaNumber> observerList, Value observerValue, List baseRegX, List aKeyList, int aStartIndex, int iLevel) {
+        getLevel(Observation map, List<Observable> observerList, Value observerValue, List baseRegX, List <BigDecimal> aKeyList, int aStartIndex, int iLevel) {
         //System.out.println("ObservationFramework.getLevel(" + map + ", " + observerList + ", " + observerValue + ", " + baseRegX + ", " + aKeyList + ", " + aStartIndex + ", " + iLevel + ")");
 
         for(int i = aStartIndex; i < observerList.size(); i++) {
-
             try {
                 BigDecimal key = BigDecimal.valueOf(i);
-                List keyList = new ArrayList(aKeyList);
+                List <BigDecimal> keyList = new ArrayList(aKeyList);
                 keyList.add(key);
 
-                List regX = new ArrayList(baseRegX);
+                List <Observable> regX = new ArrayList(baseRegX);
                 regX.add(observerList.get(i));
 
                 if(!map.containsKey(key))
                     continue;
 
                 if(iLevel < level) {
-                    Value yValue = getLevel(map.get(key), observerList, observerValue, regX, keyList, i, iLevel + 1);
+                    getLevel(map.get(key), observerList, observerValue, regX, keyList, i, iLevel + 1);
                 }
 
                 double [] doubleValue = map.get(key).get(regX);
                 //observerValue.add(doubleValue[0], doubleValue[0]);
                 observerValue.add(doubleValue[0], doubleValue[1]);
+                for(Observable o : regX) {
+                    o.getValue().add(doubleValue[0], doubleValue[1]);
+                }
+                //observerList.get(i).getValue().add(doubleValue[0], doubleValue[1]);
 
             } catch (ModelSpecificationException e) {
+            } catch (NumberFormatException e) {
             } catch (NullPointerException e) {
             } catch (Exception e) {
-                e.printStackTrace();
+                Log.write(e);
             }
         }
 
@@ -80,7 +86,7 @@ public class ObservationFramework {
 
 
     private Observation
-        mapLevel(Observation map, List<AlphaNumber> observerList, BigDecimal observerValue, List baseRegX, List aKeyList, int aStartIndex, int iLevel) {
+        mapLevel(Observation map, List<Observable> observerList, BigDecimal observerValue, List baseRegX, List aKeyList, int aStartIndex, int iLevel) {
         //System.out.println("ObservationFramework.mapLevel(" + map + ", " + observerList + ", " + observerValue + ", " + baseRegX + ", " + aKeyList + ", " + aStartIndex + ", " + iLevel + ")");
 
         try {
@@ -244,7 +250,7 @@ public class ObservationFramework {
             }
         }
 
-        public double [] get(List <AlphaNumber> regX) throws ModelSpecificationException {
+        public double [] get(List <Observable> regX) throws ModelSpecificationException {
             //System.out.println("Observation.get(" + regX.toString() + ") from " + keyList);
             try {
                 List <String> alphas = new ArrayList();
@@ -277,6 +283,9 @@ public class ObservationFramework {
                 //return observationMap.get(alphas).get(numbers);
 
             } catch (ModelSpecificationException e) {
+                throw e;
+
+            } catch (NumberFormatException e) {
                 throw e;
 
             } catch (NullPointerException e) {
