@@ -45,7 +45,7 @@ public class RaceProgramHorse extends Horse {
     //private static final int regressionSize = 9;
     //private static HipposUpdatingRegression regressionMap = new HipposUpdatingRegression(regressionSize, false);
     //private static HipposUpdatingRegression regressionMap;
-    private static ObservationFramework observationFramework = new ObservationFramework(3);
+    private static ObservationFramework observationFramework = new ObservationFramework();
     private List<BigDecimal> xList = new ArrayList();
 
     BigDecimal age;
@@ -907,25 +907,17 @@ public class RaceProgramHorse extends Horse {
                  */
 
                 try {
-                    AlphaNumber subRank = new AlphaNumber(subStart.getSubRank());
-
-                    BigDecimal rating = subStart.getRating();
-                    if(rating == null) {
-                        subRank.setNumber(null);
-                    }
-
-                    if(x != null) {
-                        subRank.setAlpha(subRank.getAlpha() != null ? subRank.getAlpha() + x : x);
-                    }
                     BigDecimal award = subStart.getAward();
-
-                    if(award == null || award.compareTo(BigDecimal.ZERO) == 0) {
-                        subRank.setNumber(BigDecimal.ZERO);
+                    AlphaNumber subRank = new AlphaNumber(subStart.getSubRank());
+                    if(subRank.getNumber() == null || subRank.getNumber().equals(BigDecimal.ZERO)) {
+                        // Ruotsalainen poikkeus (Scarlet Susie), sijoitus on 0, mutta palkinto onkin 10€
                         award = null;
                     }
-
-                    Observable observerRank = new Observable(award, subRank.toString());
-                    observableList.add(observerRank);
+                    if(award == null || award.equals(BigDecimal.ZERO)) {
+                        subRank.setNumber(BigDecimal.ZERO);;
+                        award = null;
+                    }
+                    observableList.add(new Observable(award, subRank.toString()));
 
                 } catch (Exception e) {
                     observableList.add(new Observable());

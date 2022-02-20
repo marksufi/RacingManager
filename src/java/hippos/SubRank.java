@@ -61,6 +61,10 @@ public class SubRank extends AlphaNumber implements RegressionMapObservation {
         //subValue = new SubRankValue(this);
     }
 
+    public SubRank(String subRankString) {
+        super(subRankString);
+    }
+
     public int compareTo(Object o) {
         SubRank ranking = (SubRank)o;
         if(getNumber() != null && (getAlpha() == null || !getAlpha().contains("h"))) {
@@ -155,7 +159,13 @@ public class SubRank extends AlphaNumber implements RegressionMapObservation {
     }
 
     public String getNumberString() {
-        return super.toString();
+        StringBuilder sb = new StringBuilder();
+
+        sb.append(super.getNumber() != null ? super.getNumber() : "");
+        sb.append("\t");
+        sb.append(super.getAlpha() != null ? super.getAlpha() : "");
+
+        return sb.toString();
     }
 
     public void setSubRaceTime(SubRaceTime subRaceTime) {

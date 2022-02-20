@@ -86,8 +86,11 @@ public class RaceResultFileParser implements FileParser {
 
                     raceResultFile.setDate(y, m, d);
 
-                    st.nextToken(); // klo
-                    raceResultFile.setLongLocality(st.nextToken());
+                    // klo
+                    String klo = st.nextToken();
+
+                    // klo voi puuttua
+                    raceResultFile.setLongLocality(klo.contains(":") ? st.nextToken() : klo);
                     return;
                 }
             }

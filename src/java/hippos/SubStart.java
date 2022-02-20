@@ -105,6 +105,7 @@ public class SubStart implements Comparable {
             kCode = set.getBigDecimal("KCODE");
             award = set.getBigDecimal("PALKINTO");
             subTime.setAlpha(raceMode.toString());
+            subRank.setAlpha(xCode.getAlpha());
         } catch (Exception e) {
             Log.write(e);
         }
@@ -562,10 +563,17 @@ public class SubStart implements Comparable {
         this.raceLength = raceLength;
     }
 
-    public void setSubRank(BigDecimal subRank) {
+    public void setSubRank(SubRank subRank) {
+        this.subRank = subRank;
+    }
+
+    public void setSubRank(String subRank) {
         this.subRank = new SubRank(subRank, this);
     }
 
+    public void setSubRank(BigDecimal subRank) {
+        this.subRank = new SubRank(subRank, this);
+    }
 
     public void setxCode(String xCode) {
         try {
@@ -592,9 +600,9 @@ public class SubStart implements Comparable {
             p.append(StringUtils.parse(startNumber != null ? startNumber.toString() : "", ' ', 3, StringUtils.ALIGN_LEFT));
             p.append(StringUtils.parse((raceLength != null ? raceLength : "") + "/" + raceTrack, ' ', 8, StringUtils.ALIGN_LEFT));
             p.append(StringUtils.toColumn(subTime != null ? subTime.getNumberString() : new String(), 15));
-            p.append(StringUtils.toColumn(subRank != null ? subRank.getNumberString() : new String(), 3));
+            p.append(StringUtils.toColumn(subRank != null ? subRank.getNumberString() : new String(), 10));
             p.append(getkCode() != null && getkCode().intValue() == 1 ? "-> " : "   ");
-            p.append(StringUtils.toColumn(xCode != null ? xCode.toString() : new String(), 7));
+            //p.append(StringUtils.toColumn(xCode != null ? xCode.toString() : new String(), 7));
             //p.append(StringUtils.toColumnString(rating != null ? rating.toString() : new String(), 5));
             p.append(award != null ? award.toString() + " €" : new String());
 
@@ -650,9 +658,9 @@ public class SubStart implements Comparable {
             //p.append(StringUtils.toColumn(subTime.getSubValue() != null ? subTime.getSubValue().toString() : new String(), 50));
             p.append(StringUtils.toColumn(subTime, 20));
             //p.append(StringUtils.toColumn(subRank.getSubValue() != null ? subRank.getSubValue().toString() : new String(), 50));
-            p.append(StringUtils.toColumn(subRank, 5));
+            p.append(StringUtils.toColumn(subRank, 10));
             p.append(getkCode() != null && getkCode().intValue() == 1 ? "-> " : "   ");
-            p.append(StringUtils.toColumn(xCode != null ? xCode.toString() : new String(), 10));
+            //p.append(StringUtils.toColumn(xCode != null ? xCode.toString() : new String(), 10));
             //p.append(StringUtils.toColumnString(rating != null ? rating.toString() : new String(), 5));
             p.append(award != null ? award.toString() + " €" : new String());
             //p.append("\t" + weeksKeyList);

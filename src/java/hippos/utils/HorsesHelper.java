@@ -11,6 +11,7 @@ import java.math.BigDecimal;
 import java.math.RoundingMode;
 import java.util.Date;
 import java.util.List;
+import java.util.StringTokenizer;
 
 /**
  * Created by IntelliJ IDEA.
@@ -644,6 +645,16 @@ public class HorsesHelper {
         }
 
         return null;
+    }
+
+    public static String removeBlanks(String line) {
+        StringBuilder sb = new StringBuilder();
+
+        StringTokenizer st = new StringTokenizer(line);
+        while (st.hasMoreElements()) {
+            sb.append(st.nextToken());
+        }
+        return sb.toString();
     }
 }
 

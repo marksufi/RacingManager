@@ -3,6 +3,7 @@ package hippos.math.regression;
 import org.apache.commons.math3.exception.util.ExceptionContextProvider;
 import org.apache.commons.math3.stat.regression.MillerUpdatingRegression;
 import org.apache.commons.math3.stat.regression.ModelSpecificationException;
+import utils.Log;
 
 import java.lang.reflect.Array;
 import java.math.BigDecimal;
@@ -28,8 +29,9 @@ public class HipposUpdatingRegression extends MillerUpdatingRegression {
             addObservation(x, y);
 
         } catch (Exception e) {
-            e.printStackTrace();
-            //Log.write(e, "(" + Arrays.toString(x) + ", " + y + ")");
+            Log.write(e, Arrays.toString(x) + y);
+            throw e;
+
         }
     }
 
@@ -86,11 +88,11 @@ public class HipposUpdatingRegression extends MillerUpdatingRegression {
             double B[] = regress().getParameterEstimates();
             boolean itc = hasIntercept();
             double b = itc ? B[0] : 0.0;
-            BigDecimal bb = itc ? BigDecimal.valueOf(B[0]) : BigDecimal.ZERO;
+            //BigDecimal bb = itc ? BigDecimal.valueOf(B[0]) : BigDecimal.ZERO;
 
             for(int i = 0; i < x.length; i++) {
-                //b += itc ? x[i] * B[i+1] : x[i] * B[i];
-                bb = bb.add(BigDecimal.valueOf(itc ? x[i] * B[i+1] : x[i] * B[i]));
+                b += itc ? x[i] * B[i+1] : x[i] * B[i];
+                //bb = bb.add(BigDecimal.valueOf(itc ? x[i] * B[i+1] : x[i] * B[i]));
             }
             /*
             System.out.println();
@@ -115,7 +117,8 @@ public class HipposUpdatingRegression extends MillerUpdatingRegression {
             System.out.println("getCovarianceOfParameters(2, 3): " + regress().getCovarianceOfParameters(2, 3));
             */
 
-            value[0] = bb.doubleValue();
+            value[0] = b;
+            //value[0] = bb.doubleValue();
             value[1] = 1.0;
             //value[1] = regress().getRSquared();
         } catch (ModelSpecificationException e) {

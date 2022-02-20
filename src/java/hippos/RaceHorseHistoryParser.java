@@ -5,6 +5,7 @@ import hippos.exception.UnvalidStartException;
 import hippos.io.FileParser;
 import hippos.io.RaceProgramFile;
 import hippos.math.AlphaNumber;
+import hippos.utils.HorsesHelper;
 import hippos.web.WebPage;
 import utils.ExistsInDatabaseException;
 import utils.HTMLParser;
@@ -101,6 +102,7 @@ public class RaceHorseHistoryParser implements FileParser {
                     if (raceLinkPage.readBlock("tr") != null) {
                         while (raceLinkPage.findBefore("tr", "</div>") != null) {
                             SubStart subStart = new SubStart(raceProgramHorse);
+                            boolean isValid = false;
                             try {
                                 for (int i = 0; i < 15; i++) {
                                     if ((line = raceLinkPage.readBlock("td")) != null) {
@@ -164,6 +166,7 @@ public class RaceHorseHistoryParser implements FileParser {
                                                 SubTime time = new SubTime(line, subStart);
                                                 if (time.getNumber() != null) {
                                                     time.setNumber(time.getNumber().subtract(BigDecimal.valueOf(100)));
+                                                    isValid = true;
                                                 }
                                                 subStart.setSubTime(time);
                                                 if (line.contains("P")) {
@@ -178,45 +181,31 @@ public class RaceHorseHistoryParser implements FileParser {
                                                 break;
 
                                             case 9: // Sijoitus
-                                                AlphaNumber rankString = new AlphaNumber(line.trim());
-                                                BigDecimal raceRanking = rankString.getBigDecimal();
-                                                subStart.setSubRank(raceRanking);
+                                                subStart.setSubRank(new SubRank(line.trim(), subStart));
+                                                if(subStart.getSubRank().getBigDecimal() != null) {
+                                                    isValid = true;
+                                                }
                                                 break;
 
                                             case 10: // X koodi
                                                 line = line.strip();
                                                 line = HTMLParser.removeBlock(line, "span");
-                                                StringBuilder sb = new StringBuilder();
-                                                StringTokenizer st = new StringTokenizer(line);
-                                                while (st.hasMoreTokens()) {
-                                                    String t = st.nextToken();
-                                                    if(!t.contains("hy")) {
-                                                        // ei hyv eikä hyl
-                                                        sb.append(t);
-                                                        if (st.hasMoreTokens()) {
-                                                            sb.append(" ");
-                                                        }
-                                                    }
+                                                line = HorsesHelper.removeBlanks(line);
+
+                                                AlphaNumber xCode = new AlphaNumber(line.trim());
+                                                if(xCode.getNumber() != null) {
+                                                    // hml 3, hyl 5...
+                                                    subStart.getSubRank().setNumber(xCode.getNumber());
                                                 }
-                                                String xCode = sb.toString().strip();
-
-                                                if (xCode.length() > 0) {
-                                                    AlphaNumber xNumber = new AlphaNumber(xCode);
-                                                    if(xNumber.getNumber() != null) {
-                                                        // hml 3, hyl 5...
-                                                        subStart.setSubRank(xNumber.getNumber());
-                                                    }
-                                                    subStart.setxCode(xCode);
-                                                } else {
-                                                    subStart.setxCode(null);
-
-                                                    // Tarkistaa onko hevosella jo aika tai sijoitus, jos ei ole, niin
-                                                    // lähtöä ei ole vielä ajetta ja vajaata tulosta ei voi tallettaa
-
-                                                    if(subStart.getSubRank() == null && subStart.getSubTime().getNumber() == null) {
-                                                        throw new AbsentException();
-                                                    }
+                                                if(xCode.getAlpha() != null && !xCode.getAlpha().isEmpty()) {
+                                                    subStart.getSubRank().setAlpha(xCode.getAlpha());
+                                                    subStart.setxCode(xCode.getAlpha().trim());
+                                                    isValid = true;
                                                 }
+
+                                                if(isValid == false)
+                                                    throw new AbsentException();
+
                                                 break;
 
                                             case 11:    // Kerroin

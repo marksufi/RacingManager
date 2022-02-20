@@ -54,7 +54,7 @@ public class HarnessApp {
     /**
      * Haetaanko uudet käsiohjelma- ja tulostiedostot Hippoksen sivuilta
      */
-    public static boolean fetchNewFiles = false;
+    public static boolean fetchNewFiles = true;
 
     /**
      * Luetaako hevosen aiemmat startit Hippoksen kilpailuhistoria-sivuilta

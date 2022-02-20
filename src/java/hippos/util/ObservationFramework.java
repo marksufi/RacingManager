@@ -16,11 +16,7 @@ import java.util.TreeMap;
 
 public class ObservationFramework {
     Observation observerMap = new Observation(new ArrayList());
-    private int level;
-
-    public ObservationFramework(int level) {
-        this.level = level;
-    }
+    private final int level = 2;
 
     public void addObservations(List <Observable> observerList, BigDecimal observerValue) {
         //System.out.println("\nObservationFramework.addObservations(" + observerList + ", " + observerValue + ")");
@@ -77,7 +73,7 @@ public class ObservationFramework {
             } catch (NumberFormatException e) {
             } catch (NullPointerException e) {
             } catch (Exception e) {
-                Log.write(e);
+                Log.write(e, i + ":" + observerList);
             }
         }
 
@@ -120,7 +116,7 @@ public class ObservationFramework {
     }
 
     public static void main(String args[]) {
-        ObservationFramework observationFramework = new ObservationFramework(3);
+        ObservationFramework observationFramework = new ObservationFramework();
 
         List observerList1 = new ArrayList();
         observerList1.add(new AlphaNumber(22));
@@ -206,7 +202,7 @@ public class ObservationFramework {
             this.keyList = keyList;
         }
 
-        public void add(List <AlphaNumber> regX, BigDecimal observerValue) throws ModelSpecificationException {
+        public void add(List <Observable> regX, BigDecimal observerValue) throws ModelSpecificationException {
             //System.out.println("Observation.add(" + regX.toString()+ "," + observerValue + ") to " + keyList);
 
             try {
@@ -215,13 +211,13 @@ public class ObservationFramework {
                 //double [] numbers = new double[regX.size()];
 
                 int i = 0;
-                for(AlphaNumber alphaNumber : regX) {
-                    if(alphaNumber.getAlpha() != null) {
-                        alphas.add(alphaNumber.getAlpha());
+                for(Observable observable : regX) {
+                    if(observable.getAlpha() != null) {
+                        alphas.add(observable.getAlpha());
                     }
 
-                    if(alphaNumber.getNumber() != null) {
-                        numbers.add(alphaNumber.getNumber());
+                    if(observable.getNumber() != null) {
+                        numbers.add(observable.getNumber());
                     }
                     //numbers[i++] = alphaNumber.getNumber().doubleValue();
                 }
@@ -237,16 +233,22 @@ public class ObservationFramework {
 
                     //alphas.add(String.valueOf(dn.length));
                     //System.out.println("Observation.add: " + alphas + Arrays.toString(dn) + " to " + observationMap.get(alphas));
-                    observationMap.getOrCreate(alphas, new HipposUpdatingRegression(dn.length, true)).add(dn, observerValue.doubleValue());
+                    try {
+                        observationMap.getOrCreate(alphas, new HipposUpdatingRegression(dn.length, true)).add(dn, observerValue.doubleValue());
+                    } catch (ModelSpecificationException e) {
+                        Log.write(e, keyList + alphas.toString() + numbers);
+                        System.out.println(observationMap.get(alphas));
+
+                    }
 
                 }
             } catch (ModelSpecificationException e) {
-                Log.write(e);
+                Log.write(e, (regX.toString() + observerValue));
 
             } catch (NullPointerException e) {
 
             } catch (Exception e) {
-                Log.write(e);
+                Log.write(e, regX.toString() + observerValue);
             }
         }
 
@@ -292,7 +294,7 @@ public class ObservationFramework {
                 throw e;
 
             } catch (Exception e) {
-                Log.write(e);
+                Log.write(e, regX.toString());
 
                 throw e;
             }

@@ -38,7 +38,7 @@ public class Observable extends AlphaNumber {
     public String toString() {
         StringBuilder sb = new StringBuilder();
         sb.append(super.toString());
-        sb.append("[" + value.toString() + "]");
+        sb.append("{" + value.average(1, BigDecimal.ZERO) + "}");
         return sb.toString();
     }
 }
