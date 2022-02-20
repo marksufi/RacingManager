@@ -1,5 +1,7 @@
 package hippos.math;
 
+import utils.Log;
+
 import java.math.BigDecimal;
 import java.math.RoundingMode;
 
@@ -25,39 +27,43 @@ public class AlphaNumber implements Comparable {
 
     public AlphaNumber(String str) {
         //System.out.println("AlphaNumber.AlphaNumber(" + str + ")");
-        if(str != null) {
-            str = str.trim();
-            StringBuffer numbers = new StringBuffer();
-            StringBuffer alphas = new StringBuffer();
-            boolean decimal = false;
-            char c;
-            int scale = 0;
-            for(int i = 0; i < str.length(); i++) {
-                switch((c = str.charAt(i))) {
-                    case '0': numbers.append(c); if(decimal == true) scale++; break;
-                    case '1': numbers.append(c); if(decimal == true) scale++; break;
-                    case '2': numbers.append(c); if(decimal == true) scale++; break;
-                    case '3': numbers.append(c); if(decimal == true) scale++; break;
-                    case '4': numbers.append(c); if(decimal == true) scale++; break;
-                    case '5': numbers.append(c); if(decimal == true) scale++; break;
-                    case '6': numbers.append(c); if(decimal == true) scale++; break;
-                    case '7': numbers.append(c); if(decimal == true) scale++; break;
-                    case '8': numbers.append(c); if(decimal == true) scale++; break;
-                    case '9': numbers.append(c); if(decimal == true) scale++; break;
-                    case ',': decimal = true; scale = 0; break;
-                    case '.': decimal = true; scale = 0; break;
-                    case '\t': break;
-                    default: alphas.append(c);
+        try {
+            if(str != null) {
+                str = str.trim();
+                StringBuffer numbers = new StringBuffer();
+                StringBuffer alphas = new StringBuffer();
+                boolean decimal = false;
+                char c;
+                int scale = 0;
+                for(int i = 0; i < str.length(); i++) {
+                    switch((c = str.charAt(i))) {
+                        case '0': numbers.append(c); if(decimal == true) scale++; break;
+                        case '1': numbers.append(c); if(decimal == true) scale++; break;
+                        case '2': numbers.append(c); if(decimal == true) scale++; break;
+                        case '3': numbers.append(c); if(decimal == true) scale++; break;
+                        case '4': numbers.append(c); if(decimal == true) scale++; break;
+                        case '5': numbers.append(c); if(decimal == true) scale++; break;
+                        case '6': numbers.append(c); if(decimal == true) scale++; break;
+                        case '7': numbers.append(c); if(decimal == true) scale++; break;
+                        case '8': numbers.append(c); if(decimal == true) scale++; break;
+                        case '9': numbers.append(c); if(decimal == true) scale++; break;
+                        case ',': decimal = true; scale = 0; break;
+                        case '.': decimal = true; scale = 0; break;
+                        case '\t': break;
+                        default: alphas.append(c);
+                    }
+                }
+                if(alphas.length() > 0) {
+                    alpha = alphas.toString();
+                }
+                if(numbers.length() > 0) {
+                    BigDecimal divider = new BigDecimal(Math.pow(10, (double)scale));
+                    number = new BigDecimal(numbers.toString());
+                    number = number.divide(divider, scale, RoundingMode.HALF_UP);
                 }
             }
-            if(alphas.length() > 0) {
-                alpha = alphas.toString();
-            }
-            if(numbers.length() > 0) {
-                BigDecimal divider = new BigDecimal(Math.pow(10, (double)scale));
-                number = new BigDecimal(numbers.toString());
-                number = number.divide(divider, scale, RoundingMode.HALF_UP);
-            }
+        } catch (Exception e) {
+            Log.write(e);
         }
     }
 
@@ -67,10 +73,7 @@ public class AlphaNumber implements Comparable {
 
     public AlphaNumber(BigDecimal number, String alpha) {
         this.number = number;
-        if (alpha != null)
-            this.alpha = alpha;
-        else
-            System.out.println("Miksi tämä?");
+        this.alpha = alpha;
     }
 
     public AlphaNumber(double newValue) {
